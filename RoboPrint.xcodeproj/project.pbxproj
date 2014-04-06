@@ -1,0 +1,485 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		846B940418F0D1A60063B9BA /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 846B940318F0D1A60063B9BA /* Foundation.framework */; };
+		846B940618F0D1A60063B9BA /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 846B940518F0D1A60063B9BA /* CoreGraphics.framework */; };
+		846B940818F0D1A60063B9BA /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 846B940718F0D1A60063B9BA /* UIKit.framework */; };
+		846B940E18F0D1A60063B9BA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 846B940C18F0D1A60063B9BA /* InfoPlist.strings */; };
+		846B941018F0D1A60063B9BA /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 846B940F18F0D1A60063B9BA /* main.m */; };
+		846B941418F0D1A60063B9BA /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 846B941318F0D1A60063B9BA /* AppDelegate.m */; };
+		846B941718F0D1A60063B9BA /* Main_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 846B941518F0D1A60063B9BA /* Main_iPhone.storyboard */; };
+		846B941A18F0D1A60063B9BA /* Main_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 846B941818F0D1A60063B9BA /* Main_iPad.storyboard */; };
+		846B941D18F0D1A60063B9BA /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 846B941C18F0D1A60063B9BA /* ViewController.m */; };
+		846B941F18F0D1A60063B9BA /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 846B941E18F0D1A60063B9BA /* Images.xcassets */; };
+		846B942618F0D1A60063B9BA /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 846B942518F0D1A60063B9BA /* XCTest.framework */; };
+		846B942718F0D1A70063B9BA /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 846B940318F0D1A60063B9BA /* Foundation.framework */; };
+		846B942818F0D1A70063B9BA /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 846B940718F0D1A60063B9BA /* UIKit.framework */; };
+		846B943018F0D1A70063B9BA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 846B942E18F0D1A70063B9BA /* InfoPlist.strings */; };
+		846B943218F0D1A70063B9BA /* RoboPrintTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 846B943118F0D1A70063B9BA /* RoboPrintTests.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		846B942918F0D1A70063B9BA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 846B93F818F0D1A60063B9BA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 846B93FF18F0D1A60063B9BA;
+			remoteInfo = RoboPrint;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		846B940018F0D1A60063B9BA /* RoboPrint.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RoboPrint.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		846B940318F0D1A60063B9BA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		846B940518F0D1A60063B9BA /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		846B940718F0D1A60063B9BA /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		846B940B18F0D1A60063B9BA /* RoboPrint-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "RoboPrint-Info.plist"; sourceTree = "<group>"; };
+		846B940D18F0D1A60063B9BA /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		846B940F18F0D1A60063B9BA /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		846B941118F0D1A60063B9BA /* RoboPrint-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RoboPrint-Prefix.pch"; sourceTree = "<group>"; };
+		846B941218F0D1A60063B9BA /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		846B941318F0D1A60063B9BA /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		846B941618F0D1A60063B9BA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPhone.storyboard; sourceTree = "<group>"; };
+		846B941918F0D1A60063B9BA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPad.storyboard; sourceTree = "<group>"; };
+		846B941B18F0D1A60063B9BA /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		846B941C18F0D1A60063B9BA /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		846B941E18F0D1A60063B9BA /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		846B942418F0D1A60063B9BA /* RoboPrintTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RoboPrintTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		846B942518F0D1A60063B9BA /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		846B942D18F0D1A70063B9BA /* RoboPrintTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "RoboPrintTests-Info.plist"; sourceTree = "<group>"; };
+		846B942F18F0D1A70063B9BA /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		846B943118F0D1A70063B9BA /* RoboPrintTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RoboPrintTests.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		846B93FD18F0D1A60063B9BA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				846B940618F0D1A60063B9BA /* CoreGraphics.framework in Frameworks */,
+				846B940818F0D1A60063B9BA /* UIKit.framework in Frameworks */,
+				846B940418F0D1A60063B9BA /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		846B942118F0D1A60063B9BA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				846B942618F0D1A60063B9BA /* XCTest.framework in Frameworks */,
+				846B942818F0D1A70063B9BA /* UIKit.framework in Frameworks */,
+				846B942718F0D1A70063B9BA /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		846B93F718F0D1A60063B9BA = {
+			isa = PBXGroup;
+			children = (
+				846B940918F0D1A60063B9BA /* RoboPrint */,
+				846B942B18F0D1A70063B9BA /* RoboPrintTests */,
+				846B940218F0D1A60063B9BA /* Frameworks */,
+				846B940118F0D1A60063B9BA /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		846B940118F0D1A60063B9BA /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				846B940018F0D1A60063B9BA /* RoboPrint.app */,
+				846B942418F0D1A60063B9BA /* RoboPrintTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		846B940218F0D1A60063B9BA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				846B940318F0D1A60063B9BA /* Foundation.framework */,
+				846B940518F0D1A60063B9BA /* CoreGraphics.framework */,
+				846B940718F0D1A60063B9BA /* UIKit.framework */,
+				846B942518F0D1A60063B9BA /* XCTest.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		846B940918F0D1A60063B9BA /* RoboPrint */ = {
+			isa = PBXGroup;
+			children = (
+				846B941218F0D1A60063B9BA /* AppDelegate.h */,
+				846B941318F0D1A60063B9BA /* AppDelegate.m */,
+				846B941518F0D1A60063B9BA /* Main_iPhone.storyboard */,
+				846B941818F0D1A60063B9BA /* Main_iPad.storyboard */,
+				846B941B18F0D1A60063B9BA /* ViewController.h */,
+				846B941C18F0D1A60063B9BA /* ViewController.m */,
+				846B941E18F0D1A60063B9BA /* Images.xcassets */,
+				846B940A18F0D1A60063B9BA /* Supporting Files */,
+			);
+			path = RoboPrint;
+			sourceTree = "<group>";
+		};
+		846B940A18F0D1A60063B9BA /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				846B940B18F0D1A60063B9BA /* RoboPrint-Info.plist */,
+				846B940C18F0D1A60063B9BA /* InfoPlist.strings */,
+				846B940F18F0D1A60063B9BA /* main.m */,
+				846B941118F0D1A60063B9BA /* RoboPrint-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		846B942B18F0D1A70063B9BA /* RoboPrintTests */ = {
+			isa = PBXGroup;
+			children = (
+				846B943118F0D1A70063B9BA /* RoboPrintTests.m */,
+				846B942C18F0D1A70063B9BA /* Supporting Files */,
+			);
+			path = RoboPrintTests;
+			sourceTree = "<group>";
+		};
+		846B942C18F0D1A70063B9BA /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				846B942D18F0D1A70063B9BA /* RoboPrintTests-Info.plist */,
+				846B942E18F0D1A70063B9BA /* InfoPlist.strings */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		846B93FF18F0D1A60063B9BA /* RoboPrint */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 846B943518F0D1A70063B9BA /* Build configuration list for PBXNativeTarget "RoboPrint" */;
+			buildPhases = (
+				846B93FC18F0D1A60063B9BA /* Sources */,
+				846B93FD18F0D1A60063B9BA /* Frameworks */,
+				846B93FE18F0D1A60063B9BA /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = RoboPrint;
+			productName = RoboPrint;
+			productReference = 846B940018F0D1A60063B9BA /* RoboPrint.app */;
+			productType = "com.apple.product-type.application";
+		};
+		846B942318F0D1A60063B9BA /* RoboPrintTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 846B943818F0D1A70063B9BA /* Build configuration list for PBXNativeTarget "RoboPrintTests" */;
+			buildPhases = (
+				846B942018F0D1A60063B9BA /* Sources */,
+				846B942118F0D1A60063B9BA /* Frameworks */,
+				846B942218F0D1A60063B9BA /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				846B942A18F0D1A70063B9BA /* PBXTargetDependency */,
+			);
+			name = RoboPrintTests;
+			productName = RoboPrintTests;
+			productReference = 846B942418F0D1A60063B9BA /* RoboPrintTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		846B93F818F0D1A60063B9BA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0510;
+				ORGANIZATIONNAME = "William Martin Engineering";
+				TargetAttributes = {
+					846B942318F0D1A60063B9BA = {
+						TestTargetID = 846B93FF18F0D1A60063B9BA;
+					};
+				};
+			};
+			buildConfigurationList = 846B93FB18F0D1A60063B9BA /* Build configuration list for PBXProject "RoboPrint" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 846B93F718F0D1A60063B9BA;
+			productRefGroup = 846B940118F0D1A60063B9BA /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				846B93FF18F0D1A60063B9BA /* RoboPrint */,
+				846B942318F0D1A60063B9BA /* RoboPrintTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		846B93FE18F0D1A60063B9BA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				846B941A18F0D1A60063B9BA /* Main_iPad.storyboard in Resources */,
+				846B941F18F0D1A60063B9BA /* Images.xcassets in Resources */,
+				846B941718F0D1A60063B9BA /* Main_iPhone.storyboard in Resources */,
+				846B940E18F0D1A60063B9BA /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		846B942218F0D1A60063B9BA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				846B943018F0D1A70063B9BA /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		846B93FC18F0D1A60063B9BA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				846B941D18F0D1A60063B9BA /* ViewController.m in Sources */,
+				846B941418F0D1A60063B9BA /* AppDelegate.m in Sources */,
+				846B941018F0D1A60063B9BA /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		846B942018F0D1A60063B9BA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				846B943218F0D1A70063B9BA /* RoboPrintTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		846B942A18F0D1A70063B9BA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 846B93FF18F0D1A60063B9BA /* RoboPrint */;
+			targetProxy = 846B942918F0D1A70063B9BA /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		846B940C18F0D1A60063B9BA /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				846B940D18F0D1A60063B9BA /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		846B941518F0D1A60063B9BA /* Main_iPhone.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				846B941618F0D1A60063B9BA /* Base */,
+			);
+			name = Main_iPhone.storyboard;
+			sourceTree = "<group>";
+		};
+		846B941818F0D1A60063B9BA /* Main_iPad.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				846B941918F0D1A60063B9BA /* Base */,
+			);
+			name = Main_iPad.storyboard;
+			sourceTree = "<group>";
+		};
+		846B942E18F0D1A70063B9BA /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				846B942F18F0D1A70063B9BA /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		846B943318F0D1A70063B9BA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		846B943418F0D1A70063B9BA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		846B943618F0D1A70063B9BA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "RoboPrint/RoboPrint-Prefix.pch";
+				INFOPLIST_FILE = "RoboPrint/RoboPrint-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		846B943718F0D1A70063B9BA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "RoboPrint/RoboPrint-Prefix.pch";
+				INFOPLIST_FILE = "RoboPrint/RoboPrint-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		846B943918F0D1A70063B9BA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/RoboPrint.app/RoboPrint";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "RoboPrint/RoboPrint-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "RoboPrintTests/RoboPrintTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Debug;
+		};
+		846B943A18F0D1A70063B9BA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/RoboPrint.app/RoboPrint";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "RoboPrint/RoboPrint-Prefix.pch";
+				INFOPLIST_FILE = "RoboPrintTests/RoboPrintTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		846B93FB18F0D1A60063B9BA /* Build configuration list for PBXProject "RoboPrint" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				846B943318F0D1A70063B9BA /* Debug */,
+				846B943418F0D1A70063B9BA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		846B943518F0D1A70063B9BA /* Build configuration list for PBXNativeTarget "RoboPrint" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				846B943618F0D1A70063B9BA /* Debug */,
+				846B943718F0D1A70063B9BA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		846B943818F0D1A70063B9BA /* Build configuration list for PBXNativeTarget "RoboPrintTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				846B943918F0D1A70063B9BA /* Debug */,
+				846B943A18F0D1A70063B9BA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 846B93F818F0D1A60063B9BA /* Project object */;
+}
