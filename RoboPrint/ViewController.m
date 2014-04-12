@@ -7,6 +7,7 @@
 //
 
 #import "ViewController.h"
+#import <RNGridMenu/RNGridMenu.h>
 
 @interface ViewController ()
 
@@ -30,8 +31,20 @@
 
 -(IBAction)showHelloWorld:(id)sender{
     
+     NSArray *images = [NSArray arrayWithObjects:
+                       [UIImage imageNamed:@"1.png"],
+                       [UIImage imageNamed:@"2.png"],
+                       [UIImage imageNamed:@"3.png"],
+                       [UIImage imageNamed:@"4.png"],
+                       nil];
+
+   
+
+    RNGridMenu *av = [[RNGridMenu alloc] initWithImages:images];
+    [av showInViewController:self center:CGPointMake(500, 500)];
     UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"hello World" message:@"Hi! from my First iPhone App" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
-    [alert show];
+
 }
+
 
 @end

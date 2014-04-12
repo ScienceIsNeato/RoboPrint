@@ -52,7 +52,7 @@ typedef NS_ENUM(NSInteger, RNGridMenuStyle) {
 @property (nonatomic, readonly) NSArray *items;
 
 // An optional delegate to receive information about what items were selected
-@property (nonatomic, weak) id<RNGridMenuDelegate> delegate;
+@property (nonatomic, retain) id<RNGridMenuDelegate> delegate;
 
 // The color that items will be highlighted with on selection.
 // default table view selection blue
