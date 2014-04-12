@@ -22,6 +22,10 @@
 		846B942818F0D1A70063B9BA /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 846B940718F0D1A60063B9BA /* UIKit.framework */; };
 		846B943018F0D1A70063B9BA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 846B942E18F0D1A70063B9BA /* InfoPlist.strings */; };
 		846B943218F0D1A70063B9BA /* RoboPrintTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 846B943118F0D1A70063B9BA /* RoboPrintTests.m */; };
+		846B943C18F0EAE10063B9BA /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 846B943B18F0EAE10063B9BA /* Accelerate.framework */; };
+		846B943E18F0EAF10063B9BA /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 846B943D18F0EAF10063B9BA /* QuartzCore.framework */; };
+		846E642F18F8EBD40090E0A3 /* RoboPrintController.m in Sources */ = {isa = PBXBuildFile; fileRef = 846E642E18F8EBD40090E0A3 /* RoboPrintController.m */; };
+		E71EB8B825D44910AAC7942B /* libPods-RoboPrint.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E1D275A3047642A4814CE03C /* libPods-RoboPrint.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +59,12 @@
 		846B942D18F0D1A70063B9BA /* RoboPrintTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "RoboPrintTests-Info.plist"; sourceTree = "<group>"; };
 		846B942F18F0D1A70063B9BA /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		846B943118F0D1A70063B9BA /* RoboPrintTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RoboPrintTests.m; sourceTree = "<group>"; };
+		846B943B18F0EAE10063B9BA /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
+		846B943D18F0EAF10063B9BA /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		846E642D18F8EBD40090E0A3 /* RoboPrintController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RoboPrintController.h; sourceTree = "<group>"; };
+		846E642E18F8EBD40090E0A3 /* RoboPrintController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RoboPrintController.m; sourceTree = "<group>"; };
+		C1F57CFDC63646F5BD2DA1F0 /* Pods-RoboPrint.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RoboPrint.xcconfig"; path = "Pods/Pods-RoboPrint.xcconfig"; sourceTree = "<group>"; };
+		E1D275A3047642A4814CE03C /* libPods-RoboPrint.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RoboPrint.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,9 +72,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				846B943E18F0EAF10063B9BA /* QuartzCore.framework in Frameworks */,
+				846B943C18F0EAE10063B9BA /* Accelerate.framework in Frameworks */,
 				846B940618F0D1A60063B9BA /* CoreGraphics.framework in Frameworks */,
 				846B940818F0D1A60063B9BA /* UIKit.framework in Frameworks */,
 				846B940418F0D1A60063B9BA /* Foundation.framework in Frameworks */,
+				E71EB8B825D44910AAC7942B /* libPods-RoboPrint.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -88,6 +101,7 @@
 				846B942B18F0D1A70063B9BA /* RoboPrintTests */,
 				846B940218F0D1A60063B9BA /* Frameworks */,
 				846B940118F0D1A60063B9BA /* Products */,
+				C1F57CFDC63646F5BD2DA1F0 /* Pods-RoboPrint.xcconfig */,
 			);
 			sourceTree = "<group>";
 		};
@@ -103,10 +117,13 @@
 		846B940218F0D1A60063B9BA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				846B943D18F0EAF10063B9BA /* QuartzCore.framework */,
+				846B943B18F0EAE10063B9BA /* Accelerate.framework */,
 				846B940318F0D1A60063B9BA /* Foundation.framework */,
 				846B940518F0D1A60063B9BA /* CoreGraphics.framework */,
 				846B940718F0D1A60063B9BA /* UIKit.framework */,
 				846B942518F0D1A60063B9BA /* XCTest.framework */,
+				E1D275A3047642A4814CE03C /* libPods-RoboPrint.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -118,6 +135,8 @@
 				846B941318F0D1A60063B9BA /* AppDelegate.m */,
 				846B941518F0D1A60063B9BA /* Main_iPhone.storyboard */,
 				846B941818F0D1A60063B9BA /* Main_iPad.storyboard */,
+				846E642D18F8EBD40090E0A3 /* RoboPrintController.h */,
+				846E642E18F8EBD40090E0A3 /* RoboPrintController.m */,
 				846B941B18F0D1A60063B9BA /* ViewController.h */,
 				846B941C18F0D1A60063B9BA /* ViewController.m */,
 				846B941E18F0D1A60063B9BA /* Images.xcassets */,
@@ -162,9 +181,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 846B943518F0D1A70063B9BA /* Build configuration list for PBXNativeTarget "RoboPrint" */;
 			buildPhases = (
+				846E526B3D6745FEBC870314 /* Check Pods Manifest.lock */,
 				846B93FC18F0D1A60063B9BA /* Sources */,
 				846B93FD18F0D1A60063B9BA /* Frameworks */,
 				846B93FE18F0D1A60063B9BA /* Resources */,
+				BBDA1380788A4D9DA301DA14 /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -248,12 +269,46 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		846E526B3D6745FEBC870314 /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		BBDA1380788A4D9DA301DA14 /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Pods-RoboPrint-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		846B93FC18F0D1A60063B9BA /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				846B941D18F0D1A60063B9BA /* ViewController.m in Sources */,
+				846E642F18F8EBD40090E0A3 /* RoboPrintController.m in Sources */,
 				846B941418F0D1A60063B9BA /* AppDelegate.m in Sources */,
 				846B941018F0D1A60063B9BA /* main.m in Sources */,
 			);
@@ -387,6 +442,7 @@
 		};
 		846B943618F0D1A70063B9BA /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = C1F57CFDC63646F5BD2DA1F0 /* Pods-RoboPrint.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
@@ -400,6 +456,7 @@
 		};
 		846B943718F0D1A70063B9BA /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = C1F57CFDC63646F5BD2DA1F0 /* Pods-RoboPrint.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
@@ -470,6 +527,7 @@
 				846B943718F0D1A70063B9BA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		846B943818F0D1A70063B9BA /* Build configuration list for PBXNativeTarget "RoboPrintTests" */ = {
 			isa = XCConfigurationList;
@@ -478,6 +536,7 @@
 				846B943A18F0D1A70063B9BA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

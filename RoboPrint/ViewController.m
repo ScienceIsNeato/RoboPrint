@@ -18,12 +18,20 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
+    self.model = [[RoboPrintController alloc] init];
 }
 
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+
+-(IBAction)showHelloWorld:(id)sender{
+    
+    UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"hello World" message:@"Hi! from my First iPhone App" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
+    [alert show];
 }
 
 @end
