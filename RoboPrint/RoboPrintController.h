@@ -7,9 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <RNGridMenu/RNGridMenu.h>
 
+@class RoboPrintController;
 @interface RoboPrintController : NSObject
 
-- (int)getDiceRoll;
+- (void)gridMenu:(RNGridMenu *)gridMenu willDismissWithSelectedItem:(RNGridMenuItem *)item atIndex:(NSInteger)itemIndex;
+
 
 @end

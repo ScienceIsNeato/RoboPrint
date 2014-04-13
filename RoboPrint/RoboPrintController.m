@@ -10,11 +10,13 @@
 
 @implementation RoboPrintController
 
-- (int)getDiceRoll
-{
-    int roll = (arc4random() % 6) + 1;
+
+- (void)gridMenu:(RNGridMenu *)gridMenu willDismissWithSelectedItem:(RNGridMenuItem *)item atIndex:(NSInteger)itemIndex {
     
-    return roll;
+    // ...
+    NSLog(@"Select index was %d", itemIndex);
 }
 
 @end
+
+

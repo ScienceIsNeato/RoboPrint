@@ -7,6 +7,7 @@
 //
 
 #import "ViewController.h"
+#import "RoboPrintController.h"
 #import <RNGridMenu/RNGridMenu.h>
 
 @interface ViewController ()
@@ -38,13 +39,18 @@
                        [UIImage imageNamed:@"4.png"],
                        nil];
 
-   
-
     RNGridMenu *av = [[RNGridMenu alloc] initWithImages:images];
+    RoboPrintController *myDelegate = [[RoboPrintController alloc] init];
+    
+    av.delegate = myDelegate;
+
+    //av.highlightColor = [UIColor colorWithRed:66.0f/255.0f green:79.0f/255.0f blue:91.0f/255.0f alpha:1.0f];
+    
     [av showInViewController:self center:CGPointMake(500, 500)];
-    UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"hello World" message:@"Hi! from my First iPhone App" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
 
 }
 
 
 @end
+
+
