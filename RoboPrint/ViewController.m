@@ -15,6 +15,12 @@
 @end
 
 @implementation ViewController
+@synthesize yellowButton;
+@synthesize redButton;
+@synthesize pinkButton;
+@synthesize blueButton;
+@synthesize blackButton;
+@synthesize greenButton;
 
 - (void)viewDidLoad
 {
@@ -84,7 +90,66 @@
     
 }
 
+- (IBAction)yellowButtonTouchUpInsideAction:(id)sender
+{
+    self.yellowButton.backgroundColor = [UIColor whiteColor];
+    self.redButton.backgroundColor = [UIColor clearColor];
+    self.pinkButton.backgroundColor = [UIColor clearColor];
+    self.blueButton.backgroundColor = [UIColor clearColor];
+    self.blackButton.backgroundColor = [UIColor clearColor];
+    self.greenButton.backgroundColor = [UIColor clearColor];
+    //[self.yellowButton setImage:[UIImage imageNamed:@"yellowSelected.png"] forState:UIControlStateNormal];
+    //NSLog(@"yellow button selected");
+}
+- (IBAction)redButtonTouchUpInsideAction:(id)sender
+{
+    self.yellowButton.backgroundColor = [UIColor clearColor];
+    self.redButton.backgroundColor = [UIColor whiteColor];
+    self.pinkButton.backgroundColor = [UIColor clearColor];
+    self.blueButton.backgroundColor = [UIColor clearColor];
+    self.blackButton.backgroundColor = [UIColor clearColor];
+    self.greenButton.backgroundColor = [UIColor clearColor];
+}
+- (IBAction)pinkButtonTouchUpInsideAction:(id)sender
+{
+    self.yellowButton.backgroundColor = [UIColor clearColor];
+    self.redButton.backgroundColor = [UIColor clearColor];
+    self.pinkButton.backgroundColor = [UIColor whiteColor];
+    self.blueButton.backgroundColor = [UIColor clearColor];
+    self.blackButton.backgroundColor = [UIColor clearColor];
+    self.greenButton.backgroundColor = [UIColor clearColor];
+}
+- (IBAction)blueButtonTouchUpInsideAction:(id)sender
+{
+    self.yellowButton.backgroundColor = [UIColor clearColor];
+    self.redButton.backgroundColor = [UIColor clearColor];
+    self.pinkButton.backgroundColor = [UIColor clearColor];
+    self.blueButton.backgroundColor = [UIColor whiteColor];
+    self.blackButton.backgroundColor = [UIColor clearColor];
+    self.greenButton.backgroundColor = [UIColor clearColor];
+}
+- (IBAction)blackButtonTouchUpInsideAction:(id)sender
+{
+    self.yellowButton.backgroundColor = [UIColor clearColor];
+    self.redButton.backgroundColor = [UIColor clearColor];
+    self.pinkButton.backgroundColor = [UIColor clearColor];
+    self.blueButton.backgroundColor = [UIColor clearColor];
+    self.blackButton.backgroundColor = [UIColor whiteColor];
+    self.greenButton.backgroundColor = [UIColor clearColor];
+}
+- (IBAction)greenButtonTouchUpInsideAction:(id)sender
+{
+    self.yellowButton.backgroundColor = [UIColor clearColor];
+    self.redButton.backgroundColor = [UIColor clearColor];
+    self.pinkButton.backgroundColor = [UIColor clearColor];
+    self.blueButton.backgroundColor = [UIColor clearColor];
+    self.blackButton.backgroundColor = [UIColor clearColor];
+    self.greenButton.backgroundColor = [UIColor whiteColor];
+}
+
 
 @end
+
+
 
 

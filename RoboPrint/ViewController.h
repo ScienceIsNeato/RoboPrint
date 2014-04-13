@@ -13,5 +13,18 @@
 @interface ViewController : UIViewController
 
 @property (strong, nonatomic) RoboPrintController *model;
+@property (weak, nonatomic) IBOutlet UIButton *yellowButton;
+@property (weak, nonatomic) IBOutlet UIButton *redButton;
+@property (weak, nonatomic) IBOutlet UIButton *pinkButton;
+@property (weak, nonatomic) IBOutlet UIButton *blueButton;
+@property (weak, nonatomic) IBOutlet UIButton *blackButton;
+@property (weak, nonatomic) IBOutlet UIButton *greenButton;
+
+- (IBAction)yellowButtonTouchUpInsideAction:(id)sender;
+- (IBAction)redButtonTouchUpInsideAction:(id)sender;
+- (IBAction)pinkButtonTouchUpInsideAction:(id)sender;
+- (IBAction)blueButtonTouchUpInsideAction:(id)sender;
+- (IBAction)blackButtonTouchUpInsideAction:(id)sender;
+- (IBAction)greenButtonTouchUpInsideAction:(id)sender;
 
 @end
