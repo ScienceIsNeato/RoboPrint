@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		842FB78918FA55310028FD06 /* _circle.png in Resources */ = {isa = PBXBuildFile; fileRef = 842FB78318FA55310028FD06 /* _circle.png */; };
+		842FB78A18FA55310028FD06 /* _line.png in Resources */ = {isa = PBXBuildFile; fileRef = 842FB78418FA55310028FD06 /* _line.png */; };
+		842FB78B18FA55310028FD06 /* _pent.png in Resources */ = {isa = PBXBuildFile; fileRef = 842FB78518FA55310028FD06 /* _pent.png */; };
+		842FB78C18FA55310028FD06 /* _square.png in Resources */ = {isa = PBXBuildFile; fileRef = 842FB78618FA55310028FD06 /* _square.png */; };
+		842FB78D18FA55310028FD06 /* _star.png in Resources */ = {isa = PBXBuildFile; fileRef = 842FB78718FA55310028FD06 /* _star.png */; };
+		842FB78E18FA55310028FD06 /* _tri.png in Resources */ = {isa = PBXBuildFile; fileRef = 842FB78818FA55310028FD06 /* _tri.png */; };
 		846B940418F0D1A60063B9BA /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 846B940318F0D1A60063B9BA /* Foundation.framework */; };
 		846B940618F0D1A60063B9BA /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 846B940518F0D1A60063B9BA /* CoreGraphics.framework */; };
 		846B940818F0D1A60063B9BA /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 846B940718F0D1A60063B9BA /* UIKit.framework */; };
@@ -43,6 +49,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		842FB78318FA55310028FD06 /* _circle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = _circle.png; sourceTree = "<group>"; };
+		842FB78418FA55310028FD06 /* _line.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = _line.png; sourceTree = "<group>"; };
+		842FB78518FA55310028FD06 /* _pent.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = _pent.png; sourceTree = "<group>"; };
+		842FB78618FA55310028FD06 /* _square.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = _square.png; sourceTree = "<group>"; };
+		842FB78718FA55310028FD06 /* _star.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = _star.png; sourceTree = "<group>"; };
+		842FB78818FA55310028FD06 /* _tri.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = _tri.png; sourceTree = "<group>"; };
 		846B940018F0D1A60063B9BA /* RoboPrint.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RoboPrint.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		846B940318F0D1A60063B9BA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		846B940518F0D1A60063B9BA /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -102,6 +114,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		842FB78218FA54F30028FD06 /* images */ = {
+			isa = PBXGroup;
+			children = (
+				842FB78318FA55310028FD06 /* _circle.png */,
+				842FB78418FA55310028FD06 /* _line.png */,
+				842FB78518FA55310028FD06 /* _pent.png */,
+				842FB78618FA55310028FD06 /* _square.png */,
+				842FB78718FA55310028FD06 /* _star.png */,
+				842FB78818FA55310028FD06 /* _tri.png */,
+				846E643F18F9253A0090E0A3 /* 1.png */,
+				846E644018F9253A0090E0A3 /* 2.png */,
+				846E644118F9253A0090E0A3 /* 3.png */,
+				846E644218F9253A0090E0A3 /* 4.png */,
+			);
+			name = images;
+			sourceTree = "<group>";
+		};
 		846B93F718F0D1A60063B9BA = {
 			isa = PBXGroup;
 			children = (
@@ -148,10 +177,6 @@
 				846B941B18F0D1A60063B9BA /* ViewController.h */,
 				846B941C18F0D1A60063B9BA /* ViewController.m */,
 				846B941E18F0D1A60063B9BA /* Images.xcassets */,
-				846E643F18F9253A0090E0A3 /* 1.png */,
-				846E644018F9253A0090E0A3 /* 2.png */,
-				846E644118F9253A0090E0A3 /* 3.png */,
-				846E644218F9253A0090E0A3 /* 4.png */,
 				846B940A18F0D1A60063B9BA /* Supporting Files */,
 			);
 			path = RoboPrint;
@@ -160,6 +185,7 @@
 		846B940A18F0D1A60063B9BA /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				842FB78218FA54F30028FD06 /* images */,
 				846B940B18F0D1A60063B9BA /* RoboPrint-Info.plist */,
 				846B940C18F0D1A60063B9BA /* InfoPlist.strings */,
 				846B940F18F0D1A60063B9BA /* main.m */,
@@ -265,9 +291,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				846E644418F9253A0090E0A3 /* 2.png in Resources */,
+				842FB78A18FA55310028FD06 /* _line.png in Resources */,
 				846B941A18F0D1A60063B9BA /* Main_iPad.storyboard in Resources */,
+				842FB78E18FA55310028FD06 /* _tri.png in Resources */,
+				842FB78918FA55310028FD06 /* _circle.png in Resources */,
+				842FB78B18FA55310028FD06 /* _pent.png in Resources */,
 				846B941F18F0D1A60063B9BA /* Images.xcassets in Resources */,
+				842FB78C18FA55310028FD06 /* _square.png in Resources */,
 				846B941718F0D1A60063B9BA /* Main_iPhone.storyboard in Resources */,
+				842FB78D18FA55310028FD06 /* _star.png in Resources */,
 				846E644618F9253A0090E0A3 /* 4.png in Resources */,
 				846B940E18F0D1A60063B9BA /* InfoPlist.strings in Resources */,
 				846E644518F9253A0090E0A3 /* 3.png in Resources */,

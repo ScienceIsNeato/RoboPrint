@@ -9,13 +9,14 @@
 #import "RoboPrintController.h"
 
 @implementation RoboPrintController
-
+@synthesize menuName;
 
 - (void)gridMenu:(RNGridMenu *)gridMenu willDismissWithSelectedItem:(RNGridMenuItem *)item atIndex:(NSInteger)itemIndex {
     
-    // ...
-    NSLog(@"Select index was %d", itemIndex);
+    // This function is the listener for the pop-up menus.
+    NSLog(@"Select index was %d and the menu was %@", itemIndex, menuName);
 }
+
 
 @end
 

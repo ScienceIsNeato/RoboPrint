@@ -11,8 +11,11 @@
 
 @class RoboPrintController;
 @interface RoboPrintController : NSObject
+{
+    NSString *menuName;
+}
 
 - (void)gridMenu:(RNGridMenu *)gridMenu willDismissWithSelectedItem:(RNGridMenuItem *)item atIndex:(NSInteger)itemIndex;
-
+@property(nonatomic, retain) NSString *menuName;
 
 @end
