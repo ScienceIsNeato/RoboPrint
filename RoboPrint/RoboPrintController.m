@@ -10,6 +10,7 @@
 
 @implementation RoboPrintController
 @synthesize menuName;
+@synthesize currentColor;
 
 - (void)gridMenu:(RNGridMenu *)gridMenu willDismissWithSelectedItem:(RNGridMenuItem *)item atIndex:(NSInteger)itemIndex {
     

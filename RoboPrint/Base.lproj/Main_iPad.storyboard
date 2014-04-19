@@ -29,7 +29,7 @@
                                 </items>
                             </navigationBar>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pZc-ZK-M2I">
-                                <rect key="frame" x="183" y="672" width="96" height="72"/>
+                                <rect key="frame" x="128" y="511" width="125" height="74"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                 <state key="normal" title="Scenes">
@@ -45,7 +45,7 @@
                                 <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UHD-w3-2Y1">
-                                <rect key="frame" x="50" y="672" width="92" height="85"/>
+                                <rect key="frame" x="0.0" y="582" width="128" height="69"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                 <state key="normal" title="Shapes">
@@ -126,6 +126,25 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3nC-ZS-Nc7">
+                                <rect key="frame" x="0.0" y="511" width="128" height="74"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                <state key="normal" title="Images">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="openImagePicker:" destination="3y2-PS-00X" eventType="touchUpInside" id="7gc-Dl-Ygu"/>
+                                </connections>
+                            </button>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nZn-gy-arn" userLabel="mainImage">
+                                <rect key="frame" x="300" y="175" width="660" height="476"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="pZF-sH-9q2" userLabel="tempDrawImage">
+                                <rect key="frame" x="300" y="175" width="660" height="476"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
@@ -136,8 +155,10 @@
                         <outlet property="blackButton" destination="h5Y-L5-bjO" id="dso-cO-K8i"/>
                         <outlet property="blueButton" destination="LPj-ZL-gvv" id="ft0-kV-w9d"/>
                         <outlet property="greenButton" destination="6Se-fk-cDC" id="RSh-45-vG1"/>
+                        <outlet property="mainImage" destination="pZF-sH-9q2" id="QIe-Wg-xHk"/>
                         <outlet property="pinkButton" destination="XeF-1S-0gf" id="kHB-SM-22A"/>
                         <outlet property="redButton" destination="yX3-Iy-W6P" id="4w0-xZ-s3f"/>
+                        <outlet property="tempDrawImage" destination="pZF-sH-9q2" id="ZkK-bT-4aE"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Wib-qJ-02O" userLabel="First Responder" sceneMemberID="firstResponder"/>
