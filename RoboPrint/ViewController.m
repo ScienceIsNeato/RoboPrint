@@ -21,6 +21,7 @@
 @synthesize blueButton;
 @synthesize blackButton;
 @synthesize greenButton;
+@synthesize model;
 
 - (void)viewDidLoad
 {
@@ -30,10 +31,21 @@
     red = 0.0/255.0;
     green = 0.0/255.0;
     blue = 0.0/255.0;
-    brush = 1.0;
+    brush = 2.0;
     opacity = 1.0;
+    model = [[RoboPrintController alloc] init];
     
-    [super viewDidLoad];
+    // TODO - replace this block with function call
+    self.yellowButton.backgroundColor = [UIColor whiteColor];
+    self.redButton.backgroundColor = [UIColor clearColor];
+    self.pinkButton.backgroundColor = [UIColor clearColor];
+    self.blueButton.backgroundColor = [UIColor clearColor];
+    self.blackButton.backgroundColor = [UIColor clearColor];
+    self.greenButton.backgroundColor = [UIColor clearColor];
+    //[self.yellowButton setImage:[UIImage imageNamed:@"yellowSelected.png"] forState:UIControlStateNormal];
+    NSLog(@"yellow button selected and prev color was %d", self.model.currentColor);
+    self.model.currentColor = YELLOW;    [super viewDidLoad];
+    // END TODO
 }
 
 - (void)didReceiveMemoryWarning
@@ -53,10 +65,10 @@
                        nil];
 
     RNGridMenu *av = [[RNGridMenu alloc] initWithImages:images];
-    RoboPrintController *menuController = [[RoboPrintController alloc] init];
+    //RoboPrintController *menuController = [[RoboPrintController alloc] init];
     
-    menuController.menuName = @"scenes";
-    av.delegate = menuController;
+    model.menuName = @"scenes";
+    av.delegate = model;
 
     //av.highlightColor = [UIColor colorWithRed:66.0f/255.0f green:79.0f/255.0f blue:91.0f/255.0f alpha:1.0f];
     
@@ -76,10 +88,10 @@
                        nil];
     
     RNGridMenu *av = [[RNGridMenu alloc] initWithImages:images];
-    RoboPrintController *menuController = [[RoboPrintController alloc] init];
+    //RoboPrintController *menuController = [[RoboPrintController alloc] init];
     
-    menuController.menuName = @"shapes";
-    av.delegate = menuController;
+    model.menuName = @"shapes";
+    av.delegate = model;
     
     //av.highlightColor = [UIColor colorWithRed:66.0f/255.0f green:79.0f/255.0f blue:91.0f/255.0f alpha:1.0f];
     
@@ -97,7 +109,7 @@
     self.blackButton.backgroundColor = [UIColor clearColor];
     self.greenButton.backgroundColor = [UIColor clearColor];
     //[self.yellowButton setImage:[UIImage imageNamed:@"yellowSelected.png"] forState:UIControlStateNormal];
-    //NSLog(@"yellow button selected and prev color was %d", self.model.currentColor);
+    NSLog(@"yellow button selected and prev color was %d", self.model.currentColor);
     self.model.currentColor = YELLOW;
 }
 - (IBAction)redButtonTouchUpInsideAction:(id)sender
@@ -172,9 +184,21 @@
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
     
-    mouseSwiped = YES;
+    mouseSwiped = YES; // Indicates that this is not a single point
     UITouch *touch = [touches anyObject];
-    CGPoint currentPoint = [touch locationInView:self.view];
+    
+    // Get current absolute location of touch event in the view
+    CGPoint currentPoint = [touch locationInView:self->tempDrawImage];
+    
+    // Scale the point so that it matches the height and width of the drawing canvas
+    currentPoint.x = currentPoint.x*(self.view.frame.size.width/self->tempDrawImage.frame.size.width);
+    currentPoint.y = currentPoint.y*(self.view.frame.size.height/self->tempDrawImage.frame.size.height);
+    //CGPoint canvasOrigin = self->tempDrawImage.frame.origin;
+    //NSLog(@"Origin x, y is: (%f, %f)", canvasOrigin.x, canvasOrigin.y);
+    //NSLog(@"Point x, y is: (%f, %f)", currentPoint.x, currentPoint.y);
+    //NSLog(@"Bounds are: (%f, %f)", self.view.frame.size.width, self.view.frame.size.height);
+
+
     
     UIGraphicsBeginImageContext(self.view.frame.size);
     [self->tempDrawImage.image drawInRect:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
@@ -182,7 +206,9 @@
     CGContextAddLineToPoint(UIGraphicsGetCurrentContext(), currentPoint.x, currentPoint.y);
     CGContextSetLineCap(UIGraphicsGetCurrentContext(), kCGLineCapRound);
     CGContextSetLineWidth(UIGraphicsGetCurrentContext(), brush );
-    CGContextSetRGBStrokeColor(UIGraphicsGetCurrentContext(), red, green, blue, 1.0);
+    NSLog(@"RGB are (%f,%f,%f", self.model.getRed,self.model.getGreen,self.model.getBlue);
+
+    CGContextSetRGBStrokeColor(UIGraphicsGetCurrentContext(), self.model.getRed, self.model.getGreen, self.model.getBlue, 1.0);
     CGContextSetBlendMode(UIGraphicsGetCurrentContext(),kCGBlendModeNormal);
     
     CGContextStrokePath(UIGraphicsGetCurrentContext());
@@ -194,13 +220,12 @@
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
-    
     if(!mouseSwiped) {
         UIGraphicsBeginImageContext(self.view.frame.size);
         [self->tempDrawImage.image drawInRect:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
         CGContextSetLineCap(UIGraphicsGetCurrentContext(), kCGLineCapRound);
         CGContextSetLineWidth(UIGraphicsGetCurrentContext(), brush);
-        CGContextSetRGBStrokeColor(UIGraphicsGetCurrentContext(), red, green, blue, opacity);
+        CGContextSetRGBStrokeColor(UIGraphicsGetCurrentContext(), self.model.getRed, self.model.getGreen, self.model.getBlue, opacity);
         CGContextMoveToPoint(UIGraphicsGetCurrentContext(), lastPoint.x, lastPoint.y);
         CGContextAddLineToPoint(UIGraphicsGetCurrentContext(), lastPoint.x, lastPoint.y);
         CGContextStrokePath(UIGraphicsGetCurrentContext());

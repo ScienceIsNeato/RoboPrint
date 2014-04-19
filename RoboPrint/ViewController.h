@@ -21,6 +21,7 @@
     IBOutlet UIImageView *tempDrawImage;
     IBOutlet UIImageView *mainImage;
     BOOL mouseSwiped;
+    RoboPrintController *model;
 }
 
 @property (strong, nonatomic) RoboPrintController *model;

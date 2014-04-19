@@ -24,6 +24,9 @@ static const int GREEN = 5;
 }
 
 - (void)gridMenu:(RNGridMenu *)gridMenu willDismissWithSelectedItem:(RNGridMenuItem *)item atIndex:(NSInteger)itemIndex;
+- (float)getRed;
+- (float)getGreen;
+- (float)getBlue;
 
 @property(nonatomic, retain) NSString *menuName;
 @property int currentColor;
