@@ -22,6 +22,8 @@
 @synthesize blackButton;
 @synthesize greenButton;
 @synthesize model;
+@synthesize tempDrawImage;
+@synthesize mainImage;
 
 - (void)viewDidLoad
 {
@@ -176,14 +178,16 @@
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
-    
+    // TODO - Confirm that start of touch is in canvas
     mouseSwiped = NO;
     UITouch *touch = [touches anyObject];
-    lastPoint = [touch locationInView:self.view];
+    lastPoint = [touch locationInView:self->tempDrawImage];
+    lastPoint.x = lastPoint.x*(self.view.frame.size.width/self->tempDrawImage.frame.size.width);
+    lastPoint.y = lastPoint.y*(self.view.frame.size.height/self->tempDrawImage.frame.size.height);
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
-    
+    // TODO - Confirm that start of touch is in canvas
     mouseSwiped = YES; // Indicates that this is not a single point
     UITouch *touch = [touches anyObject];
     
@@ -206,7 +210,7 @@
     CGContextAddLineToPoint(UIGraphicsGetCurrentContext(), currentPoint.x, currentPoint.y);
     CGContextSetLineCap(UIGraphicsGetCurrentContext(), kCGLineCapRound);
     CGContextSetLineWidth(UIGraphicsGetCurrentContext(), brush );
-    NSLog(@"RGB are (%f,%f,%f", self.model.getRed,self.model.getGreen,self.model.getBlue);
+    //NSLog(@"RGB are (%f,%f,%f", self.model.getRed,self.model.getGreen,self.model.getBlue);
 
     CGContextSetRGBStrokeColor(UIGraphicsGetCurrentContext(), self.model.getRed, self.model.getGreen, self.model.getBlue, 1.0);
     CGContextSetBlendMode(UIGraphicsGetCurrentContext(),kCGBlendModeNormal);
@@ -219,7 +223,7 @@
     lastPoint = currentPoint;
 }
 
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+/*- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
     if(!mouseSwiped) {
         UIGraphicsBeginImageContext(self.view.frame.size);
         [self->tempDrawImage.image drawInRect:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
@@ -236,10 +240,44 @@
     
     UIGraphicsBeginImageContext(self->mainImage.frame.size);
     [self->mainImage.image drawInRect:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height) blendMode:kCGBlendModeNormal alpha:1.0];
-    [self->tempDrawImage.image drawInRect:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height) blendMode:kCGBlendModeNormal alpha:opacity];
+    [self->mainImage.image drawInRect:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height) blendMode:kCGBlendModeNormal alpha:opacity];
     self->mainImage.image = UIGraphicsGetImageFromCurrentImageContext();
     self->tempDrawImage.image = nil;
     UIGraphicsEndImageContext();
+    
+    UIGraphicsBeginImageContext(self->tempDrawImage.image.size);
+    [self->tempDrawImage.image drawAtPoint:CGPointMake(0,0)];
+    [self->mainImage.image drawAtPoint:CGPointMake(0,0)];
+    
+    self->mainImage.image  = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    [self->mainImage setBackgroundColor:[UIColor greenColor]];
+    [self->tempDrawImage setBackgroundColor:[UIColor blackColor]];
+}*/
+
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+    
+    if(!mouseSwiped) {
+        UIGraphicsBeginImageContext(self.view.frame.size);
+        [self.tempDrawImage.image drawInRect:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
+        CGContextSetLineCap(UIGraphicsGetCurrentContext(), kCGLineCapRound);
+        CGContextSetLineWidth(UIGraphicsGetCurrentContext(), brush);
+        CGContextSetRGBStrokeColor(UIGraphicsGetCurrentContext(), red, green, blue, opacity);
+        CGContextMoveToPoint(UIGraphicsGetCurrentContext(), lastPoint.x, lastPoint.y);
+        CGContextAddLineToPoint(UIGraphicsGetCurrentContext(), lastPoint.x, lastPoint.y);
+        CGContextStrokePath(UIGraphicsGetCurrentContext());
+        CGContextFlush(UIGraphicsGetCurrentContext());
+        self.tempDrawImage.image = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+    }
+    
+    //UIGraphicsBeginImageContext(self.mainImage.frame.size);
+    //[self.mainImage.image drawInRect:CGRectMake(0, 0, self.mainImage.frame.size.width, self.mainImage.frame.size.height) blendMode:kCGBlendModeNormal alpha:1.0];
+    //self.mainImage.image = UIGraphicsGetImageFromCurrentImageContext();
+    //self.tempDrawImage.image = nil;
+    //UIGraphicsEndImageContext();
+    //[self->mainImage setBackgroundColor:[UIColor greenColor]];
+    //[self->tempDrawImage setBackgroundColor:[UIColor blackColor]];
 }
 
 
