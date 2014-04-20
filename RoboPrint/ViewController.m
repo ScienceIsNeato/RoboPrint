@@ -101,6 +101,7 @@
     
 }
 
+/********* BEGIN COLOR MENU ***************/
 
 - (IBAction)yellowButtonTouchUpInsideAction:(id)sender
 {
@@ -165,6 +166,8 @@
     self.model.currentColor = GREEN;
 }
 
+/********* BEGIN SIDE MENU ***************/
+
 - (IBAction)openImagePicker:(id)sender
 {
     UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Loading Images"
@@ -176,6 +179,101 @@
     
     [alert show];
 }
+
+
+
+/********* BEGIN TOP MENU ***************/
+
+
+
+- (IBAction)backPressed:(id)sender
+{
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Back Pressed"
+                                                   message: @"Not Yet Implemented"
+                                                  delegate: self
+                                         cancelButtonTitle:@"Cancel"
+                                         otherButtonTitles:@"OK",nil];
+    
+    
+    [alert show];
+}
+
+- (IBAction)forwardPressed:(id)sender
+{
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Forward Pressed"
+                                                   message: @"Not Yet Implemented"
+                                                  delegate: self
+                                         cancelButtonTitle:@"Cancel"
+                                         otherButtonTitles:@"OK",nil];
+    
+    
+    [alert show];
+}
+
+- (IBAction)startOverPressed:(id)sender
+{
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Start Over Pressed"
+                                                   message: @"Not Yet Implemented"
+                                                  delegate: self
+                                         cancelButtonTitle:@"Cancel"
+                                         otherButtonTitles:@"OK",nil];
+    
+    
+    [alert show];
+}
+
+- (IBAction)openImagePressed:(id)sender
+{
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Open Image"
+                                                   message: @"Not Yet Implemented"
+                                                  delegate: self
+                                         cancelButtonTitle:@"Cancel"
+                                         otherButtonTitles:@"OK",nil];
+    
+    
+    [alert show];
+}
+
+- (IBAction)saveImagePressed:(id)sender
+{
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Save Image"
+                                                   message: @"Not Yet Implemented"
+                                                  delegate: self
+                                         cancelButtonTitle:@"Cancel"
+                                         otherButtonTitles:@"OK",nil];
+    
+    
+    [alert show];
+}
+
+
+- (IBAction)printPressed:(id)sender
+{
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Robo Print!"
+                                                   message: @"Not Yet Implemented"
+                                                  delegate: self
+                                         cancelButtonTitle:@"Cancel"
+                                         otherButtonTitles:@"OK",nil];
+    
+    
+    [alert show];
+}
+
+- (IBAction)openSettingsMenu:(id)sender
+{
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Manage Settings"
+                                                   message: @"Not Yet Implemented"
+                                                  delegate: self
+                                         cancelButtonTitle:@"Cancel"
+                                         otherButtonTitles:@"OK",nil];
+    
+    
+    [alert show];
+}
+
+
+/********* BEGIN CANVAS HANDLERS ***************/
+
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     // TODO - Confirm that start of touch is in canvas
