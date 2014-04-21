@@ -38,15 +38,14 @@
     model = [[RoboPrintController alloc] init];
     
     // TODO - replace this block with function call
-    self.yellowButton.backgroundColor = [UIColor whiteColor];
-    self.redButton.backgroundColor = [UIColor clearColor];
-    self.pinkButton.backgroundColor = [UIColor clearColor];
-    self.blueButton.backgroundColor = [UIColor clearColor];
-    self.blackButton.backgroundColor = [UIColor clearColor];
-    self.greenButton.backgroundColor = [UIColor clearColor];
-    //[self.yellowButton setImage:[UIImage imageNamed:@"yellowSelected.png"] forState:UIControlStateNormal];
-    NSLog(@"yellow button selected and prev color was %d", self.model.currentColor);
-    self.model.currentColor = YELLOW;    [super viewDidLoad];
+    [self.yellowButton setImage:[UIImage imageNamed:@"color_selected_mask.png"]
+                       forState:UIControlStateNormal];
+    [self.redButton setImage:nil forState:UIControlStateNormal];
+    [self.pinkButton setImage:nil forState:UIControlStateNormal];
+    [self.blueButton setImage:nil forState:UIControlStateNormal];
+    [self.blackButton setImage:nil forState:UIControlStateNormal];
+    [self.greenButton setImage:nil forState:UIControlStateNormal];
+    self.model.currentColor = YELLOW;
     // END TODO
 }
 
@@ -57,25 +56,121 @@
 }
 
 
+/********* BEGIN COLOR MENU ***************/
+
+- (IBAction)yellowButtonTouchUpInsideAction:(id)sender
+{
+    [self.yellowButton setImage:[UIImage imageNamed:@"color_selected_mask.png"]
+                        forState:UIControlStateNormal];
+    [self.redButton setImage:nil forState:UIControlStateNormal];
+    [self.pinkButton setImage:nil forState:UIControlStateNormal];
+    [self.blueButton setImage:nil forState:UIControlStateNormal];
+    [self.blackButton setImage:nil forState:UIControlStateNormal];
+    [self.greenButton setImage:nil forState:UIControlStateNormal];
+    //NSLog(@"yellow button selected and prev color was %d", self.model.currentColor);
+    self.model.currentColor = YELLOW;
+}
+- (IBAction)redButtonTouchUpInsideAction:(id)sender
+{
+    [self.yellowButton setImage:nil forState:UIControlStateNormal];
+    [self.redButton setImage:[UIImage imageNamed:@"color_selected_mask.png"]
+                       forState:UIControlStateNormal];
+    [self.pinkButton setImage:nil forState:UIControlStateNormal];
+    [self.blueButton setImage:nil forState:UIControlStateNormal];
+    [self.blackButton setImage:nil forState:UIControlStateNormal];
+    [self.greenButton setImage:nil forState:UIControlStateNormal];
+    self.model.currentColor = RED;
+}
+- (IBAction)pinkButtonTouchUpInsideAction:(id)sender
+{
+    [self.yellowButton setImage:nil forState:UIControlStateNormal];
+    [self.redButton setImage:nil forState:UIControlStateNormal];
+    [self.pinkButton setImage:[UIImage imageNamed:@"color_selected_mask.png"]
+                    forState:UIControlStateNormal];
+    [self.blueButton setImage:nil forState:UIControlStateNormal];
+    [self.blackButton setImage:nil forState:UIControlStateNormal];
+    [self.greenButton setImage:nil forState:UIControlStateNormal];
+    self.model.currentColor = PINK;
+}
+- (IBAction)blueButtonTouchUpInsideAction:(id)sender
+{
+    [self.yellowButton setImage:nil forState:UIControlStateNormal];
+    [self.redButton setImage:nil forState:UIControlStateNormal];
+    [self.pinkButton setImage:nil forState:UIControlStateNormal];
+    [self.blueButton setImage:[UIImage imageNamed:@"color_selected_mask.png"]
+                     forState:UIControlStateNormal];
+    [self.blackButton setImage:nil forState:UIControlStateNormal];
+    [self.greenButton setImage:nil forState:UIControlStateNormal];
+    self.model.currentColor = BLUE;
+}
+- (IBAction)blackButtonTouchUpInsideAction:(id)sender
+{
+    [self.yellowButton setImage:nil forState:UIControlStateNormal];
+    [self.redButton setImage:nil forState:UIControlStateNormal];
+    [self.pinkButton setImage:nil forState:UIControlStateNormal];
+    [self.blueButton setImage:nil forState:UIControlStateNormal];
+    [self.blackButton setImage:[UIImage imageNamed:@"color_selected_mask.png"]
+                     forState:UIControlStateNormal];
+    [self.greenButton setImage:nil forState:UIControlStateNormal];
+    self.model.currentColor = BLACK;
+}
+- (IBAction)greenButtonTouchUpInsideAction:(id)sender
+{
+    [self.yellowButton setImage:nil forState:UIControlStateNormal];
+    [self.redButton setImage:nil forState:UIControlStateNormal];
+    [self.pinkButton setImage:nil forState:UIControlStateNormal];
+    [self.blueButton setImage:nil forState:UIControlStateNormal];
+    [self.blackButton setImage:nil forState:UIControlStateNormal];
+    [self.greenButton setImage:[UIImage imageNamed:@"color_selected_mask.png"]
+                      forState:UIControlStateNormal];
+    self.model.currentColor = GREEN;
+}
+
+/********* BEGIN SIDE MENU ***************/
+
+- (IBAction)openImagePicker:(id)sender
+{
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Loading Images"
+                                                   message: @"Not Yet Implemented"
+                                                  delegate: self
+                                         cancelButtonTitle:@"Cancel"
+                                         otherButtonTitles:@"OK",nil];
+    
+    
+    [alert show];
+}
+
+- (IBAction)pencilSketchPressed:(id)sender
+{
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Pencil Sketches"
+                                                   message: @"Not Yet Implemented"
+                                                  delegate: self
+                                         cancelButtonTitle:@"Cancel"
+                                         otherButtonTitles:@"OK",nil];
+    
+    
+    [alert show];
+}
+
 -(IBAction)dispatchScenesMenu:(id)sender{
     
-     NSArray *images = [NSArray arrayWithObjects:
+    NSArray *images = [NSArray arrayWithObjects:
                        [UIImage imageNamed:@"1.png"],
                        [UIImage imageNamed:@"2.png"],
                        [UIImage imageNamed:@"3.png"],
                        [UIImage imageNamed:@"4.png"],
                        nil];
-
+    
     RNGridMenu *av = [[RNGridMenu alloc] initWithImages:images];
     //RoboPrintController *menuController = [[RoboPrintController alloc] init];
     
     model.menuName = @"scenes";
     av.delegate = model;
-
+    
     //av.highlightColor = [UIColor colorWithRed:66.0f/255.0f green:79.0f/255.0f blue:91.0f/255.0f alpha:1.0f];
     
     [av showInViewController:self center:CGPointMake(500, 500)];
-
+    
 }
 
 -(IBAction)dispatchShapesMenu:(id)sender{
@@ -101,76 +196,21 @@
     
 }
 
-/********* BEGIN COLOR MENU ***************/
-
-- (IBAction)yellowButtonTouchUpInsideAction:(id)sender
+- (IBAction)textPressed:(id)sender
 {
-    self.yellowButton.backgroundColor = [UIColor whiteColor];
-    self.redButton.backgroundColor = [UIColor clearColor];
-    self.pinkButton.backgroundColor = [UIColor clearColor];
-    self.blueButton.backgroundColor = [UIColor clearColor];
-    self.blackButton.backgroundColor = [UIColor clearColor];
-    self.greenButton.backgroundColor = [UIColor clearColor];
-    //[self.yellowButton setImage:[UIImage imageNamed:@"yellowSelected.png"] forState:UIControlStateNormal];
-    NSLog(@"yellow button selected and prev color was %d", self.model.currentColor);
-    self.model.currentColor = YELLOW;
-}
-- (IBAction)redButtonTouchUpInsideAction:(id)sender
-{
-    self.yellowButton.backgroundColor = [UIColor clearColor];
-    self.redButton.backgroundColor = [UIColor whiteColor];
-    self.pinkButton.backgroundColor = [UIColor clearColor];
-    self.blueButton.backgroundColor = [UIColor clearColor];
-    self.blackButton.backgroundColor = [UIColor clearColor];
-    self.greenButton.backgroundColor = [UIColor clearColor];
-    self.model.currentColor = RED;
-}
-- (IBAction)pinkButtonTouchUpInsideAction:(id)sender
-{
-    self.yellowButton.backgroundColor = [UIColor clearColor];
-    self.redButton.backgroundColor = [UIColor clearColor];
-    self.pinkButton.backgroundColor = [UIColor whiteColor];
-    self.blueButton.backgroundColor = [UIColor clearColor];
-    self.blackButton.backgroundColor = [UIColor clearColor];
-    self.greenButton.backgroundColor = [UIColor clearColor];
-    self.model.currentColor = PINK;
-}
-- (IBAction)blueButtonTouchUpInsideAction:(id)sender
-{
-    self.yellowButton.backgroundColor = [UIColor clearColor];
-    self.redButton.backgroundColor = [UIColor clearColor];
-    self.pinkButton.backgroundColor = [UIColor clearColor];
-    self.blueButton.backgroundColor = [UIColor whiteColor];
-    self.blackButton.backgroundColor = [UIColor clearColor];
-    self.greenButton.backgroundColor = [UIColor clearColor];
-    self.model.currentColor = BLUE;
-}
-- (IBAction)blackButtonTouchUpInsideAction:(id)sender
-{
-    self.yellowButton.backgroundColor = [UIColor clearColor];
-    self.redButton.backgroundColor = [UIColor clearColor];
-    self.pinkButton.backgroundColor = [UIColor clearColor];
-    self.blueButton.backgroundColor = [UIColor clearColor];
-    self.blackButton.backgroundColor = [UIColor whiteColor];
-    self.greenButton.backgroundColor = [UIColor clearColor];
-    self.model.currentColor = BLACK;
-}
-- (IBAction)greenButtonTouchUpInsideAction:(id)sender
-{
-    self.yellowButton.backgroundColor = [UIColor clearColor];
-    self.redButton.backgroundColor = [UIColor clearColor];
-    self.pinkButton.backgroundColor = [UIColor clearColor];
-    self.blueButton.backgroundColor = [UIColor clearColor];
-    self.blackButton.backgroundColor = [UIColor clearColor];
-    self.greenButton.backgroundColor = [UIColor whiteColor];
-    self.model.currentColor = GREEN;
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Adding Text"
+                                                   message: @"Not Yet Implemented"
+                                                  delegate: self
+                                         cancelButtonTitle:@"Cancel"
+                                         otherButtonTitles:@"OK",nil];
+    
+    
+    [alert show];
 }
 
-/********* BEGIN SIDE MENU ***************/
-
-- (IBAction)openImagePicker:(id)sender
+- (IBAction)enlargePressed:(id)sender
 {
-    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Loading Images"
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Enlarge 2X"
                                                    message: @"Not Yet Implemented"
                                                   delegate: self
                                          cancelButtonTitle:@"Cancel"
@@ -212,14 +252,7 @@
 
 - (IBAction)startOverPressed:(id)sender
 {
-    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Start Over Pressed"
-                                                   message: @"Not Yet Implemented"
-                                                  delegate: self
-                                         cancelButtonTitle:@"Cancel"
-                                         otherButtonTitles:@"OK",nil];
-    
-    
-    [alert show];
+    self.tempDrawImage.image = nil;
 }
 
 - (IBAction)openImagePressed:(id)sender
@@ -236,14 +269,17 @@
 
 - (IBAction)saveImagePressed:(id)sender
 {
-    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Save Image"
-                                                   message: @"Not Yet Implemented"
-                                                  delegate: self
-                                         cancelButtonTitle:@"Cancel"
-                                         otherButtonTitles:@"OK",nil];
-    
-    
+    UIImageWriteToSavedPhotosAlbum(self.tempDrawImage.image, nil, nil, nil);
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Saving Images"
+                                                    message:@"Image saved successfully."
+                                                   delegate:self
+                                          cancelButtonTitle:@"OK"
+                                          otherButtonTitles:nil];
     [alert show];
+    
+    
+   // [alert show];
+    // TODO - add error catching
 }
 
 
