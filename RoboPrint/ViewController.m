@@ -28,7 +28,6 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	// Do any additional setup after loading the view, typically from a nib.
     self.model = [[RoboPrintController alloc] init];
     red = 0.0/255.0;
     green = 0.0/255.0;
@@ -142,6 +141,9 @@
 
 - (IBAction)pencilSketchPressed:(id)sender
 {
+    // TODO
+    // SEE HERE FOR INSTRUCTIONS FOR GETTING IMAGE FROM CAMERA
+    // http://www.icodeblog.com/2009/07/28/getting-images-from-the-iphone-photo-library-or-camera-using-uiimagepickercontroller/
     UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Pencil Sketches"
                                                    message: @"Not Yet Implemented"
                                                   delegate: self
@@ -257,14 +259,40 @@
 
 - (IBAction)openImagePressed:(id)sender
 {
-    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Open Image"
-                                                   message: @"Not Yet Implemented"
-                                                  delegate: self
-                                         cancelButtonTitle:@"Cancel"
-                                         otherButtonTitles:@"OK",nil];
-    
-    
+    // Initially, show an alert letting the user know
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Warning"
+                                                message: @"Opening an image will erase this image. Continue?"
+                                                delegate: self
+                                                cancelButtonTitle:@"Cancel"
+                                                otherButtonTitles:@"Load Image",nil];
+
     [alert show];
+}
+
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (buttonIndex == 0)
+    {
+        //NSLog(@"User decided to cancel Image Load");
+    }
+    else
+    {
+        // Clicked through warning. Load image.
+        UIImagePickerController * picker = [[UIImagePickerController alloc] init];
+        picker.delegate = self;
+        picker.sourceType = UIImagePickerControllerSourceTypeSavedPhotosAlbum;
+        
+        [self presentViewController:picker animated:YES completion:nil];
+    }
+}
+
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
+    [self dismissViewControllerAnimated:YES completion:nil];
+	tempDrawImage.image = [info objectForKey:@"UIImagePickerControllerOriginalImage"];
+}
+
+- (NSUInteger)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window {
+    return UIInterfaceOrientationMaskAll;
 }
 
 - (IBAction)saveImagePressed:(id)sender
@@ -336,8 +364,6 @@
     //NSLog(@"Point x, y is: (%f, %f)", currentPoint.x, currentPoint.y);
     //NSLog(@"Bounds are: (%f, %f)", self.view.frame.size.width, self.view.frame.size.height);
 
-
-    
     UIGraphicsBeginImageContext(self.view.frame.size);
     [self->tempDrawImage.image drawInRect:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
     CGContextMoveToPoint(UIGraphicsGetCurrentContext(), lastPoint.x, lastPoint.y);
@@ -416,6 +442,45 @@
 
 
 @end
+
+
+/****************       SUPPLEMENTAL    ****************/
+
+// The following functions are only used for the image picker in landscape mode
+@implementation UIViewController (OrientationFix)
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation {
+    return UIInterfaceOrientationIsLandscape(toInterfaceOrientation);
+}
+
+- (BOOL)shouldAutorotate {
+    return YES;
+}
+
+- (NSUInteger)supportedInterfaceOrientations {
+    return UIInterfaceOrientationMaskLandscape;
+}
+
+@end
+
+@implementation UIImagePickerController (OrientationFix)
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation {
+    return UIInterfaceOrientationIsLandscape(toInterfaceOrientation);
+}
+
+- (BOOL)shouldAutorotate {
+    return YES;
+}
+
+- (NSUInteger)supportedInterfaceOrientations {
+    return UIInterfaceOrientationMaskLandscape;
+}
+
+@end
+
+// test
+
 
 
 
