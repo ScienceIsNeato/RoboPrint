@@ -22,8 +22,10 @@
 @synthesize blackButton;
 @synthesize greenButton;
 @synthesize model;
-@synthesize tempDrawImage;
-@synthesize mainImage;
+@synthesize canvasImageView;
+@synthesize lastImage;
+
+
 
 - (void)viewDidLoad
 {
@@ -230,14 +232,15 @@
 
 - (IBAction)backPressed:(id)sender
 {
-    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Back Pressed"
+    [self.canvasImageView setImage:self.lastImage];
+    /*UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Back Pressed"
                                                    message: @"Not Yet Implemented"
                                                   delegate: self
                                          cancelButtonTitle:@"Cancel"
                                          otherButtonTitles:@"OK",nil];
     
     
-    [alert show];
+    [alert show];*/
 }
 
 - (IBAction)forwardPressed:(id)sender
@@ -254,7 +257,7 @@
 
 - (IBAction)startOverPressed:(id)sender
 {
-    self.tempDrawImage.image = nil;
+    self.canvasImageView.image = nil;
 }
 
 - (IBAction)openImagePressed:(id)sender
@@ -288,7 +291,7 @@
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
     [self dismissViewControllerAnimated:YES completion:nil];
-	tempDrawImage.image = [info objectForKey:@"UIImagePickerControllerOriginalImage"];
+	canvasImageView.image = [info objectForKey:@"UIImagePickerControllerOriginalImage"];
 }
 
 - (NSUInteger)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window {
@@ -297,7 +300,7 @@
 
 - (IBAction)saveImagePressed:(id)sender
 {
-    UIImageWriteToSavedPhotosAlbum(self.tempDrawImage.image, nil, nil, nil);
+    UIImageWriteToSavedPhotosAlbum(self.canvasImageView.image, nil, nil, nil);
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Saving Images"
                                                     message:@"Image saved successfully."
                                                    delegate:self
@@ -340,32 +343,36 @@
 
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+    // Put the current state of the drawing on the stack
+    // Assign current image to last image before making changes
+    self.lastImage = self.canvasImageView.image;
+    
     // TODO - Confirm that start of touch is in canvas
     mouseSwiped = NO;
     UITouch *touch = [touches anyObject];
-    lastPoint = [touch locationInView:self->tempDrawImage];
-    lastPoint.x = lastPoint.x*(self.view.frame.size.width/self->tempDrawImage.frame.size.width);
-    lastPoint.y = lastPoint.y*(self.view.frame.size.height/self->tempDrawImage.frame.size.height);
+    lastPoint = [touch locationInView:self->canvasImageView];
+    lastPoint.x = lastPoint.x*(self.view.frame.size.width/self->canvasImageView.frame.size.width);
+    lastPoint.y = lastPoint.y*(self.view.frame.size.height/self->canvasImageView.frame.size.height);
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
     // TODO - Confirm that start of touch is in canvas
+    
     mouseSwiped = YES; // Indicates that this is not a single point
     UITouch *touch = [touches anyObject];
     
     // Get current absolute location of touch event in the view
-    CGPoint currentPoint = [touch locationInView:self->tempDrawImage];
+    CGPoint currentPoint = [touch locationInView:self->canvasImageView];
     
     // Scale the point so that it matches the height and width of the drawing canvas
-    currentPoint.x = currentPoint.x*(self.view.frame.size.width/self->tempDrawImage.frame.size.width);
-    currentPoint.y = currentPoint.y*(self.view.frame.size.height/self->tempDrawImage.frame.size.height);
-    //CGPoint canvasOrigin = self->tempDrawImage.frame.origin;
+    currentPoint.x = currentPoint.x*(self.view.frame.size.width/self->canvasImageView.frame.size.width);
+    currentPoint.y = currentPoint.y*(self.view.frame.size.height/self->canvasImageView.frame.size.height);
     //NSLog(@"Origin x, y is: (%f, %f)", canvasOrigin.x, canvasOrigin.y);
     //NSLog(@"Point x, y is: (%f, %f)", currentPoint.x, currentPoint.y);
     //NSLog(@"Bounds are: (%f, %f)", self.view.frame.size.width, self.view.frame.size.height);
 
     UIGraphicsBeginImageContext(self.view.frame.size);
-    [self->tempDrawImage.image drawInRect:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
+    [self->canvasImageView.image drawInRect:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
     CGContextMoveToPoint(UIGraphicsGetCurrentContext(), lastPoint.x, lastPoint.y);
     CGContextAddLineToPoint(UIGraphicsGetCurrentContext(), currentPoint.x, currentPoint.y);
     CGContextSetLineCap(UIGraphicsGetCurrentContext(), kCGLineCapRound);
@@ -376,50 +383,22 @@
     CGContextSetBlendMode(UIGraphicsGetCurrentContext(),kCGBlendModeNormal);
     
     CGContextStrokePath(UIGraphicsGetCurrentContext());
-    self->tempDrawImage.image = UIGraphicsGetImageFromCurrentImageContext();
-    [self->tempDrawImage setAlpha:opacity];
+    self->canvasImageView.image = UIGraphicsGetImageFromCurrentImageContext();
+    [self->canvasImageView setAlpha:opacity];
     UIGraphicsEndImageContext();
     
     lastPoint = currentPoint;
 }
 
-/*- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
-    if(!mouseSwiped) {
-        UIGraphicsBeginImageContext(self.view.frame.size);
-        [self->tempDrawImage.image drawInRect:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
-        CGContextSetLineCap(UIGraphicsGetCurrentContext(), kCGLineCapRound);
-        CGContextSetLineWidth(UIGraphicsGetCurrentContext(), brush);
-        CGContextSetRGBStrokeColor(UIGraphicsGetCurrentContext(), self.model.getRed, self.model.getGreen, self.model.getBlue, opacity);
-        CGContextMoveToPoint(UIGraphicsGetCurrentContext(), lastPoint.x, lastPoint.y);
-        CGContextAddLineToPoint(UIGraphicsGetCurrentContext(), lastPoint.x, lastPoint.y);
-        CGContextStrokePath(UIGraphicsGetCurrentContext());
-        CGContextFlush(UIGraphicsGetCurrentContext());
-        self->tempDrawImage.image = UIGraphicsGetImageFromCurrentImageContext();
-        UIGraphicsEndImageContext();
-    }
-    
-    UIGraphicsBeginImageContext(self->mainImage.frame.size);
-    [self->mainImage.image drawInRect:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height) blendMode:kCGBlendModeNormal alpha:1.0];
-    [self->mainImage.image drawInRect:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height) blendMode:kCGBlendModeNormal alpha:opacity];
-    self->mainImage.image = UIGraphicsGetImageFromCurrentImageContext();
-    self->tempDrawImage.image = nil;
-    UIGraphicsEndImageContext();
-    
-    UIGraphicsBeginImageContext(self->tempDrawImage.image.size);
-    [self->tempDrawImage.image drawAtPoint:CGPointMake(0,0)];
-    [self->mainImage.image drawAtPoint:CGPointMake(0,0)];
-    
-    self->mainImage.image  = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    [self->mainImage setBackgroundColor:[UIColor greenColor]];
-    [self->tempDrawImage setBackgroundColor:[UIColor blackColor]];
-}*/
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+    NSLog(@"touvhes ended");
     
+    // Only called for a single point
+    /*
     if(!mouseSwiped) {
         UIGraphicsBeginImageContext(self.view.frame.size);
-        [self.tempDrawImage.image drawInRect:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
+        [self.canvasImageView.image drawInRect:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
         CGContextSetLineCap(UIGraphicsGetCurrentContext(), kCGLineCapRound);
         CGContextSetLineWidth(UIGraphicsGetCurrentContext(), brush);
         CGContextSetRGBStrokeColor(UIGraphicsGetCurrentContext(), red, green, blue, opacity);
@@ -427,17 +406,17 @@
         CGContextAddLineToPoint(UIGraphicsGetCurrentContext(), lastPoint.x, lastPoint.y);
         CGContextStrokePath(UIGraphicsGetCurrentContext());
         CGContextFlush(UIGraphicsGetCurrentContext());
-        self.tempDrawImage.image = UIGraphicsGetImageFromCurrentImageContext();
+        self.canvasImageView.image = UIGraphicsGetImageFromCurrentImageContext();
         UIGraphicsEndImageContext();
     }
-    
-    //UIGraphicsBeginImageContext(self.mainImage.frame.size);
-    //[self.mainImage.image drawInRect:CGRectMake(0, 0, self.mainImage.frame.size.width, self.mainImage.frame.size.height) blendMode:kCGBlendModeNormal alpha:1.0];
-    //self.mainImage.image = UIGraphicsGetImageFromCurrentImageContext();
-    //self.tempDrawImage.image = nil;
+    */
+    //UIGraphicsBeginImageContext(self.canvasImageView.frame.size);
+    //[self.canvasImageView.image drawInRect:CGRectMake(0, 0, self.canvasImageView.frame.size.width, self.canvasImageView.frame.size.height) blendMode:kCGBlendModeNormal alpha:1.0];
+    //self.canvasImageView.image = UIGraphicsGetImageFromCurrentImageContext();
+    //self.canvasImageView.image = nil;
     //UIGraphicsEndImageContext();
-    //[self->mainImage setBackgroundColor:[UIColor greenColor]];
-    //[self->tempDrawImage setBackgroundColor:[UIColor blackColor]];
+    //[self->canvasImageView setBackgroundColor:[UIColor greenColor]];
+    //[self->canvasImageView setBackgroundColor:[UIColor blackColor]];
 }
 
 

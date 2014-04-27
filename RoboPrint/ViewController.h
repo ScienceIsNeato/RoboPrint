@@ -18,15 +18,14 @@
     CGFloat blue;
     CGFloat brush;
     CGFloat opacity;
-    //IBOutlet UIImageView *tempDrawImage;
-    //IBOutlet UIImageView *mainImage;
+    IBOutlet UIImageView *canvasImageView;
     BOOL mouseSwiped;
     RoboPrintController *model;
 }
 
 @property (strong, nonatomic) RoboPrintController *model;
-@property (strong, retain) UIImageView *tempDrawImage;
-@property (strong, retain) UIImageView *mainImage;
+@property (strong, retain) UIImageView *canvasImageView;
+@property (strong, retain) UIImage *lastImage;
 @property (weak, nonatomic) IBOutlet UIButton *yellowButton;
 @property (weak, nonatomic) IBOutlet UIButton *redButton;
 @property (weak, nonatomic) IBOutlet UIButton *pinkButton;

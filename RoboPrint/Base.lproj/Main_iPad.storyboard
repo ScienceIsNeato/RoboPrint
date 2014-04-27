@@ -250,11 +250,7 @@
                                 </subviews>
                                 <color key="backgroundColor" white="0.26619203629032256" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="pZF-sH-9q2" userLabel="tempDrawImage">
-                                <rect key="frame" x="198" y="125" width="826" height="643"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            </imageView>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nZn-gy-arn" userLabel="mainImage">
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nZn-gy-arn" userLabel="canvasImageView">
                                 <rect key="frame" x="198" y="125" width="826" height="643"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </imageView>
@@ -267,11 +263,10 @@
                         <outlet property="YellowButton" destination="6fe-Q8-GFD" id="XTt-Sv-T1R"/>
                         <outlet property="blackButton" destination="h5Y-L5-bjO" id="dso-cO-K8i"/>
                         <outlet property="blueButton" destination="LPj-ZL-gvv" id="ft0-kV-w9d"/>
+                        <outlet property="canvasImageView" destination="nZn-gy-arn" id="tqo-oZ-bQp"/>
                         <outlet property="greenButton" destination="6Se-fk-cDC" id="RSh-45-vG1"/>
-                        <outlet property="mainImage" destination="pZF-sH-9q2" id="QIe-Wg-xHk"/>
                         <outlet property="pinkButton" destination="XeF-1S-0gf" id="kHB-SM-22A"/>
                         <outlet property="redButton" destination="yX3-Iy-W6P" id="4w0-xZ-s3f"/>
-                        <outlet property="tempDrawImage" destination="pZF-sH-9q2" id="ZkK-bT-4aE"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Wib-qJ-02O" userLabel="First Responder" sceneMemberID="firstResponder"/>
