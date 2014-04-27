@@ -53,6 +53,8 @@
 		846E644418F9253A0090E0A3 /* 2.png in Resources */ = {isa = PBXBuildFile; fileRef = 846E644018F9253A0090E0A3 /* 2.png */; };
 		846E644518F9253A0090E0A3 /* 3.png in Resources */ = {isa = PBXBuildFile; fileRef = 846E644118F9253A0090E0A3 /* 3.png */; };
 		846E644618F9253A0090E0A3 /* 4.png in Resources */ = {isa = PBXBuildFile; fileRef = 846E644218F9253A0090E0A3 /* 4.png */; };
+		84F03970190CFCDA0006C3BE /* back_disabled.png in Resources */ = {isa = PBXBuildFile; fileRef = 84F0396E190CFCDA0006C3BE /* back_disabled.png */; };
+		84F03971190CFCDA0006C3BE /* forward_disabled.png in Resources */ = {isa = PBXBuildFile; fileRef = 84F0396F190CFCDA0006C3BE /* forward_disabled.png */; };
 		E71EB8B825D44910AAC7942B /* libPods-RoboPrint.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E1D275A3047642A4814CE03C /* libPods-RoboPrint.a */; };
 /* End PBXBuildFile section */
 
@@ -119,6 +121,8 @@
 		846E644018F9253A0090E0A3 /* 2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 2.png; sourceTree = "<group>"; };
 		846E644118F9253A0090E0A3 /* 3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 3.png; sourceTree = "<group>"; };
 		846E644218F9253A0090E0A3 /* 4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 4.png; sourceTree = "<group>"; };
+		84F0396E190CFCDA0006C3BE /* back_disabled.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = back_disabled.png; sourceTree = "<group>"; };
+		84F0396F190CFCDA0006C3BE /* forward_disabled.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = forward_disabled.png; sourceTree = "<group>"; };
 		C1F57CFDC63646F5BD2DA1F0 /* Pods-RoboPrint.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RoboPrint.xcconfig"; path = "Pods/Pods-RoboPrint.xcconfig"; sourceTree = "<group>"; };
 		E1D275A3047642A4814CE03C /* libPods-RoboPrint.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RoboPrint.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -153,6 +157,8 @@
 		842FB78218FA54F30028FD06 /* images */ = {
 			isa = PBXGroup;
 			children = (
+				84F0396E190CFCDA0006C3BE /* back_disabled.png */,
+				84F0396F190CFCDA0006C3BE /* forward_disabled.png */,
 				842FB7D71904CBDF0028FD06 /* color_selected_mask.png */,
 				842FB7C91904C6D10028FD06 /* backgrounds_button.png */,
 				842FB7CA1904C6D10028FD06 /* drawing_options_label.png */,
@@ -378,6 +384,8 @@
 				842FB7C819048EFF0028FD06 /* undo_label.png in Resources */,
 				846E644318F9253A0090E0A3 /* 1.png in Resources */,
 				842FB7D01904C6D10028FD06 /* backgrounds_button.png in Resources */,
+				84F03971190CFCDA0006C3BE /* forward_disabled.png in Resources */,
+				84F03970190CFCDA0006C3BE /* back_disabled.png in Resources */,
 				842FB7C519048EFF0028FD06 /* print_button.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

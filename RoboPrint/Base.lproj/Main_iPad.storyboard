@@ -261,9 +261,11 @@
                     <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     <connections>
                         <outlet property="YellowButton" destination="6fe-Q8-GFD" id="XTt-Sv-T1R"/>
+                        <outlet property="backButton" destination="bgg-F1-gzY" id="zsm-ca-UcX"/>
                         <outlet property="blackButton" destination="h5Y-L5-bjO" id="dso-cO-K8i"/>
                         <outlet property="blueButton" destination="LPj-ZL-gvv" id="ft0-kV-w9d"/>
                         <outlet property="canvasImageView" destination="nZn-gy-arn" id="tqo-oZ-bQp"/>
+                        <outlet property="forwardButton" destination="eZY-k1-Sku" id="cp1-Hz-EiP"/>
                         <outlet property="greenButton" destination="6Se-fk-cDC" id="RSh-45-vG1"/>
                         <outlet property="pinkButton" destination="XeF-1S-0gf" id="kHB-SM-22A"/>
                         <outlet property="redButton" destination="yX3-Iy-W6P" id="4w0-xZ-s3f"/>

@@ -21,17 +21,25 @@
     IBOutlet UIImageView *canvasImageView;
     BOOL mouseSwiped;
     RoboPrintController *model;
+    int imageStackIndex;
+    int imageStackSize;
+    int imageStackMaxSize;
+    BOOL exceededImageStackMaxLength;
+    UIImage *mostRecentCanvasState;
 }
 
 @property (strong, nonatomic) RoboPrintController *model;
 @property (strong, retain) UIImageView *canvasImageView;
 @property (strong, retain) UIImage *lastImage;
+@property (strong, retain) NSMutableArray *imageStack;
 @property (weak, nonatomic) IBOutlet UIButton *yellowButton;
 @property (weak, nonatomic) IBOutlet UIButton *redButton;
 @property (weak, nonatomic) IBOutlet UIButton *pinkButton;
 @property (weak, nonatomic) IBOutlet UIButton *blueButton;
 @property (weak, nonatomic) IBOutlet UIButton *blackButton;
 @property (weak, nonatomic) IBOutlet UIButton *greenButton;
+@property (weak, nonatomic) IBOutlet UIButton *backButton;
+@property (weak, nonatomic) IBOutlet UIButton *forwardButton;
 
 - (IBAction)yellowButtonTouchUpInsideAction:(id)sender;
 - (IBAction)redButtonTouchUpInsideAction:(id)sender;
