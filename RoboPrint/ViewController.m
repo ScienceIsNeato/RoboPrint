@@ -33,13 +33,16 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    // Initialize sub controller
     self.model = [[RoboPrintController alloc] init];
+    
+    // Declare colors as black
     red = 0.0/255.0;
     green = 0.0/255.0;
     blue = 0.0/255.0;
     brush = 2.0;
     opacity = 1.0;
-    model = [[RoboPrintController alloc] init];
     
     // TODO - replace this block with function call
     [self.yellowButton setImage:[UIImage imageNamed:@"color_selected_mask.png"]
@@ -53,9 +56,12 @@
     imageStackIndex = 0; // most recent image
     // END TODO
     
+    // Initialize image stack and associated bools, ints, and nav buttons
     self.imageStack = [[NSMutableArray alloc] init];
     exceededImageStackMaxLength = false;
     mostRecentCanvasState = nil;
+    imageStackMaxSize = 30;     // Set maximum number of go-back actions to be 30 drawing events
+    passedMaxImageIndexOnce = false;
     
     // On start, disable back button
     [self.backButton setImage:[UIImage imageNamed:@"back_disabled.png"]
@@ -63,6 +69,10 @@
     // On start, disable forward button
     [self.forwardButton setImage:[UIImage imageNamed:@"forward_disabled.png"]
                      forState:UIControlStateNormal];
+    
+    startOverButonResponse = false;
+    
+    
 }
 
 - (void)didReceiveMemoryWarning
@@ -83,7 +93,6 @@
     [self.blueButton setImage:nil forState:UIControlStateNormal];
     [self.blackButton setImage:nil forState:UIControlStateNormal];
     [self.greenButton setImage:nil forState:UIControlStateNormal];
-    //NSLog(@"yellow button selected and prev color was %d", self.model.currentColor);
     self.model.currentColor = YELLOW;
 }
 - (IBAction)redButtonTouchUpInsideAction:(id)sender
@@ -243,88 +252,108 @@
 
 /********* BEGIN TOP MENU ***************/
 
-
-
 - (IBAction)backPressed:(id)sender
 {
-    //[self.canvasImageView setImage:self.lastImage];
-    //id object = [self.imageStack lastObject];
-    //[self.canvasImageView setImage:[self.imageStack lastObject]];
-    // do something with object
+    // Handler for back button
     
-    //[self.imageStack removeObjectAtIndex:[self.imageStack count] - 1];
-    /*UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Back Pressed"
-                                                   message: @"Not Yet Implemented"
-                                                  delegate: self
-                                         cancelButtonTitle:@"Cancel"
-                                         otherButtonTitles:@"OK",nil];
+    int imagesOnStack = [imageStack count]; // Need to cast to signed int
     
-    
-    [alert show];*/
-    int count = [imageStack count];
-    NSLog(@"Stack count is %d",count);
-   
-    if (imageStackIndex < [imageStack count]) {
-        NSLog(@"Stack index is %d",imageStackIndex);
-        NSLog(@"Loading previous view");
-        [self.canvasImageView setImage:[self.imageStack objectAtIndex: imageStackIndex ]];
-        imageStackIndex++;
-        
-        // Enable forward button
+    // Enable forward button if clicked back from existing image and not very first thing
+    if ([imageStack count] > 0)
+    {
         [self.forwardButton setImage:[UIImage imageNamed:@"forward_button.png"]
                             forState:UIControlStateNormal];
-    } else {
-        // TODO
-        // need to disable back button
-        [self.backButton setImage:[UIImage imageNamed:@"back_disabled.png"]
-                           forState:UIControlStateNormal];
-        if (!exceededImageStackMaxLength) {
-            self.canvasImageView.image = nil;
+    }
+    
+    // Check to see if there are previous images on the stack
+    if (imageStackIndex < (imagesOnStack))
+    {
+        // Not at end of stack, so load next image
+        if (!(imageStackIndex == imagesOnStack - 1))
+        {
+            [self.canvasImageView setImage:[self.imageStack objectAtIndex: imageStackIndex + 1]];
+            imageStackIndex++;
+            
+            // Disable back button if next click is beyond max stack size
+            if (imageStackIndex == imageStackMaxSize - 1)
+            {
+                // Disable back button
+                [self.backButton setImage:[UIImage imageNamed:@"back_disabled.png"]
+                                 forState:UIControlStateNormal];
+                passedMaxImageIndexOnce = true;
+            }
+        }
+        else
+        {
+            // At end of stack, either because of stack size or start of drawing
+            [self.backButton setImage:[UIImage imageNamed:@"back_disabled.png"]
+                             forState:UIControlStateNormal];
+            if (imageStackIndex == imageStackMaxSize - 1)
+            {
+                // Reached back click limit due to max size limitation
+                // No need to do anything
+            }
+            else
+            {
+                if (passedMaxImageIndexOnce == false)
+                {
+                    // Reached end of stack because there's nothing earlier
+                    // Since we can't load a non-image, we clear the existing image
+                    [self.canvasImageView setImage:nil]; // clear image
+                    imageStackIndex = imagesOnStack;
+                }
+                
+            }
+            
         }
     }
 }
 
 - (IBAction)forwardPressed:(id)sender
 {
-    NSLog(@"Stack index is %d",imageStackIndex);
+    // Handler for forward action
     
-    if (imageStackIndex > 0) {
+    if (imageStackIndex > 0)
+    {
+        // Back has been pressed prior to the forward button being pressed
         imageStackIndex--;
         [self.canvasImageView setImage:[self.imageStack objectAtIndex: imageStackIndex ]];
+
         // Re-enable back button
         [self.backButton setImage:[UIImage imageNamed:@"back_button.png"]
                             forState:UIControlStateNormal];
-    } else {
-        // TODO
-        // need to disable back button
-        // Disable forward button
-        [self.forwardButton setImage:[UIImage imageNamed:@"forward_disabled.png"]
-                            forState:UIControlStateNormal];
-        if (imageStack!=nil) {
-            [self.canvasImageView setImage:mostRecentCanvasState];
-        }
         
-
-      //  if (!exceededImageStackMaxLength) {
-        //    self.canvasImageView.image = nil;
-        //}
+        if (imageStackIndex == 0)
+        {
+            // Disable forward button if got to front of stack
+            [self.forwardButton setImage:[UIImage imageNamed:@"forward_disabled.png"]
+                                forState:UIControlStateNormal];
+        }
+    }
+    else
+    {
+        // Forward pressed before back is pressed
+        if ([imageStack count] > 0)
+        {
+            // Just reset to top of stack if there is anything on it
+            [self.canvasImageView setImage:[self.imageStack objectAtIndex:0 ]];
+        }
     }
 }
 
 - (IBAction)startOverPressed:(id)sender
 {
-    // TODO - display warning that image will be erased. 
-    self.canvasImageView.image = nil;
-    imageStackIndex = 0;
-    imageStack =nil;
+    // Initially, show an alert letting the user know
+    // that this will erase their progress
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Warning"
+                                                   message: @"Starting over will erase all current content. Continue?"
+                                                  delegate: self
+                                         cancelButtonTitle:@"Cancel"
+                                         otherButtonTitles:@"Start Over",nil];
+    alert.tag = START_OVER;
+    [alert show];
     
-    // Disable forward and back buttons
-    // Disable forward button
-    [self.forwardButton setImage:[UIImage imageNamed:@"forward_disabled.png"]
-                        forState:UIControlStateNormal];
-    // Disable forward button
-    [self.backButton setImage:[UIImage imageNamed:@"back_disabled.png"]
-                        forState:UIControlStateNormal];
+    // Handing done in alertView handler
 }
 
 - (IBAction)openImagePressed:(id)sender
@@ -335,35 +364,11 @@
                                                 delegate: self
                                                 cancelButtonTitle:@"Cancel"
                                                 otherButtonTitles:@"Load Image",nil];
-
+    alert.tag = LOAD_DRAWING;
     [alert show];
 }
 
--(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
-{
-    if (buttonIndex == 0)
-    {
-        //NSLog(@"User decided to cancel Image Load");
-    }
-    else
-    {
-        // Clicked through warning. Load image.
-        UIImagePickerController * picker = [[UIImagePickerController alloc] init];
-        picker.delegate = self;
-        picker.sourceType = UIImagePickerControllerSourceTypeSavedPhotosAlbum;
-        
-        [self presentViewController:picker animated:YES completion:nil];
-    }
-}
 
-- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
-    [self dismissViewControllerAnimated:YES completion:nil];
-	canvasImageView.image = [info objectForKey:@"UIImagePickerControllerOriginalImage"];
-}
-
-- (NSUInteger)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window {
-    return UIInterfaceOrientationMaskAll;
-}
 
 - (IBAction)saveImagePressed:(id)sender
 {
@@ -374,9 +379,7 @@
                                           cancelButtonTitle:@"OK"
                                           otherButtonTitles:nil];
     [alert show];
-    
-    
-   // [alert show];
+        
     // TODO - add error catching
 }
 
@@ -413,23 +416,12 @@
     // Put the current state of the drawing on the stack
     // Assign current image to last image before making changes
     //[self.imageStack addObject:self.canvasImageView.image];
-    if (self.canvasImageView.image != nil)
+    /*if (self.canvasImageView.image != nil)
     {
         [self.imageStack insertObject:self.canvasImageView.image atIndex:0];
-    }
+    }*/
     
-    // Need to clear image stack if back has been pressed and drawing started again
-    if (imageStackIndex != 0) {
-        NSLog(@"need to clear stack in future");
-        for (int index = [imageStack count]-1; index > imageStackIndex; index--) {
-            [imageStack removeObjectAtIndex:0];
-        }
-        imageStackIndex = 0;
-        // Disable forward button
-        [self.forwardButton setImage:[UIImage imageNamed:@"forward_disabled.png"]
-                            forState:UIControlStateNormal];
-        
-    }
+    
     // TODO - Confirm that start of touch is in canvas
     mouseSwiped = NO;
     UITouch *touch = [touches anyObject];
@@ -475,35 +467,123 @@
 
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+    
     NSLog(@"touvhes ended");
-    [self.backButton setImage:[UIImage imageNamed:@"back_button.png"]
-                     forState:UIControlStateNormal];
-    mostRecentCanvasState = self.canvasImageView.image;
-    // Only called for a single point
-    /*
-    if(!mouseSwiped) {
-        UIGraphicsBeginImageContext(self.view.frame.size);
-        [self.canvasImageView.image drawInRect:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
-        CGContextSetLineCap(UIGraphicsGetCurrentContext(), kCGLineCapRound);
-        CGContextSetLineWidth(UIGraphicsGetCurrentContext(), brush);
-        CGContextSetRGBStrokeColor(UIGraphicsGetCurrentContext(), red, green, blue, opacity);
-        CGContextMoveToPoint(UIGraphicsGetCurrentContext(), lastPoint.x, lastPoint.y);
-        CGContextAddLineToPoint(UIGraphicsGetCurrentContext(), lastPoint.x, lastPoint.y);
-        CGContextStrokePath(UIGraphicsGetCurrentContext());
-        CGContextFlush(UIGraphicsGetCurrentContext());
-        self.canvasImageView.image = UIGraphicsGetImageFromCurrentImageContext();
-        UIGraphicsEndImageContext();
+    // Enable the back button
+
+    
+    // Ignore events that didn't create images and single points
+    if (self.canvasImageView.image != nil && mouseSwiped)
+    {
+        [self.backButton setImage:[UIImage imageNamed:@"back_button.png"]
+                         forState:UIControlStateNormal];
+        
+        // Need to remove things at front of stack and update index
+        // Need to clear image stack if back has been pressed and drawing started again
+        if (imageStackIndex != 0)
+        {
+            // In this case, back was pressed, then new drawing began,
+            // so we need to clear everything off the stack that the
+            // user clicked 'back' through'
+            NSLog(@"need to clear stack in future");
+            for (int index = 0; index < imageStackIndex; index++)
+            {
+                NSLog(@"Image removed");
+                [imageStack removeObjectAtIndex:0];
+            }
+            // Reset stack index as head
+            imageStackIndex = 0;
+            
+            // Then put current image as head
+            [self.imageStack insertObject:self.canvasImageView.image atIndex:0];
+            
+            // Disable forward button
+            [self.forwardButton setImage:[UIImage imageNamed:@"forward_disabled.png"]
+                                forState:UIControlStateNormal];
+            
+        }
+        else
+        {
+            // Otherwise, just add this image to the stack
+            
+            // First ensure that there is room at the back of the stack
+            if ([imageStack count] == imageStackMaxSize)
+            {
+                [imageStack removeObjectAtIndex:(imageStackMaxSize - 1)];
+            }
+            [self.imageStack insertObject:self.canvasImageView.image atIndex:0];
+        }
     }
-    */
-    //UIGraphicsBeginImageContext(self.canvasImageView.frame.size);
-    //[self.canvasImageView.image drawInRect:CGRectMake(0, 0, self.canvasImageView.frame.size.width, self.canvasImageView.frame.size.height) blendMode:kCGBlendModeNormal alpha:1.0];
-    //self.canvasImageView.image = UIGraphicsGetImageFromCurrentImageContext();
-    //self.canvasImageView.image = nil;
-    //UIGraphicsEndImageContext();
-    //[self->canvasImageView setBackgroundColor:[UIColor greenColor]];
-    //[self->canvasImageView setBackgroundColor:[UIColor blackColor]];
 }
 
+/****************       BEGIN OTHER HANDLERS    ****************/
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    // This function handles the results of any yes/no dialogs that have had the yes
+    // button selected.
+    if (buttonIndex == 0)
+    {
+        //NSLog(@"User decided to cancel Image Load");
+    }
+    else
+    {
+        // Clicked through warning. Load image.
+        if (alertView.tag == START_OVER)
+        {
+            // Clear the currently displayed image
+            self.canvasImageView.image = nil;
+            
+            // Clear all images off of the image stack
+            while ([imageStack count] > 0)
+            {
+                [imageStack removeObjectAtIndex:0];
+            }
+            imageStackIndex = 0;
+            
+            // Disable forward and back buttons
+            [self.forwardButton setImage:[UIImage imageNamed:@"forward_disabled.png"]
+                                forState:UIControlStateNormal];
+            [self.backButton setImage:[UIImage imageNamed:@"back_disabled.png"]
+                             forState:UIControlStateNormal];
+        }
+        // Clicked through warning. Load image.
+        else if (alertView.tag == LOAD_DRAWING)
+        {
+            UIImagePickerController * picker = [[UIImagePickerController alloc] init];
+            picker.delegate = self;
+            picker.sourceType = UIImagePickerControllerSourceTypeSavedPhotosAlbum;
+            
+            [self presentViewController:picker animated:YES completion:nil];
+            
+            // Clear all images off of the image stack
+            while ([imageStack count] > 0)
+            {
+                [imageStack removeObjectAtIndex:0];
+            }
+            imageStackIndex = 0;
+            
+            // Disable forward and back buttons
+            [self.forwardButton setImage:[UIImage imageNamed:@"forward_disabled.png"]
+                                forState:UIControlStateNormal];
+            [self.backButton setImage:[UIImage imageNamed:@"back_disabled.png"]
+                             forState:UIControlStateNormal];
+        }
+    }
+}
+
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
+    // Handles loader for choices from image library
+    [self dismissViewControllerAnimated:YES completion:nil];
+	canvasImageView.image = [info objectForKey:@"UIImagePickerControllerOriginalImage"];
+    
+    // Save chosen image as current top of stack
+    [self.imageStack insertObject:self.canvasImageView.image atIndex:0];
+}
+
+- (NSUInteger)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window {
+    // Forces orientation to be landscape mode
+    return UIInterfaceOrientationMaskAll;
+}
 
 @end
 
@@ -542,8 +622,6 @@
 }
 
 @end
-
-// test
 
 
 

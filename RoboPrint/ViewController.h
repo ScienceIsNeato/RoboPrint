@@ -9,6 +9,9 @@
 #import <UIKit/UIKit.h>
 #import "RoboPrintController.h"
 
+#define START_OVER 1
+#define LOAD_DRAWING 2
+
 
 @interface ViewController : UIViewController{
     
@@ -24,7 +27,9 @@
     int imageStackIndex;
     int imageStackSize;
     int imageStackMaxSize;
+    BOOL passedMaxImageIndexOnce;
     BOOL exceededImageStackMaxLength;
+    BOOL startOverButonResponse;
     UIImage *mostRecentCanvasState;
 }
 
