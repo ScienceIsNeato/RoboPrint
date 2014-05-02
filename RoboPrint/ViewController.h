@@ -12,6 +12,17 @@
 #define START_OVER 1
 #define LOAD_DRAWING 2
 
+#define SHAPES 1
+#define BACKGROUNDS 2
+
+#define CIRCLE      0
+#define TRIANGLE    1
+#define LINE        2
+#define SQUARE      3
+#define STAR        4
+#define PENTAGRAM   5
+
+
 
 @interface ViewController : UIViewController{
     
@@ -31,6 +42,7 @@
     BOOL exceededImageStackMaxLength;
     BOOL startOverButonResponse;
     UIImage *mostRecentCanvasState;
+    int popupMenuName;
 }
 
 @property (strong, nonatomic) RoboPrintController *model;
@@ -45,6 +57,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *greenButton;
 @property (weak, nonatomic) IBOutlet UIButton *backButton;
 @property (weak, nonatomic) IBOutlet UIButton *forwardButton;
+@property int popupMenuName;
 
 - (IBAction)yellowButtonTouchUpInsideAction:(id)sender;
 - (IBAction)redButtonTouchUpInsideAction:(id)sender;

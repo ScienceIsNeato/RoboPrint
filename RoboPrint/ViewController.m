@@ -27,6 +27,7 @@
 @synthesize imageStack;
 @synthesize backButton;
 @synthesize forwardButton;
+@synthesize popupMenuName;
 
 
 
@@ -192,8 +193,8 @@
     RNGridMenu *av = [[RNGridMenu alloc] initWithImages:images];
     //RoboPrintController *menuController = [[RoboPrintController alloc] init];
     
-    model.menuName = @"scenes";
-    av.delegate = model;
+    popupMenuName = BACKGROUNDS;
+    av.delegate = self;
     
     //av.highlightColor = [UIColor colorWithRed:66.0f/255.0f green:79.0f/255.0f blue:91.0f/255.0f alpha:1.0f];
     
@@ -215,8 +216,8 @@
     RNGridMenu *av = [[RNGridMenu alloc] initWithImages:images];
     //RoboPrintController *menuController = [[RoboPrintController alloc] init];
     
-    model.menuName = @"shapes";
-    av.delegate = model;
+    popupMenuName = SHAPES;
+    av.delegate = self;
     
     //av.highlightColor = [UIColor colorWithRed:66.0f/255.0f green:79.0f/255.0f blue:91.0f/255.0f alpha:1.0f];
     
@@ -570,6 +571,200 @@
         }
     }
 }
+
+
+
+
+- (void)gridMenu:(RNGridMenu *)gridMenu willDismissWithSelectedItem:(RNGridMenuItem *)item atIndex:(NSInteger)itemIndex {
+    
+    UIImage *shape = [UIImage imageNamed:@"color_selected_mask.png"]; // Initialization
+    UIImage *background = [UIImage imageNamed:@"color_selected_mask.png"]; // Initialization
+
+    // This function is the listener for the pop-up menus.
+    
+    switch (popupMenuName)
+    {
+        case SHAPES:
+        
+            switch (itemIndex)
+            {
+                case CIRCLE:
+                    shape =  [UIImage imageNamed:@"_circle.png"];
+                    break;
+                case TRIANGLE:
+                    shape =  [UIImage imageNamed:@"_tri.png"];
+                    break;
+                case LINE:
+                    shape =  [UIImage imageNamed:@"_line.png"];
+                    break;
+                case SQUARE:
+                    shape =  [UIImage imageNamed:@"_square.png"];
+                    break;
+                case STAR:
+                    shape =  [UIImage imageNamed:@"_star.png"];
+                    break;
+                case PENTAGRAM:
+                    shape =  [UIImage imageNamed:@"_pent.png"];
+                    break;
+                default:
+                    break;
+                    
+                
+            }
+            NSLog(@"Select ccc index was %d and the menu was %d", itemIndex, popupMenuName);
+            UIGraphicsBeginImageContext(self.view.frame.size);
+            [self->canvasImageView.image drawInRect:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
+            self->canvasImageView.image = [self maskImage:self->canvasImageView.image withMask:shape];
+            //self->canvasImageView.image = [UIImage imageNamed:@"back_disabled.png"];
+            [self->canvasImageView setAlpha:opacity];
+            UIGraphicsEndImageContext();
+            
+            // Update image stack
+            // Ignore events that didn't create images and single points
+            if (self.canvasImageView.image != nil && mouseSwiped)
+            {
+                [self.backButton setImage:[UIImage imageNamed:@"back_button.png"]
+                                 forState:UIControlStateNormal];
+                
+                // Need to remove things at front of stack and update index
+                // Need to clear image stack if back has been pressed and drawing started again
+                if (imageStackIndex != 0)
+                {
+                    // In this case, back was pressed, then new drawing began,
+                    // so we need to clear everything off the stack that the
+                    // user clicked 'back' through'
+                    NSLog(@"need to clear stack in future");
+                    for (int index = 0; index < imageStackIndex; index++)
+                    {
+                        NSLog(@"Image removed");
+                        [imageStack removeObjectAtIndex:0];
+                    }
+                    // Reset stack index as head
+                    imageStackIndex = 0;
+                    
+                    // Then put current image as head
+                    [self.imageStack insertObject:self.canvasImageView.image atIndex:0];
+                    
+                    // Disable forward button
+                    [self.forwardButton setImage:[UIImage imageNamed:@"forward_disabled.png"]
+                                        forState:UIControlStateNormal];
+                    
+                }
+                else
+                {
+                    // Otherwise, just add this image to the stack
+                    
+                    // First ensure that there is room at the back of the stack
+                    if ([imageStack count] == imageStackMaxSize)
+                    {
+                        [imageStack removeObjectAtIndex:(imageStackMaxSize - 1)];
+                    }
+                    [self.imageStack insertObject:self.canvasImageView.image atIndex:0];
+                }
+            }
+            
+            break;
+        case BACKGROUNDS:
+            switch (itemIndex)
+            {
+                case 0:
+                    background =  [UIImage imageNamed:@"1.png"];
+                    break;
+                case 1:
+                    background =  [UIImage imageNamed:@"2.png"];
+                    break;
+                case 2:
+                    background =  [UIImage imageNamed:@"3.png"];
+                    break;
+                case 3:
+                    background =  [UIImage imageNamed:@"4.png"];
+                    break;
+                default:
+                    break;
+                
+            }
+            
+            NSLog(@"Select ccc index was %d and the menu was %d", itemIndex, popupMenuName);
+            UIGraphicsBeginImageContext(self.view.frame.size);
+            [self->canvasImageView.image drawInRect:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
+            self->canvasImageView.image = [self maskImage:self->canvasImageView.image withMask:background];
+            //self->canvasImageView.image = [UIImage imageNamed:@"back_disabled.png"];
+            [self->canvasImageView setAlpha:opacity];
+            UIGraphicsEndImageContext();
+            // Update image stack
+            // Ignore events that didn't create images and single points
+            if (self.canvasImageView.image != nil && mouseSwiped)
+            {
+                [self.backButton setImage:[UIImage imageNamed:@"back_button.png"]
+                                 forState:UIControlStateNormal];
+                
+                // Need to remove things at front of stack and update index
+                // Need to clear image stack if back has been pressed and drawing started again
+                if (imageStackIndex != 0)
+                {
+                    // In this case, back was pressed, then new drawing began,
+                    // so we need to clear everything off the stack that the
+                    // user clicked 'back' through'
+                    NSLog(@"need to clear stack in future");
+                    for (int index = 0; index < imageStackIndex; index++)
+                    {
+                        NSLog(@"Image removed");
+                        [imageStack removeObjectAtIndex:0];
+                    }
+                    // Reset stack index as head
+                    imageStackIndex = 0;
+                    
+                    // Then put current image as head
+                    [self.imageStack insertObject:self.canvasImageView.image atIndex:0];
+                    
+                    // Disable forward button
+                    [self.forwardButton setImage:[UIImage imageNamed:@"forward_disabled.png"]
+                                        forState:UIControlStateNormal];
+                    
+                }
+                else
+                {
+                    // Otherwise, just add this image to the stack
+                    
+                    // First ensure that there is room at the back of the stack
+                    if ([imageStack count] == imageStackMaxSize)
+                    {
+                        [imageStack removeObjectAtIndex:(imageStackMaxSize - 1)];
+                    }
+                    [self.imageStack insertObject:self.canvasImageView.image atIndex:0];
+                }
+            }
+
+            break;
+            
+        default:
+            break;
+    }
+
+    
+}
+
+- (UIImage*) maskImage:(UIImage *)image withMask:(UIImage *)maskImage {
+    
+    CGImageRef maskRef = maskImage.CGImage;
+    
+    CGImageRef mask = CGImageMaskCreate(CGImageGetWidth(maskRef),
+                                        CGImageGetHeight(maskRef),
+                                        CGImageGetBitsPerComponent(maskRef),
+                                        CGImageGetBitsPerPixel(maskRef),
+                                        CGImageGetBytesPerRow(maskRef),
+                                        CGImageGetDataProvider(maskRef), NULL, false);
+    
+    CGImageRef maskedImageRef = CGImageCreateWithMask([image CGImage], mask);
+    UIImage *maskedImage = [UIImage imageWithCGImage:maskedImageRef];
+    
+    CGImageRelease(mask);
+    CGImageRelease(maskedImageRef);
+    
+    // returns new image with mask applied
+    return maskedImage;
+}
+
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
     // Handles loader for choices from image library

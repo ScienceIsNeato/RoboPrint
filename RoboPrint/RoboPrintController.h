@@ -20,7 +20,7 @@ static const int GREEN = 5;
 @class RoboPrintController;
 @interface RoboPrintController : NSObject
 {
-    NSString *menuName;
+   
 }
 
 - (void)gridMenu:(RNGridMenu *)gridMenu willDismissWithSelectedItem:(RNGridMenuItem *)item atIndex:(NSInteger)itemIndex;
@@ -28,7 +28,6 @@ static const int GREEN = 5;
 - (float)getGreen;
 - (float)getBlue;
 
-@property(nonatomic, retain) NSString *menuName;
 @property int currentColor;
 
 @end
