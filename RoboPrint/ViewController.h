@@ -22,6 +22,10 @@
 #define STAR        4
 #define PENTAGRAM   5
 
+#define MINIMUM_SCALE .1
+#define MAXIMUM_SCALE 10
+
+
 
 
 @interface ViewController : UIViewController{
@@ -57,6 +61,12 @@
 @property (weak, nonatomic) IBOutlet UIButton *greenButton;
 @property (weak, nonatomic) IBOutlet UIButton *backButton;
 @property (weak, nonatomic) IBOutlet UIButton *forwardButton;
+@property (weak, nonatomic) IBOutlet UIButton *imagesButton;
+@property (weak, nonatomic) IBOutlet UIButton *pencilButton;
+@property (weak, nonatomic) IBOutlet UIButton *backgroundsButton;
+@property (weak, nonatomic) IBOutlet UIButton *shapesButton;
+@property (weak, nonatomic) IBOutlet UIButton *enlargeButton;
+@property (weak, nonatomic) IBOutlet UIButton *textButton;
 @property int popupMenuName;
 
 - (IBAction)yellowButtonTouchUpInsideAction:(id)sender;

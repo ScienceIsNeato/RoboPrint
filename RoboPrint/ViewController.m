@@ -9,18 +9,31 @@
 #import "ViewController.h"
 #import "RoboPrintController.h"
 #import <RNGridMenu/RNGridMenu.h>
+#import <QuartzCore/QuartzCore.h>
 
 @interface ViewController ()
 
 @end
 
 @implementation ViewController
+
+// Color Buttons
 @synthesize yellowButton;
 @synthesize redButton;
 @synthesize pinkButton;
 @synthesize blueButton;
 @synthesize blackButton;
 @synthesize greenButton;
+
+// Mode Buttons
+@synthesize imagesButton;
+@synthesize pencilButton;
+@synthesize backgroundsButton;
+@synthesize shapesButton;
+@synthesize enlargeButton;
+@synthesize textButton;
+
+// Other properties
 @synthesize model;
 @synthesize canvasImageView;
 @synthesize lastImage;
@@ -42,7 +55,7 @@
     red = 0.0/255.0;
     green = 0.0/255.0;
     blue = 0.0/255.0;
-    brush = 2.0;
+    brush = 1.0;
     opacity = 1.0;
     
     // TODO - replace this block with function call
@@ -55,6 +68,10 @@
     [self.greenButton setImage:nil forState:UIControlStateNormal];
     self.model.currentColor = YELLOW;
     imageStackIndex = 0; // most recent image
+    
+    self.model.currentMode = PENCIL;
+    [self.pencilButton setImage:[UIImage imageNamed:@"color_selected_mask.png"]
+                       forState:UIControlStateNormal];
     // END TODO
     
     // Initialize image stack and associated bools, ints, and nav buttons
@@ -72,6 +89,14 @@
                      forState:UIControlStateNormal];
     
     startOverButonResponse = false;
+    
+    // Set up pinch gesture recognizer for Enlarge menu
+    self.canvasImageView.userInteractionEnabled = YES;
+    UIPinchGestureRecognizer *pgr = [[UIPinchGestureRecognizer alloc]
+                                     initWithTarget:self action:@selector(handlePinch:)];
+    pgr.delegate = self;
+    [self.canvasImageView addGestureRecognizer:pgr];
+    //[pgr release];
     
     
 }
@@ -156,6 +181,17 @@
 
 - (IBAction)openImagePicker:(id)sender
 {
+    [self.imagesButton setImage:[UIImage imageNamed:@"color_selected_mask.png"]
+                       forState:UIControlStateNormal];
+    [self.pencilButton setImage:nil forState:UIControlStateNormal];
+    [self.backgroundsButton setImage:nil forState:UIControlStateNormal];
+    [self.shapesButton setImage:nil forState:UIControlStateNormal];
+    [self.enlargeButton setImage:nil forState:UIControlStateNormal];
+    [self.textButton setImage:nil forState:UIControlStateNormal];
+    self.model.currentMode = IMAGE;
+    // TODO
+    // SEE HERE FOR INSTRUCTIONS FOR GETTING IMAGE FROM CAMERA
+    // http://www.icodeblog.com/2009/07/28/getting-images-from-the-iphone-photo-library-or-camera-using-uiimagepickercontroller/
     UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Loading Images"
                                                    message: @"Not Yet Implemented"
                                                   delegate: self
@@ -168,20 +204,26 @@
 
 - (IBAction)pencilSketchPressed:(id)sender
 {
-    // TODO
-    // SEE HERE FOR INSTRUCTIONS FOR GETTING IMAGE FROM CAMERA
-    // http://www.icodeblog.com/2009/07/28/getting-images-from-the-iphone-photo-library-or-camera-using-uiimagepickercontroller/
-    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Pencil Sketches"
-                                                   message: @"Not Yet Implemented"
-                                                  delegate: self
-                                         cancelButtonTitle:@"Cancel"
-                                         otherButtonTitles:@"OK",nil];
     
-    
-    [alert show];
+    [self.imagesButton setImage:nil forState:UIControlStateNormal];
+    [self.pencilButton setImage:[UIImage imageNamed:@"color_selected_mask.png"]
+                       forState:UIControlStateNormal];
+    [self.backgroundsButton setImage:nil forState:UIControlStateNormal];
+    [self.shapesButton setImage:nil forState:UIControlStateNormal];
+    [self.enlargeButton setImage:nil forState:UIControlStateNormal];
+    [self.textButton setImage:nil forState:UIControlStateNormal];
+    self.model.currentMode = PENCIL;
 }
 
 -(IBAction)dispatchScenesMenu:(id)sender{
+    [self.imagesButton setImage:nil forState:UIControlStateNormal];
+    [self.pencilButton setImage:nil forState:UIControlStateNormal];
+    [self.backgroundsButton setImage:[UIImage imageNamed:@"color_selected_mask.png"]
+                             forState:UIControlStateNormal];
+    [self.shapesButton setImage:nil forState:UIControlStateNormal];
+    [self.enlargeButton setImage:nil forState:UIControlStateNormal];
+    [self.textButton setImage:nil forState:UIControlStateNormal];
+    self.model.currentMode = BACKGROUNDS;
     
     NSArray *images = [NSArray arrayWithObjects:
                        [UIImage imageNamed:@"1.png"],
@@ -203,6 +245,14 @@
 }
 
 -(IBAction)dispatchShapesMenu:(id)sender{
+    [self.imagesButton setImage:nil forState:UIControlStateNormal];
+    [self.pencilButton setImage:nil forState:UIControlStateNormal];
+    [self.backgroundsButton setImage:nil forState:UIControlStateNormal];
+    [self.shapesButton setImage:[UIImage imageNamed:@"color_selected_mask.png"]
+                        forState:UIControlStateNormal];
+    [self.enlargeButton setImage:nil forState:UIControlStateNormal];
+    [self.textButton setImage:nil forState:UIControlStateNormal];
+    self.model.currentMode = SHAPES;
     
     NSArray *images = [NSArray arrayWithObjects:
                        [UIImage imageNamed:@"_circle.png"],
@@ -225,8 +275,31 @@
     
 }
 
+
+- (IBAction)enlargePressed:(id)sender
+{
+    [self.imagesButton setImage:nil forState:UIControlStateNormal];
+    [self.pencilButton setImage:nil forState:UIControlStateNormal];
+    [self.backgroundsButton setImage:nil forState:UIControlStateNormal];
+    [self.shapesButton setImage:nil forState:UIControlStateNormal];
+    [self.enlargeButton setImage:[UIImage imageNamed:@"color_selected_mask.png"]
+                        forState:UIControlStateNormal];
+    [self.textButton setImage:nil forState:UIControlStateNormal];
+    [self.shapesButton setImage:nil forState:UIControlStateNormal];
+    self.model.currentMode = ENLARGE;
+}
+
 - (IBAction)textPressed:(id)sender
 {
+    [self.imagesButton setImage:nil forState:UIControlStateNormal];
+    [self.pencilButton setImage:nil forState:UIControlStateNormal];
+    [self.backgroundsButton setImage:nil forState:UIControlStateNormal];
+    [self.shapesButton setImage:nil forState:UIControlStateNormal];
+    [self.enlargeButton setImage:nil forState:UIControlStateNormal];
+    [self.textButton setImage:[UIImage imageNamed:@"color_selected_mask.png"]
+                     forState:UIControlStateNormal];
+    self.model.currentMode = TEXT;
+    
     UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Adding Text"
                                                    message: @"Not Yet Implemented"
                                                   delegate: self
@@ -237,17 +310,79 @@
     [alert show];
 }
 
-- (IBAction)enlargePressed:(id)sender
+
+- (void)handlePinch:(UIPinchGestureRecognizer *)pinchGestureRecognizer
 {
-    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Enlarge 2X"
-                                                   message: @"Not Yet Implemented"
-                                                  delegate: self
-                                         cancelButtonTitle:@"Cancel"
-                                         otherButtonTitles:@"OK",nil];
+    //handle pinch...
+    switch (self.model.currentMode) {
+        case SHAPES:
+            NSLog(@"should be resizing shapes now");
+            break;
+            
+        case TEXT:
+            NSLog(@"should be resizing text now");
+            break;
+        case ENLARGE:
+            if (pinchGestureRecognizer.state == UIGestureRecognizerStateEnded
+                || pinchGestureRecognizer.state == UIGestureRecognizerStateChanged) {
+                NSLog(@"gesture.scale = %f", pinchGestureRecognizer.scale);
+                
+                CGFloat currentScale = self.canvasImageView.frame.size.width / self.canvasImageView.bounds.size.width;
+                CGFloat newScale = currentScale * pinchGestureRecognizer.scale;
+                
+                if (newScale < MINIMUM_SCALE) {
+                    newScale = MINIMUM_SCALE;
+                }
+                if (newScale > MAXIMUM_SCALE) {
+                    newScale = MAXIMUM_SCALE;
+                }
+                
+                CGAffineTransform transform = CGAffineTransformMakeScale(newScale, newScale);
+                self.canvasImageView.transform = transform;
+                CGFloat tx = 5.0f;
+                CGFloat ty = 1500.0f;
+               // transform = CGAffineTransformMakeTranslation(tx, ty);
+                
+                self.canvasImageView.transform = transform;
+                [self.canvasImageView setCenter:CGPointMake(self.canvasImageView.center.x, self.canvasImageView.center.y + 44)];
+                pinchGestureRecognizer.scale = 1;
+            }
+            NSLog(@"should be resizing image now");
+            break;
+            
+            
+        default:
+            NSLog(@"should be doing nothing now");
+            break;
+    }
     
-    
-    [alert show];
 }
+
+
+
+/*- (void)pinch:(UIPinchGestureRecognizer *)gesture {
+    if (gesture.state == UIGestureRecognizerStateEnded
+        || gesture.state == UIGestureRecognizerStateChanged) {
+        NSLog(@"gesture.scale XXX = %f", gesture.scale);
+        
+        CGFloat currentScale = self.canvasImageView.frame.size.width / self.canvasImageView.bounds.size.width;
+        CGFloat newScale = currentScale * gesture.scale;
+        
+        if (newScale < MINIMUM_SCALE) {
+            newScale = MINIMUM_SCALE;
+        }
+        if (newScale > MAXIMUM_SCALE) {
+            newScale = MAXIMUM_SCALE;
+        }
+        
+        CGAffineTransform transform = CGAffineTransformMakeScale(newScale, newScale);
+        self.canvasImageView.transform = transform;
+        CGFloat tx = 5.0f;
+        CGFloat ty = 150.0f;
+        transform = CGAffineTransformMakeTranslation(tx, ty);
+        gesture.scale = 1;
+    }
+}*/
 
 
 
@@ -433,37 +568,49 @@
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
     // TODO - Confirm that start of touch is in canvas
-    
-    mouseSwiped = YES; // Indicates that this is not a single point
-    UITouch *touch = [touches anyObject];
-    
-    // Get current absolute location of touch event in the view
-    CGPoint currentPoint = [touch locationInView:self->canvasImageView];
-    
-    // Scale the point so that it matches the height and width of the drawing canvas
-    currentPoint.x = currentPoint.x*(self.view.frame.size.width/self->canvasImageView.frame.size.width);
-    currentPoint.y = currentPoint.y*(self.view.frame.size.height/self->canvasImageView.frame.size.height);
-    //NSLog(@"Origin x, y is: (%f, %f)", canvasOrigin.x, canvasOrigin.y);
-    //NSLog(@"Point x, y is: (%f, %f)", currentPoint.x, currentPoint.y);
-    //NSLog(@"Bounds are: (%f, %f)", self.view.frame.size.width, self.view.frame.size.height);
-
-    UIGraphicsBeginImageContext(self.view.frame.size);
-    [self->canvasImageView.image drawInRect:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
-    CGContextMoveToPoint(UIGraphicsGetCurrentContext(), lastPoint.x, lastPoint.y);
-    CGContextAddLineToPoint(UIGraphicsGetCurrentContext(), currentPoint.x, currentPoint.y);
-    CGContextSetLineCap(UIGraphicsGetCurrentContext(), kCGLineCapRound);
-    CGContextSetLineWidth(UIGraphicsGetCurrentContext(), brush );
-    //NSLog(@"RGB are (%f,%f,%f", self.model.getRed,self.model.getGreen,self.model.getBlue);
-
-    CGContextSetRGBStrokeColor(UIGraphicsGetCurrentContext(), self.model.getRed, self.model.getGreen, self.model.getBlue, 1.0);
-    CGContextSetBlendMode(UIGraphicsGetCurrentContext(),kCGBlendModeNormal);
-    
-    CGContextStrokePath(UIGraphicsGetCurrentContext());
-    self->canvasImageView.image = UIGraphicsGetImageFromCurrentImageContext();
-    [self->canvasImageView setAlpha:opacity];
-    UIGraphicsEndImageContext();
-    
-    lastPoint = currentPoint;
+    switch (self.model.currentMode)
+    {
+        case (PENCIL):
+        {
+            mouseSwiped = YES; // Indicates that this is not a single point
+            UITouch *touch = [touches anyObject];
+            
+            // Get current absolute location of touch event in the view
+            CGPoint currentPoint = [touch locationInView:self->canvasImageView];
+            
+            // Scale the point so that it matches the height and width of the drawing canvas
+            currentPoint.x = currentPoint.x*(self.view.frame.size.width/self->canvasImageView.frame.size.width);
+            currentPoint.y = currentPoint.y*(self.view.frame.size.height/self->canvasImageView.frame.size.height);
+            //NSLog(@"Origin x, y is: (%f, %f)", canvasOrigin.x, canvasOrigin.y);
+            //NSLog(@"Point x, y is: (%f, %f)", currentPoint.x, currentPoint.y);
+            //NSLog(@"Bounds are: (%f, %f)", self.view.frame.size.width, self.view.frame.size.height);
+            
+            UIGraphicsBeginImageContext(self.view.frame.size);
+            [self->canvasImageView.image drawInRect:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
+            CGContextMoveToPoint(UIGraphicsGetCurrentContext(), lastPoint.x, lastPoint.y);
+            CGContextAddLineToPoint(UIGraphicsGetCurrentContext(), currentPoint.x, currentPoint.y);
+            CGContextSetLineCap(UIGraphicsGetCurrentContext(), kCGLineCapRound);
+            CGContextSetLineWidth(UIGraphicsGetCurrentContext(), brush );
+            //NSLog(@"RGB are (%f,%f,%f", self.model.getRed,self.model.getGreen,self.model.getBlue);
+            
+            CGContextSetRGBStrokeColor(UIGraphicsGetCurrentContext(), self.model.getRed, self.model.getGreen, self.model.getBlue, 1.0);
+            CGContextSetBlendMode(UIGraphicsGetCurrentContext(),kCGBlendModeNormal);
+            
+            CGContextStrokePath(UIGraphicsGetCurrentContext());
+            self->canvasImageView.image = UIGraphicsGetImageFromCurrentImageContext();
+            [self->canvasImageView setAlpha:opacity];
+            UIGraphicsEndImageContext();
+            
+            lastPoint = currentPoint;
+            break;
+        }
+            
+        default:
+        {
+            NSLog(@"Mode other than pencil");
+            break;
+        }
+    }
 }
 
 

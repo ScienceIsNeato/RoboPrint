@@ -185,7 +185,7 @@
                                         <rect key="frame" x="6" y="350" width="90" height="90"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
-                                        <state key="normal" image="images_button.png">
+                                        <state key="normal" backgroundImage="images_button.png">
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
                                         <connections>
@@ -196,7 +196,7 @@
                                         <rect key="frame" x="102" y="546" width="90" height="90"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
-                                        <state key="normal" title="Scenes" image="text_button.png">
+                                        <state key="normal" backgroundImage="text_button.png">
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
                                         <connections>
@@ -207,7 +207,7 @@
                                         <rect key="frame" x="102" y="448" width="90" height="90"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
-                                        <state key="normal" title="Shapes" image="shapes_button.png">
+                                        <state key="normal" backgroundImage="shapes_button.png">
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
                                         <connections>
@@ -218,7 +218,10 @@
                                         <rect key="frame" x="102" y="350" width="90" height="90"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
-                                        <state key="normal" title="Shapes" image="pencil_button.png">
+                                        <accessibility key="accessibilityConfiguration">
+                                            <accessibilityTraits key="traits" none="YES" button="YES" image="YES"/>
+                                        </accessibility>
+                                        <state key="normal" backgroundImage="pencil_button.png">
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
                                         <connections>
@@ -229,7 +232,7 @@
                                         <rect key="frame" x="6" y="448" width="90" height="90"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
-                                        <state key="normal" image="backgrounds_button.png">
+                                        <state key="normal" backgroundImage="backgrounds_button.png">
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
                                         <connections>
@@ -240,7 +243,7 @@
                                         <rect key="frame" x="5" y="546" width="90" height="90"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
-                                        <state key="normal" image="enlarge_button.png">
+                                        <state key="normal" backgroundImage="enlarge_button.png">
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
                                         <connections>
@@ -250,7 +253,7 @@
                                 </subviews>
                                 <color key="backgroundColor" white="0.26619203629032256" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nZn-gy-arn" userLabel="canvasImageView">
+                            <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nZn-gy-arn" userLabel="canvasImageView">
                                 <rect key="frame" x="198" y="125" width="826" height="643"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </imageView>
@@ -262,13 +265,19 @@
                     <connections>
                         <outlet property="YellowButton" destination="6fe-Q8-GFD" id="XTt-Sv-T1R"/>
                         <outlet property="backButton" destination="bgg-F1-gzY" id="zsm-ca-UcX"/>
+                        <outlet property="backgroundsButton" destination="ny9-Ts-GT7" id="aaN-XH-eoA"/>
                         <outlet property="blackButton" destination="h5Y-L5-bjO" id="dso-cO-K8i"/>
                         <outlet property="blueButton" destination="LPj-ZL-gvv" id="ft0-kV-w9d"/>
                         <outlet property="canvasImageView" destination="nZn-gy-arn" id="tqo-oZ-bQp"/>
+                        <outlet property="enlargeButton" destination="REL-tw-tdn" id="dMg-BV-aKA"/>
                         <outlet property="forwardButton" destination="eZY-k1-Sku" id="cp1-Hz-EiP"/>
                         <outlet property="greenButton" destination="6Se-fk-cDC" id="RSh-45-vG1"/>
+                        <outlet property="imagesButton" destination="3nC-ZS-Nc7" id="2tf-ah-ROk"/>
+                        <outlet property="pencilButton" destination="CTM-St-uIn" id="ywd-Qf-ifr"/>
                         <outlet property="pinkButton" destination="XeF-1S-0gf" id="kHB-SM-22A"/>
                         <outlet property="redButton" destination="yX3-Iy-W6P" id="4w0-xZ-s3f"/>
+                        <outlet property="shapesButton" destination="UHD-w3-2Y1" id="RUX-xI-1EK"/>
+                        <outlet property="textButton" destination="pZc-ZK-M2I" id="X0h-e3-zAm"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Wib-qJ-02O" userLabel="First Responder" sceneMemberID="firstResponder"/>

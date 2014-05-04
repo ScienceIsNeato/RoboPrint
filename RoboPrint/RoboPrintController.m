@@ -10,7 +10,20 @@
 
 @implementation RoboPrintController
 @synthesize currentColor;
+@synthesize currentMode;
 
+- (void)setMode:(int) Mode
+{
+    currentMode = Mode;
+    
+    switch (self.currentColor)
+    {
+
+            
+        default:
+            break;
+    }
+}
 
 - (float)getRed
 {
