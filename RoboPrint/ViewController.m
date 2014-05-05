@@ -41,6 +41,8 @@
 @synthesize backButton;
 @synthesize forwardButton;
 @synthesize popupMenuName;
+@synthesize xRescale;
+@synthesize yRescale;
 
 
 
@@ -97,6 +99,18 @@
     pgr.delegate = self;
     [self.canvasImageView addGestureRecognizer:pgr];
     //[pgr release];
+    
+    // Set up scale factors
+    xRescale = (self.view.frame.size.width/self->canvasImageView.frame.size.width);
+    yRescale = (self.view.frame.size.height/self->canvasImageView.frame.size.height);
+    
+    // Set starting shape width and origin
+    defaultShapeWidth = 100.0;
+    shapeWidth = defaultShapeWidth;
+    defaultShapeOrigin = CGPointMake(self.canvasImageView.frame.size.width/2-defaultShapeWidth/2,
+                                     self.canvasImageView.frame.size.height/2-defaultShapeWidth/2);
+    shapeOrigin = defaultShapeOrigin;
+    
     
     
 }
@@ -192,7 +206,7 @@
     // TODO
     // SEE HERE FOR INSTRUCTIONS FOR GETTING IMAGE FROM CAMERA
     // http://www.icodeblog.com/2009/07/28/getting-images-from-the-iphone-photo-library-or-camera-using-uiimagepickercontroller/
-    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Loading Images"
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Pencil Sketch Conversion"
                                                    message: @"Not Yet Implemented"
                                                   delegate: self
                                          cancelButtonTitle:@"Cancel"
@@ -339,9 +353,9 @@
                 
                 CGAffineTransform transform = CGAffineTransformMakeScale(newScale, newScale);
                 self.canvasImageView.transform = transform;
-                CGFloat tx = 5.0f;
-                CGFloat ty = 1500.0f;
-               // transform = CGAffineTransformMakeTranslation(tx, ty);
+                //CGFloat tx = 5.0f;
+                //CGFloat ty = 1500.0f;
+                // transform = CGAffineTransformMakeTranslation(tx, ty);
                 
                 self.canvasImageView.transform = transform;
                 [self.canvasImageView setCenter:CGPointMake(self.canvasImageView.center.x, self.canvasImageView.center.y + 44)];
@@ -357,33 +371,6 @@
     }
     
 }
-
-
-
-/*- (void)pinch:(UIPinchGestureRecognizer *)gesture {
-    if (gesture.state == UIGestureRecognizerStateEnded
-        || gesture.state == UIGestureRecognizerStateChanged) {
-        NSLog(@"gesture.scale XXX = %f", gesture.scale);
-        
-        CGFloat currentScale = self.canvasImageView.frame.size.width / self.canvasImageView.bounds.size.width;
-        CGFloat newScale = currentScale * gesture.scale;
-        
-        if (newScale < MINIMUM_SCALE) {
-            newScale = MINIMUM_SCALE;
-        }
-        if (newScale > MAXIMUM_SCALE) {
-            newScale = MAXIMUM_SCALE;
-        }
-        
-        CGAffineTransform transform = CGAffineTransformMakeScale(newScale, newScale);
-        self.canvasImageView.transform = transform;
-        CGFloat tx = 5.0f;
-        CGFloat ty = 150.0f;
-        transform = CGAffineTransformMakeTranslation(tx, ty);
-        gesture.scale = 1;
-    }
-}*/
-
 
 
 /********* BEGIN TOP MENU ***************/
@@ -549,21 +536,13 @@
 
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
-    // Put the current state of the drawing on the stack
-    // Assign current image to last image before making changes
-    //[self.imageStack addObject:self.canvasImageView.image];
-    /*if (self.canvasImageView.image != nil)
-    {
-        [self.imageStack insertObject:self.canvasImageView.image atIndex:0];
-    }*/
-    
-    
+ 
     // TODO - Confirm that start of touch is in canvas
     mouseSwiped = NO;
     UITouch *touch = [touches anyObject];
     lastPoint = [touch locationInView:self->canvasImageView];
-    lastPoint.x = lastPoint.x*(self.view.frame.size.width/self->canvasImageView.frame.size.width);
-    lastPoint.y = lastPoint.y*(self.view.frame.size.height/self->canvasImageView.frame.size.height);
+    lastPoint.x = lastPoint.x*xRescale;
+    lastPoint.y = lastPoint.y*yRescale;
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
@@ -579,13 +558,10 @@
             CGPoint currentPoint = [touch locationInView:self->canvasImageView];
             
             // Scale the point so that it matches the height and width of the drawing canvas
-            currentPoint.x = currentPoint.x*(self.view.frame.size.width/self->canvasImageView.frame.size.width);
-            currentPoint.y = currentPoint.y*(self.view.frame.size.height/self->canvasImageView.frame.size.height);
-            //NSLog(@"Origin x, y is: (%f, %f)", canvasOrigin.x, canvasOrigin.y);
-            //NSLog(@"Point x, y is: (%f, %f)", currentPoint.x, currentPoint.y);
-            //NSLog(@"Bounds are: (%f, %f)", self.view.frame.size.width, self.view.frame.size.height);
+            currentPoint.x = currentPoint.x*xRescale;
+            currentPoint.y = currentPoint.y*yRescale;
             
-            UIGraphicsBeginImageContext(self.view.frame.size);
+            UIGraphicsBeginImageContextWithOptions(self.view.frame.size, NO, 1);
             [self->canvasImageView.image drawInRect:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
             CGContextMoveToPoint(UIGraphicsGetCurrentContext(), lastPoint.x, lastPoint.y);
             CGContextAddLineToPoint(UIGraphicsGetCurrentContext(), currentPoint.x, currentPoint.y);
@@ -616,12 +592,16 @@
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
     
-    NSLog(@"touvhes ended");
-    // Enable the back button
+    NSLog(@"touches ended");
 
     
+    [self updateImageStack];
+}
+
+-(void)updateImageStack
+{
     // Ignore events that didn't create images and single points
-    if (self.canvasImageView.image != nil && mouseSwiped)
+    if ((self.canvasImageView.image != nil && mouseSwiped) || (self.model.currentMode == SHAPES))
     {
         [self.backButton setImage:[UIImage imageNamed:@"back_button.png"]
                          forState:UIControlStateNormal];
@@ -662,6 +642,7 @@
             [self.imageStack insertObject:self.canvasImageView.image atIndex:0];
         }
     }
+    
 }
 
 /****************       BEGIN OTHER HANDLERS    ****************/
@@ -736,7 +717,7 @@
             switch (itemIndex)
             {
                 case CIRCLE:
-                    shape =  [UIImage imageNamed:@"_circle.png"];
+                    shape = [self addCircle:(self->canvasImageView.image) radius:(defaultShapeWidth/2) origin:(defaultShapeOrigin)];
                     break;
                 case TRIANGLE:
                     shape =  [UIImage imageNamed:@"_tri.png"];
@@ -759,56 +740,11 @@
                 
             }
             NSLog(@"Select ccc index was %d and the menu was %d", itemIndex, popupMenuName);
-            UIGraphicsBeginImageContext(self.view.frame.size);
-            [self->canvasImageView.image drawInRect:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
-            self->canvasImageView.image = [self maskImage:self->canvasImageView.image withMask:shape];
-            //self->canvasImageView.image = [UIImage imageNamed:@"back_disabled.png"];
-            [self->canvasImageView setAlpha:opacity];
-            UIGraphicsEndImageContext();
-            
+
+            // Put the new shape on the canvas
+            self->canvasImageView.image = [self mergeImage:shape overImage:self.canvasImageView.image inSize:CGSizeMake(self.view.frame.size.height, self.view.frame.size.width)];
             // Update image stack
-            // Ignore events that didn't create images and single points
-            if (self.canvasImageView.image != nil && mouseSwiped)
-            {
-                [self.backButton setImage:[UIImage imageNamed:@"back_button.png"]
-                                 forState:UIControlStateNormal];
-                
-                // Need to remove things at front of stack and update index
-                // Need to clear image stack if back has been pressed and drawing started again
-                if (imageStackIndex != 0)
-                {
-                    // In this case, back was pressed, then new drawing began,
-                    // so we need to clear everything off the stack that the
-                    // user clicked 'back' through'
-                    NSLog(@"need to clear stack in future");
-                    for (int index = 0; index < imageStackIndex; index++)
-                    {
-                        NSLog(@"Image removed");
-                        [imageStack removeObjectAtIndex:0];
-                    }
-                    // Reset stack index as head
-                    imageStackIndex = 0;
-                    
-                    // Then put current image as head
-                    [self.imageStack insertObject:self.canvasImageView.image atIndex:0];
-                    
-                    // Disable forward button
-                    [self.forwardButton setImage:[UIImage imageNamed:@"forward_disabled.png"]
-                                        forState:UIControlStateNormal];
-                    
-                }
-                else
-                {
-                    // Otherwise, just add this image to the stack
-                    
-                    // First ensure that there is room at the back of the stack
-                    if ([imageStack count] == imageStackMaxSize)
-                    {
-                        [imageStack removeObjectAtIndex:(imageStackMaxSize - 1)];
-                    }
-                    [self.imageStack insertObject:self.canvasImageView.image atIndex:0];
-                }
-            }
+            [self updateImageStack];
             
             break;
         case BACKGROUNDS:
@@ -834,53 +770,12 @@
             NSLog(@"Select ccc index was %d and the menu was %d", itemIndex, popupMenuName);
             UIGraphicsBeginImageContext(self.view.frame.size);
             [self->canvasImageView.image drawInRect:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
-            self->canvasImageView.image = [self maskImage:self->canvasImageView.image withMask:background];
+            //self->canvasImageView.image = [self maskImage:self->canvasImageView.image withMask:background];
+            self->canvasImageView.image = [self mergeImage:self.canvasImageView.image overImage:background inSize:CGSizeMake(self.view.frame.size.height, self.view.frame.size.width)];
             //self->canvasImageView.image = [UIImage imageNamed:@"back_disabled.png"];
             [self->canvasImageView setAlpha:opacity];
             UIGraphicsEndImageContext();
-            // Update image stack
-            // Ignore events that didn't create images and single points
-            if (self.canvasImageView.image != nil && mouseSwiped)
-            {
-                [self.backButton setImage:[UIImage imageNamed:@"back_button.png"]
-                                 forState:UIControlStateNormal];
-                
-                // Need to remove things at front of stack and update index
-                // Need to clear image stack if back has been pressed and drawing started again
-                if (imageStackIndex != 0)
-                {
-                    // In this case, back was pressed, then new drawing began,
-                    // so we need to clear everything off the stack that the
-                    // user clicked 'back' through'
-                    NSLog(@"need to clear stack in future");
-                    for (int index = 0; index < imageStackIndex; index++)
-                    {
-                        NSLog(@"Image removed");
-                        [imageStack removeObjectAtIndex:0];
-                    }
-                    // Reset stack index as head
-                    imageStackIndex = 0;
-                    
-                    // Then put current image as head
-                    [self.imageStack insertObject:self.canvasImageView.image atIndex:0];
-                    
-                    // Disable forward button
-                    [self.forwardButton setImage:[UIImage imageNamed:@"forward_disabled.png"]
-                                        forState:UIControlStateNormal];
-                    
-                }
-                else
-                {
-                    // Otherwise, just add this image to the stack
-                    
-                    // First ensure that there is room at the back of the stack
-                    if ([imageStack count] == imageStackMaxSize)
-                    {
-                        [imageStack removeObjectAtIndex:(imageStackMaxSize - 1)];
-                    }
-                    [self.imageStack insertObject:self.canvasImageView.image atIndex:0];
-                }
-            }
+            [self updateImageStack];
 
             break;
             
@@ -891,27 +786,32 @@
     
 }
 
-- (UIImage*) maskImage:(UIImage *)image withMask:(UIImage *)maskImage {
-    
-    CGImageRef maskRef = maskImage.CGImage;
-    
-    CGImageRef mask = CGImageMaskCreate(CGImageGetWidth(maskRef),
-                                        CGImageGetHeight(maskRef),
-                                        CGImageGetBitsPerComponent(maskRef),
-                                        CGImageGetBitsPerPixel(maskRef),
-                                        CGImageGetBytesPerRow(maskRef),
-                                        CGImageGetDataProvider(maskRef), NULL, false);
-    
-    CGImageRef maskedImageRef = CGImageCreateWithMask([image CGImage], mask);
-    UIImage *maskedImage = [UIImage imageWithCGImage:maskedImageRef];
-    
-    CGImageRelease(mask);
-    CGImageRelease(maskedImageRef);
-    
-    // returns new image with mask applied
-    return maskedImage;
-}
 
+-(UIImage*)mergeImage:(UIImage*)mask overImage:(UIImage*)source inSize:(CGSize)size
+{
+    //Capture image context ref
+    
+    UIImageView *totalimage=[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, size.height, size.width)];
+    
+    UIImageView *firstImage=[[UIImageView alloc] initWithImage:mask];
+    UIImageView *secondImage=[[UIImageView alloc] initWithImage:source];
+    
+    [totalimage addSubview:firstImage];
+    [totalimage addSubview:secondImage];
+    
+    UIGraphicsBeginImageContext(totalimage.bounds.size);
+    [totalimage.layer renderInContext:UIGraphicsGetCurrentContext()];
+    
+    //Draw images onto the context
+    [source drawInRect:CGRectMake(0, 0, source.size.width, source.size.height)];
+    [mask drawInRect:CGRectMake(0, 0, mask.size.width, mask.size.height)];
+    
+    UIImage *viewImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return viewImage;
+    
+}
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
     // Handles loader for choices from image library
@@ -927,7 +827,22 @@
     return UIInterfaceOrientationMaskAll;
 }
 
+-(UIImage *)addCircle:(UIImage *)img radius:(CGFloat)radius origin:(CGPoint)origin{
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(canvasImageView.frame.size.height,canvasImageView.frame.size.width), NO, 1);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    
+    CGContextSetRGBStrokeColor(context, self.model.getRed, self.model.getGreen, self.model.getBlue, 1.0f);
+    CGContextStrokeEllipseInRect(context, CGRectMake((origin.x+radius)*xRescale, (origin.y+radius)*yRescale, 2*radius*xRescale, 2*radius*yRescale));
+    
+    UIImage *tempShape = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return tempShape;
+    }
+
 @end
+
+
 
 
 /****************       SUPPLEMENTAL    ****************/

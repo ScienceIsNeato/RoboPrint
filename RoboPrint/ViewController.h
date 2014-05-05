@@ -47,6 +47,11 @@
     BOOL startOverButonResponse;
     UIImage *mostRecentCanvasState;
     int popupMenuName;
+    CGFloat defaultShapeWidth;
+    CGFloat shapeWidth;
+    CGPoint defaultShapeOrigin;
+    CGPoint shapeOrigin;
+    
 }
 
 @property (strong, nonatomic) RoboPrintController *model;
@@ -68,6 +73,9 @@
 @property (weak, nonatomic) IBOutlet UIButton *enlargeButton;
 @property (weak, nonatomic) IBOutlet UIButton *textButton;
 @property int popupMenuName;
+@property CGFloat xRescale;
+@property CGFloat yRescale;
+
 
 - (IBAction)yellowButtonTouchUpInsideAction:(id)sender;
 - (IBAction)redButtonTouchUpInsideAction:(id)sender;
@@ -78,5 +86,7 @@
 - (BOOL) selectImage: (UIViewController*) controller
        usingDelegate: (id <UIImagePickerControllerDelegate,
                        UINavigationControllerDelegate>) delegate;
+-(UIImage *)addCircle:(UIImage *)img radius:(CGFloat)radius origin:(CGPoint)origin;
+-(void)updateImageStack;
 
 @end
