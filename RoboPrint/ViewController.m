@@ -110,6 +110,9 @@
     defaultShapeOrigin = CGPointMake(self.canvasImageView.frame.size.width/2-defaultShapeWidth/2,
                                      self.canvasImageView.frame.size.height/2-defaultShapeWidth/2);
     shapeOrigin = defaultShapeOrigin;
+    shapeOriginOffset.x = 0;
+    shapeOriginOffset.y = 0;
+    
     
     
     
@@ -330,7 +333,47 @@
     //handle pinch...
     switch (self.model.currentMode) {
         case SHAPES:
-            NSLog(@"should be resizing shapes now");
+            if (pinchGestureRecognizer.state == UIGestureRecognizerStateEnded
+                || pinchGestureRecognizer.state == UIGestureRecognizerStateChanged)
+            {
+                
+                CGFloat currentScale = self.canvasImageView.frame.size.width / self.canvasImageView.bounds.size.width;
+                CGFloat newScale = currentScale * pinchGestureRecognizer.scale;
+                
+                if (newScale < MINIMUM_SCALE) {
+                    newScale = MINIMUM_SCALE;
+                }
+                if (newScale > MAXIMUM_SCALE) {
+                    newScale = MAXIMUM_SCALE;
+                }
+                if ([imageStack count] > 0)
+                {
+                    // Get scale of pinch
+                    shapeWidth *= newScale;
+                    
+                    // Put the new shape on the canvas
+                    UIImage *shape = [self addCircle:(self->canvasImageView.image) radius:(shapeWidth/2) origin:(shapeOrigin) replace:TRUE];
+                    
+                    // Pop previous circle off the stack
+                    [imageStack removeObjectAtIndex:0];
+                    
+                    // Make sure there was more than one image on the stack
+                    if ([imageStack count] > 0)
+                    {
+                        // Set the image on the canvas to the one before the shape was added
+                        [self.canvasImageView setImage:[self.imageStack objectAtIndex: 0]];
+                    }
+                    else
+                    {
+                        [self.canvasImageView setImage:nil];
+                    }
+                    // Put the new shape on the canvas
+                    self->canvasImageView.image = [self mergeImage:shape overImage:self.canvasImageView.image inSize:CGSizeMake(self.view.frame.size.height, self.view.frame.size.width)];
+                    // Update image stack
+                    [self updateImageStack];
+                }
+                pinchGestureRecognizer.scale = 1;
+            }
             break;
             
         case TEXT:
@@ -580,6 +623,46 @@
             lastPoint = currentPoint;
             break;
         }
+        
+        case (SHAPES):
+        {
+            if ([imageStack count] > 0)
+            {
+                // Get current absolute location of touch event in the view
+                UITouch *touch = [touches anyObject];
+                CGPoint currentPoint = [touch locationInView:self->canvasImageView];
+                
+                // Scale the point so that it matches the height and width of the drawing canvas
+                currentPoint.x = currentPoint.x*xRescale;
+                currentPoint.y = currentPoint.y*yRescale;
+                shapeOrigin.x = (defaultShapeOrigin.x + (currentPoint.x - lastPoint.x) + shapeOriginOffset.x);
+                shapeOrigin.y = (defaultShapeOrigin.y + (currentPoint.y - lastPoint.y) + shapeOriginOffset.y);
+                
+                // Put the new shape on the canvas
+                UIImage *shape = [self addCircle:(self->canvasImageView.image) radius:(shapeWidth/2) origin:(shapeOrigin) replace:TRUE];
+                
+                // Pop previous circle off the stack
+                [imageStack removeObjectAtIndex:0];
+                
+                // Make sure there was more than one image on the stack
+                if ([imageStack count] > 0)
+                {
+                    // Set the image on the canvas to the one before the shape was added
+                    [self.canvasImageView setImage:[self.imageStack objectAtIndex: 0]];
+                }
+                else
+                {
+                    [self.canvasImageView setImage:nil];
+                }
+                // Put the new shape on the canvas
+                self->canvasImageView.image = [self mergeImage:shape overImage:self.canvasImageView.image inSize:CGSizeMake(self.view.frame.size.height, self.view.frame.size.width)];
+                // Update image stack
+                [self updateImageStack];
+            }
+            
+      
+            break;
+        }
             
         default:
         {
@@ -592,10 +675,38 @@
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
     
-    NSLog(@"touches ended");
+    switch (self.model.currentMode)
+    {
+        case (PENCIL):
+        {
+            [self updateImageStack];
+        }
+            
+        case (SHAPES):
+        {
+            // Get current absolute location of touch event in the view
+            UITouch *touch = [touches anyObject];
+            
+            // Get current absolute location of touch event in the view
+            CGPoint currentPoint = [touch locationInView:self->canvasImageView];
+            // Scale the point so that it matches the height and width of the drawing canvas
+            currentPoint.x = currentPoint.x*xRescale;
+            currentPoint.y = currentPoint.y*yRescale;
+            shapeOriginOffset.x += (currentPoint.x - lastPoint.x);
+            shapeOriginOffset.y += (currentPoint.y - lastPoint.y);
+            break;
+        }
+            
+        default:
+        {
+            NSLog(@"Mode other than pencil");
+            break;
+        }
+    }
+
 
     
-    [self updateImageStack];
+    
 }
 
 -(void)updateImageStack
@@ -717,7 +828,13 @@
             switch (itemIndex)
             {
                 case CIRCLE:
-                    shape = [self addCircle:(self->canvasImageView.image) radius:(defaultShapeWidth/2) origin:(defaultShapeOrigin)];
+                    shape = [self addCircle:(self->canvasImageView.image) radius:(defaultShapeWidth/2) origin:(defaultShapeOrigin) replace:FALSE];
+                    
+                    // Reset all defaults for this shape since it is new
+                    shapeOrigin = defaultShapeOrigin;
+                    shapeOriginOffset.x = 0;
+                    shapeOriginOffset.y = 0;
+                    shapeWidth = defaultShapeWidth;
                     break;
                 case TRIANGLE:
                     shape =  [UIImage imageNamed:@"_tri.png"];
@@ -822,13 +939,15 @@
     [self.imageStack insertObject:self.canvasImageView.image atIndex:0];
 }
 
-- (NSUInteger)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window {
+- (NSUInteger)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window
+{
     // Forces orientation to be landscape mode
     return UIInterfaceOrientationMaskAll;
 }
 
--(UIImage *)addCircle:(UIImage *)img radius:(CGFloat)radius origin:(CGPoint)origin{
-    UIGraphicsBeginImageContextWithOptions(CGSizeMake(canvasImageView.frame.size.height,canvasImageView.frame.size.width), NO, 1);
+-(UIImage *)addCircle:(UIImage *)img radius:(CGFloat)radius origin:(CGPoint)origin replace:(BOOL)replace
+{
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(self.view.frame.size.width,self.view.frame.size.height), NO, 1);
     CGContextRef context = UIGraphicsGetCurrentContext();
     
     CGContextSetRGBStrokeColor(context, self.model.getRed, self.model.getGreen, self.model.getBlue, 1.0f);
@@ -838,7 +957,7 @@
     UIGraphicsEndImageContext();
     
     return tempShape;
-    }
+}
 
 @end
 

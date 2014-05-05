@@ -254,7 +254,7 @@
                                 <color key="backgroundColor" white="0.26619203629032256" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
                             <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nZn-gy-arn" userLabel="canvasImageView">
-                                <rect key="frame" x="198" y="125" width="826" height="643"/>
+                                <rect key="frame" x="198" y="127" width="826" height="641"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </imageView>
                         </subviews>

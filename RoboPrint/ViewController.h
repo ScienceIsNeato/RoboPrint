@@ -51,6 +51,7 @@
     CGFloat shapeWidth;
     CGPoint defaultShapeOrigin;
     CGPoint shapeOrigin;
+    CGPoint shapeOriginOffset;
     
 }
 
@@ -86,7 +87,8 @@
 - (BOOL) selectImage: (UIViewController*) controller
        usingDelegate: (id <UIImagePickerControllerDelegate,
                        UINavigationControllerDelegate>) delegate;
--(UIImage *)addCircle:(UIImage *)img radius:(CGFloat)radius origin:(CGPoint)origin;
+-(UIImage *)addCircle:(UIImage *)img radius:(CGFloat)radius origin:(CGPoint)origin replace:(BOOL)replace;
 -(void)updateImageStack;
+-(UIImage*)mergeImage:(UIImage*)mask overImage:(UIImage*)source inSize:(CGSize)size;
 
 @end

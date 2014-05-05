@@ -504,11 +504,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "RoboPrint/ViewController.m"
-            timestampString = "420952829.182724"
+            timestampString = "420958170.467224"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "383"
-            endingLineNumber = "383"
+            startingLineNumber = "439"
+            endingLineNumber = "439"
             landmarkName = "-backPressed:"
             landmarkType = "5">
          </BreakpointContent>
@@ -520,12 +520,44 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "RoboPrint/ViewController.m"
-            timestampString = "420952829.182724"
+            timestampString = "420958170.467224"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "720"
-            endingLineNumber = "720"
+            startingLineNumber = "844"
+            endingLineNumber = "844"
             landmarkName = "-gridMenu:willDismissWithSelectedItem:atIndex:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "RoboPrint/ViewController.m"
+            timestampString = "420958170.467224"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "645"
+            endingLineNumber = "645"
+            landmarkName = "-touchesMoved:withEvent:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "RoboPrint/ViewController.m"
+            timestampString = "420958170.467224"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "728"
+            endingLineNumber = "728"
+            landmarkName = "-updateImageStack"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
