@@ -52,6 +52,7 @@
     CGPoint defaultShapeOrigin;
     CGPoint shapeOrigin;
     CGPoint shapeOriginOffset;
+    int currentShape;
     
 }
 

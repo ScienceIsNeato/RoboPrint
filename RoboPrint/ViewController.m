@@ -112,6 +112,7 @@
     shapeOrigin = defaultShapeOrigin;
     shapeOriginOffset.x = 0;
     shapeOriginOffset.y = 0;
+    currentShape = CIRCLE;
     
     
     
@@ -350,9 +351,23 @@
                 {
                     // Get scale of pinch
                     shapeWidth *= newScale;
-                    
+                    UIImage *shape = nil;
                     // Put the new shape on the canvas
-                    UIImage *shape = [self addCircle:(self->canvasImageView.image) radius:(shapeWidth/2) origin:(shapeOrigin) replace:TRUE];
+                    switch (currentShape)
+                    {
+                        case CIRCLE:
+                            shape = [self addCircle:(self->canvasImageView.image) radius:(shapeWidth/2) origin:(shapeOrigin) replace:TRUE];
+                            break;
+                        case SQUARE:
+                            shape = [self addSquare:(self->canvasImageView.image) radius:(shapeWidth/2) origin:(shapeOrigin) replace:TRUE];
+                            break;
+                        case TRIANGLE:
+                            shape = [self addTriangle:(self->canvasImageView.image) radius:(shapeWidth/2) origin:(shapeOrigin) replace:TRUE];
+                            break;
+                            
+                        default:
+                            break;
+                    }
                     
                     // Pop previous circle off the stack
                     [imageStack removeObjectAtIndex:0];
@@ -639,7 +654,20 @@
                 shapeOrigin.y = (defaultShapeOrigin.y + (currentPoint.y - lastPoint.y) + shapeOriginOffset.y);
                 
                 // Put the new shape on the canvas
-                UIImage *shape = [self addCircle:(self->canvasImageView.image) radius:(shapeWidth/2) origin:(shapeOrigin) replace:TRUE];
+                UIImage *shape;
+                switch (currentShape) {
+                    case CIRCLE:
+                        shape = [self addCircle:(self->canvasImageView.image) radius:(shapeWidth/2) origin:(shapeOrigin) replace:TRUE];
+                        break;
+                    case SQUARE:
+                        shape = [self addSquare:(self->canvasImageView.image) radius:(shapeWidth/2) origin:(shapeOrigin) replace:TRUE];
+                        break;
+                    case TRIANGLE:
+                        shape = [self addTriangle:(self->canvasImageView.image) radius:(shapeWidth/2) origin:(shapeOrigin) replace:TRUE];
+                        break;
+                    default:
+                        break;
+                }
                 
                 // Pop previous circle off the stack
                 [imageStack removeObjectAtIndex:0];
@@ -824,26 +852,19 @@
     switch (popupMenuName)
     {
         case SHAPES:
-        
+            currentShape = itemIndex;
             switch (itemIndex)
             {
                 case CIRCLE:
                     shape = [self addCircle:(self->canvasImageView.image) radius:(defaultShapeWidth/2) origin:(defaultShapeOrigin) replace:FALSE];
-                    
-                    // Reset all defaults for this shape since it is new
-                    shapeOrigin = defaultShapeOrigin;
-                    shapeOriginOffset.x = 0;
-                    shapeOriginOffset.y = 0;
-                    shapeWidth = defaultShapeWidth;
                     break;
                 case TRIANGLE:
-                    shape =  [UIImage imageNamed:@"_tri.png"];
-                    break;
+                    shape = [self addTriangle:(self->canvasImageView.image) radius:(defaultShapeWidth/2) origin:(defaultShapeOrigin) replace:FALSE];                    break;
                 case LINE:
                     shape =  [UIImage imageNamed:@"_line.png"];
                     break;
                 case SQUARE:
-                    shape =  [UIImage imageNamed:@"_square.png"];
+                    shape = [self addSquare:(self->canvasImageView.image) radius:(defaultShapeWidth/2) origin:(defaultShapeOrigin) replace:FALSE];
                     break;
                 case STAR:
                     shape =  [UIImage imageNamed:@"_star.png"];
@@ -856,6 +877,11 @@
                     
                 
             }
+            // Reset all defaults for this shape since it is new
+            shapeOrigin = defaultShapeOrigin;
+            shapeOriginOffset.x = 0;
+            shapeOriginOffset.y = 0;
+            shapeWidth = defaultShapeWidth;
             NSLog(@"Select ccc index was %d and the menu was %d", itemIndex, popupMenuName);
 
             // Put the new shape on the canvas
@@ -953,6 +979,66 @@
     CGContextSetRGBStrokeColor(context, self.model.getRed, self.model.getGreen, self.model.getBlue, 1.0f);
     CGContextStrokeEllipseInRect(context, CGRectMake((origin.x+radius)*xRescale, (origin.y+radius)*yRescale, 2*radius*xRescale, 2*radius*yRescale));
     
+    UIImage *tempShape = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return tempShape;
+}
+
+-(UIImage *)addSquare:(UIImage *)img radius:(CGFloat)radius origin:(CGPoint)origin replace:(BOOL)replace
+{
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(self.view.frame.size.width,self.view.frame.size.height), NO, 1);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    
+    CGContextSetRGBStrokeColor(context, self.model.getRed, self.model.getGreen, self.model.getBlue, 1.0f);
+    CGContextSetLineWidth(context, 1);
+    
+    // Top edge
+    CGContextMoveToPoint(context, (origin.x)*xRescale,(origin.y)*yRescale);
+    CGContextAddLineToPoint(context, (origin.x+2*radius)*xRescale, (origin.y)*yRescale);
+    
+    // Left Edge
+    CGContextMoveToPoint(context, (origin.x)*xRescale,(origin.y)*yRescale);
+    CGContextAddLineToPoint(context, (origin.x)*xRescale, (origin.y+2*radius)*yRescale);
+    
+    // Right Edge
+    CGContextMoveToPoint(context, (origin.x+2*radius)*xRescale,(origin.y+2*radius)*yRescale);
+    CGContextAddLineToPoint(context, (origin.x+2*radius)*xRescale, (origin.y)*yRescale);
+    
+    // Bottom Edge
+    CGContextMoveToPoint(context, (origin.x)*xRescale,(origin.y+2*radius)*yRescale);
+    CGContextAddLineToPoint(context, (origin.x+2*radius)*xRescale, (origin.y+2*radius)*yRescale);
+    
+    CGContextStrokePath(context);
+    
+    UIImage *tempShape = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return tempShape;
+}
+
+-(UIImage *)addTriangle:(UIImage *)img radius:(CGFloat)radius origin:(CGPoint)origin replace:(BOOL)replace
+{
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(self.view.frame.size.width,self.view.frame.size.height), NO, 1);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    
+    CGContextSetRGBStrokeColor(context, self.model.getRed, self.model.getGreen, self.model.getBlue, 1.0f);
+    CGContextSetLineWidth(context, 1);
+    
+    // Left edge
+    CGContextMoveToPoint(context, (origin.x+radius)*xRescale,(origin.y-radius/2)*yRescale);
+    CGContextAddLineToPoint(context, (origin.x)*xRescale, (origin.y+radius)*yRescale);
+    
+    // Right Edge
+    CGContextMoveToPoint(context, (origin.x+radius)*xRescale,(origin.y-radius/2)*yRescale);
+    CGContextAddLineToPoint(context, (origin.x+2*radius)*xRescale, (origin.y+radius)*yRescale);
+    
+    // Bottom Edge
+    CGContextMoveToPoint(context, (origin.x)*xRescale,(origin.y+radius)*yRescale);
+    CGContextAddLineToPoint(context, (origin.x+2*radius)*xRescale, (origin.y+radius)*yRescale);
+    
+    CGContextStrokePath(context);
+
     UIImage *tempShape = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     
