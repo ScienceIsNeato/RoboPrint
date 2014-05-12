@@ -113,6 +113,7 @@
     shapeOriginOffset.x = 0;
     shapeOriginOffset.y = 0;
     currentShape = CIRCLE;
+    shapeCreationIndex = 0;
     
     
     
@@ -364,6 +365,11 @@
                         case TRIANGLE:
                             shape = [self addTriangle:(self->canvasImageView.image) radius:(shapeWidth/2) origin:(shapeOrigin) replace:TRUE];
                             break;
+                        case PENTAGON:
+                            shape = [self addPentagon:(self->canvasImageView.image) radius:(shapeWidth/2) origin:(shapeOrigin) replace:TRUE];
+                        case STAR:
+                            shape = [self addStar:(self->canvasImageView.image) radius:(shapeWidth/2) origin:(shapeOrigin) replace:TRUE];
+                            break;
                             
                         default:
                             break;
@@ -605,6 +611,8 @@
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
     // TODO - Confirm that start of touch is in canvas
+    
+    
     switch (self.model.currentMode)
     {
         case (PENCIL):
@@ -641,7 +649,7 @@
         
         case (SHAPES):
         {
-            if ([imageStack count] > 0)
+            if (([imageStack count] > 0) && (shapeCreationIndex == imageStackIndex))
             {
                 // Get current absolute location of touch event in the view
                 UITouch *touch = [touches anyObject];
@@ -664,6 +672,12 @@
                         break;
                     case TRIANGLE:
                         shape = [self addTriangle:(self->canvasImageView.image) radius:(shapeWidth/2) origin:(shapeOrigin) replace:TRUE];
+                        break;
+                    case PENTAGON:
+                        shape = [self addPentagon:(self->canvasImageView.image) radius:(shapeWidth/2) origin:(shapeOrigin) replace:TRUE];
+                        break;
+                    case STAR:
+                        shape = [self addStar:(self->canvasImageView.image) radius:(shapeWidth/2) origin:(shapeOrigin) replace:TRUE];
                         break;
                     default:
                         break;
@@ -867,10 +881,10 @@
                     shape = [self addSquare:(self->canvasImageView.image) radius:(defaultShapeWidth/2) origin:(defaultShapeOrigin) replace:FALSE];
                     break;
                 case STAR:
-                    shape =  [UIImage imageNamed:@"_star.png"];
+                    shape = [self addStar:(self->canvasImageView.image) radius:(defaultShapeWidth/2) origin:(defaultShapeOrigin) replace:FALSE];
                     break;
-                case PENTAGRAM:
-                    shape =  [UIImage imageNamed:@"_pent.png"];
+                case PENTAGON:
+                    shape = [self addPentagon:(self->canvasImageView.image) radius:(defaultShapeWidth/2) origin:(defaultShapeOrigin) replace:FALSE];
                     break;
                 default:
                     break;
@@ -888,6 +902,9 @@
             self->canvasImageView.image = [self mergeImage:shape overImage:self.canvasImageView.image inSize:CGSizeMake(self.view.frame.size.height, self.view.frame.size.width)];
             // Update image stack
             [self updateImageStack];
+            
+            // Set the index for the shape as the current index
+            shapeCreationIndex = imageStackIndex;
             
             break;
         case BACKGROUNDS:
@@ -1039,6 +1056,120 @@
     
     CGContextStrokePath(context);
 
+    UIImage *tempShape = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return tempShape;
+}
+
+-(UIImage *)addPentagon:(UIImage *)img radius:(CGFloat)radius origin:(CGPoint)origin replace:(BOOL)replace
+{
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(self.view.frame.size.width,self.view.frame.size.height), NO, 1);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    
+    CGContextSetRGBStrokeColor(context, self.model.getRed, self.model.getGreen, self.model.getBlue, 1.0f);
+    CGContextSetLineWidth(context, 1);
+    
+    float fudgeFactor = 0.2;
+    // Pentagon Points
+    CGPoint topPoint = CGPointMake((origin.x+radius)*xRescale,
+                                   (origin.y + (radius*fudgeFactor))*yRescale);
+    CGPoint topLeftPoint = CGPointMake((origin.x)*xRescale,
+                                   (origin.y + radius)*yRescale);
+    CGPoint topRightPoint = CGPointMake((origin.x+2*radius)*xRescale,
+                                   (origin.y + radius)*yRescale);
+    CGPoint bottomLeftPoint = CGPointMake((origin.x + radius*2*fudgeFactor)*xRescale,
+                                   (origin.y + 2*radius)*yRescale);
+    CGPoint bottomRightPoint = CGPointMake((origin.x + 2*radius - radius*2*fudgeFactor)*xRescale,
+                                   (origin.y + 2*radius)*yRescale);
+    
+    // Connect the dots
+    
+    // top to top left
+    CGContextMoveToPoint(context, topPoint.x, topPoint.y);
+    CGContextAddLineToPoint(context, topLeftPoint.x, topLeftPoint.y);
+    
+    // top left to bottom left
+    CGContextMoveToPoint(context, topLeftPoint.x, topLeftPoint.y);
+    CGContextAddLineToPoint(context, bottomLeftPoint.x, bottomLeftPoint.y);
+    
+    // bottom left to bottom right
+    CGContextMoveToPoint(context, bottomLeftPoint.x, bottomLeftPoint.y);
+    CGContextAddLineToPoint(context, bottomRightPoint.x, bottomRightPoint.y);
+    
+    // bottom right to top right
+    CGContextMoveToPoint(context, bottomRightPoint.x, bottomRightPoint.y);
+    CGContextAddLineToPoint(context, topRightPoint.x, topRightPoint.y);
+    
+    // top right to top
+    CGContextMoveToPoint(context, topRightPoint.x, topRightPoint.y);
+    CGContextAddLineToPoint(context, topPoint.x, topPoint.y);
+    
+    CGContextStrokePath(context);
+    
+    UIImage *tempShape = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return tempShape;
+}
+
+-(UIImage *)addStar:(UIImage *)img radius:(CGFloat)radius origin:(CGPoint)origin replace:(BOOL)replace
+{
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(self.view.frame.size.width,self.view.frame.size.height), NO, 1);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    
+    CGContextSetRGBStrokeColor(context, self.model.getRed, self.model.getGreen, self.model.getBlue, 1.0f);
+    CGContextSetLineWidth(context, 1);
+    
+    // In this function, it will be easier to work in the polar coordinate system.
+    CGFloat outerRadius = radius;
+    CGFloat innerRadius = radius/4;
+    CGFloat outerTheta = 0;
+    CGFloat innerTheta = 0;
+    CGFloat PI = 3.14;
+    CGFloat offset = PI/8; // degrees
+    CGFloat delta = PI/4; // degrees
+    CGPoint tempInner;
+    CGPoint tempOuter;
+    CGPoint innerLast;
+    CGPoint actualOrigin = CGPointMake((origin.x + radius),
+                                       (origin.y + radius));
+
+    // Initialize first inner point
+    innerTheta = offset;
+    innerLast = CGPointMake((actualOrigin.x + innerRadius*cosf(innerTheta))*xRescale,
+                            (actualOrigin.y + innerRadius*sinf(innerTheta))*yRescale);
+    
+    for (innerTheta = offset; innerTheta < 2*PI; innerTheta += delta)
+    {
+        // Create the inner and outer points
+        tempInner = CGPointMake((actualOrigin.x + innerRadius*cosf(innerTheta))*xRescale,
+                    (actualOrigin.y + innerRadius*sinf(innerTheta))*yRescale);
+        tempOuter = CGPointMake((actualOrigin.x + outerRadius*cosf(outerTheta))*xRescale,
+                                (actualOrigin.y + outerRadius*sinf(outerTheta))*yRescale);
+        
+        // Connect the last inner point to the new outer point
+        CGContextMoveToPoint(context, innerLast.x,innerLast.y);
+        CGContextAddLineToPoint(context, tempOuter.x, tempOuter.y);
+        
+        // Connect the outer point to the new inner point
+        CGContextMoveToPoint(context, tempInner.x,tempInner.y);
+        CGContextAddLineToPoint(context, tempOuter.x, tempOuter.y);
+        
+        innerLast = tempInner;
+        
+        // increment angle of outer circle
+        outerTheta += delta;
+    }
+    
+    // Connect last dot
+    tempOuter = CGPointMake((actualOrigin.x + outerRadius*cosf(outerTheta))*xRescale,
+                            (actualOrigin.y + outerRadius*sinf(outerTheta))*yRescale);
+    CGContextMoveToPoint(context, tempInner.x,tempInner.y);
+    CGContextAddLineToPoint(context, tempOuter.x, tempOuter.y);
+    
+    CGContextStrokePath(context);
+    
     UIImage *tempShape = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     

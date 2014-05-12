@@ -20,7 +20,7 @@
 #define LINE        2
 #define SQUARE      3
 #define STAR        4
-#define PENTAGRAM   5
+#define PENTAGON    5
 
 #define MINIMUM_SCALE .1
 #define MAXIMUM_SCALE 10
@@ -53,6 +53,7 @@
     CGPoint shapeOrigin;
     CGPoint shapeOriginOffset;
     int currentShape;
+    int shapeCreationIndex;
     
 }
 
