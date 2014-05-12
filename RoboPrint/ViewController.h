@@ -54,6 +54,9 @@
     CGPoint shapeOriginOffset;
     int currentShape;
     int shapeCreationIndex;
+    CGPoint lineP1;
+    CGPoint lineP2;
+    BOOL lineCanBeMoved;
     
 }
 
@@ -89,7 +92,6 @@
 - (BOOL) selectImage: (UIViewController*) controller
        usingDelegate: (id <UIImagePickerControllerDelegate,
                        UINavigationControllerDelegate>) delegate;
--(UIImage *)addCircle:(UIImage *)img radius:(CGFloat)radius origin:(CGPoint)origin replace:(BOOL)replace;
 -(void)updateImageStack;
 -(UIImage*)mergeImage:(UIImage*)mask overImage:(UIImage*)source inSize:(CGSize)size;
 
