@@ -28,7 +28,7 @@
 
 
 
-@interface ViewController : UIViewController{
+@interface ViewController : UIViewController <UIGestureRecognizerDelegate, RNGridMenuDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate>{
     
     CGPoint lastPoint;
     CGFloat red;
@@ -94,5 +94,7 @@
                        UINavigationControllerDelegate>) delegate;
 -(void)updateImageStack;
 -(UIImage*)mergeImage:(UIImage*)mask overImage:(UIImage*)source inSize:(CGSize)size;
+
+- (cv::Mat)cvMatFromUIImage:(UIImage *)image;
 
 @end

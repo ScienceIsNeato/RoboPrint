@@ -34,6 +34,11 @@
 		842FB7D61904C6D10028FD06 /* text_button.png in Resources */ = {isa = PBXBuildFile; fileRef = 842FB7CF1904C6D10028FD06 /* text_button.png */; };
 		842FB7D81904CBDF0028FD06 /* color_selected_mask.png in Resources */ = {isa = PBXBuildFile; fileRef = 842FB7D71904CBDF0028FD06 /* color_selected_mask.png */; };
 		842FB7DB1904CFC90028FD06 /* Main_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 842FB7D91904CFC90028FD06 /* Main_iPad.storyboard */; };
+		844636AA1921CB9D007F419E /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 844636A91921CB9D007F419E /* opencv2.framework */; };
+		844636AE1921CFB4007F419E /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 844636AB1921CFB4007F419E /* AVFoundation.framework */; };
+		844636AF1921CFB4007F419E /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 844636AC1921CFB4007F419E /* CoreMedia.framework */; };
+		844636B01921CFB4007F419E /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 844636AD1921CFB4007F419E /* ImageIO.framework */; };
+		844636B41921D0E0007F419E /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 844636B31921D0E0007F419E /* AssetsLibrary.framework */; };
 		846B940418F0D1A60063B9BA /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 846B940318F0D1A60063B9BA /* Foundation.framework */; };
 		846B940618F0D1A60063B9BA /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 846B940518F0D1A60063B9BA /* CoreGraphics.framework */; };
 		846B940818F0D1A60063B9BA /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 846B940718F0D1A60063B9BA /* UIKit.framework */; };
@@ -41,7 +46,7 @@
 		846B941018F0D1A60063B9BA /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 846B940F18F0D1A60063B9BA /* main.m */; };
 		846B941418F0D1A60063B9BA /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 846B941318F0D1A60063B9BA /* AppDelegate.m */; };
 		846B941718F0D1A60063B9BA /* Main_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 846B941518F0D1A60063B9BA /* Main_iPhone.storyboard */; };
-		846B941D18F0D1A60063B9BA /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 846B941C18F0D1A60063B9BA /* ViewController.m */; };
+		846B941D18F0D1A60063B9BA /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 846B941C18F0D1A60063B9BA /* ViewController.mm */; };
 		846B941F18F0D1A60063B9BA /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 846B941E18F0D1A60063B9BA /* Images.xcassets */; };
 		846B942618F0D1A60063B9BA /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 846B942518F0D1A60063B9BA /* XCTest.framework */; };
 		846B942718F0D1A70063B9BA /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 846B940318F0D1A60063B9BA /* Foundation.framework */; };
@@ -96,6 +101,12 @@
 		842FB7CF1904C6D10028FD06 /* text_button.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = text_button.png; sourceTree = "<group>"; };
 		842FB7D71904CBDF0028FD06 /* color_selected_mask.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = color_selected_mask.png; sourceTree = "<group>"; };
 		842FB7DA1904CFC90028FD06 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPad.storyboard; sourceTree = "<group>"; };
+		844636A91921CB9D007F419E /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = opencv2.framework; path = Pods/opencv2.framework; sourceTree = "<group>"; };
+		844636AB1921CFB4007F419E /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		844636AC1921CFB4007F419E /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
+		844636AD1921CFB4007F419E /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
+		844636B11921D099007F419E /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
+		844636B31921D0E0007F419E /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
 		846B940018F0D1A60063B9BA /* RoboPrint.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RoboPrint.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		846B940318F0D1A60063B9BA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		846B940518F0D1A60063B9BA /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -108,7 +119,7 @@
 		846B941318F0D1A60063B9BA /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		846B941618F0D1A60063B9BA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPhone.storyboard; sourceTree = "<group>"; };
 		846B941B18F0D1A60063B9BA /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		846B941C18F0D1A60063B9BA /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		846B941C18F0D1A60063B9BA /* ViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ViewController.mm; sourceTree = "<group>"; };
 		846B941E18F0D1A60063B9BA /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		846B942418F0D1A60063B9BA /* RoboPrintTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RoboPrintTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		846B942518F0D1A60063B9BA /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
@@ -132,8 +143,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				844636B41921D0E0007F419E /* AssetsLibrary.framework in Frameworks */,
+				844636AE1921CFB4007F419E /* AVFoundation.framework in Frameworks */,
+				844636AF1921CFB4007F419E /* CoreMedia.framework in Frameworks */,
+				844636B01921CFB4007F419E /* ImageIO.framework in Frameworks */,
 				846B943E18F0EAF10063B9BA /* QuartzCore.framework in Frameworks */,
 				846B943C18F0EAE10063B9BA /* Accelerate.framework in Frameworks */,
+				844636AA1921CB9D007F419E /* opencv2.framework in Frameworks */,
 				846B940618F0D1A60063B9BA /* CoreGraphics.framework in Frameworks */,
 				846B940818F0D1A60063B9BA /* UIKit.framework in Frameworks */,
 				846B940418F0D1A60063B9BA /* Foundation.framework in Frameworks */,
@@ -214,6 +230,12 @@
 		846B940218F0D1A60063B9BA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				844636B31921D0E0007F419E /* AssetsLibrary.framework */,
+				844636B11921D099007F419E /* OpenAL.framework */,
+				844636AB1921CFB4007F419E /* AVFoundation.framework */,
+				844636AC1921CFB4007F419E /* CoreMedia.framework */,
+				844636AD1921CFB4007F419E /* ImageIO.framework */,
+				844636A91921CB9D007F419E /* opencv2.framework */,
 				846B943D18F0EAF10063B9BA /* QuartzCore.framework */,
 				846B943B18F0EAE10063B9BA /* Accelerate.framework */,
 				846B940318F0D1A60063B9BA /* Foundation.framework */,
@@ -235,7 +257,7 @@
 				846E642D18F8EBD40090E0A3 /* RoboPrintController.h */,
 				846E642E18F8EBD40090E0A3 /* RoboPrintController.m */,
 				846B941B18F0D1A60063B9BA /* ViewController.h */,
-				846B941C18F0D1A60063B9BA /* ViewController.m */,
+				846B941C18F0D1A60063B9BA /* ViewController.mm */,
 				846B941E18F0D1A60063B9BA /* Images.xcassets */,
 				846B940A18F0D1A60063B9BA /* Supporting Files */,
 			);
@@ -438,7 +460,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				846B941D18F0D1A60063B9BA /* ViewController.m in Sources */,
+				846B941D18F0D1A60063B9BA /* ViewController.mm in Sources */,
 				846E642F18F8EBD40090E0A3 /* RoboPrintController.m in Sources */,
 				846B941418F0D1A60063B9BA /* AppDelegate.m in Sources */,
 				846B941018F0D1A60063B9BA /* main.m in Sources */,
@@ -579,6 +601,10 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Pods",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RoboPrint/RoboPrint-Prefix.pch";
 				INFOPLIST_FILE = "RoboPrint/RoboPrint-Info.plist";
@@ -596,6 +622,10 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Pods",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RoboPrint/RoboPrint-Prefix.pch";
 				INFOPLIST_FILE = "RoboPrint/RoboPrint-Info.plist";

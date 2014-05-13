@@ -11,6 +11,7 @@
 		3FD8E97F3DCB4B3EA25855B5 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82769E6DFEEA4AE698916A14 /* QuartzCore.framework */; };
 		48AAD7AED6DC436A9AA89C08 /* Pods-RoboPrint-RNGridMenu-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 07730AA7A7A84E1B8A2154FD /* Pods-RoboPrint-RNGridMenu-dummy.m */; };
 		5D8600B0266447749B4825FA /* Pods-RoboPrint-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 03AEBF6AFEEA40F28A4BA102 /* Pods-RoboPrint-dummy.m */; };
+		844636A81921CA88007F419E /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 844636A71921CA88007F419E /* opencv2.framework */; };
 		846E643818F90D600090E0A3 /* RNGridMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = 846E643718F90D600090E0A3 /* RNGridMenu.m */; };
 		84AE272E20A44A9091164513 /* libPods-RoboPrint-RNGridMenu.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC34F3F858474362817A2F9F /* libPods-RoboPrint-RNGridMenu.a */; };
 		8DA74D35C0B24B28B30B4662 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 70EC99473F2441FD8A46D18F /* Accelerate.framework */; };
@@ -37,6 +38,7 @@
 		7526AC23903A45EDB0AC0065 /* libPods-RoboPrint.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RoboPrint.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		784A8E24A8F9458FB133A24F /* Pods-RoboPrint-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-RoboPrint-acknowledgements.markdown"; sourceTree = "<group>"; };
 		82769E6DFEEA4AE698916A14 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk/System/Library/Frameworks/QuartzCore.framework; sourceTree = DEVELOPER_DIR; };
+		844636A71921CA88007F419E /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = opencv2.framework; sourceTree = "<group>"; };
 		846E643618F90D600090E0A3 /* RNGridMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNGridMenu.h; sourceTree = "<group>"; };
 		846E643718F90D600090E0A3 /* RNGridMenu.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNGridMenu.m; sourceTree = "<group>"; };
 		9A3ACA9A82F04CAD8ACF2756 /* Pods-RoboPrint-RNGridMenu.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-RoboPrint-RNGridMenu.xcconfig"; sourceTree = "<group>"; };
@@ -63,6 +65,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				844636A81921CA88007F419E /* opencv2.framework in Frameworks */,
 				D176F5FF2F64464AB7E9AA60 /* Foundation.framework in Frameworks */,
 				84AE272E20A44A9091164513 /* libPods-RoboPrint-RNGridMenu.a in Frameworks */,
 			);
@@ -152,6 +155,7 @@
 		C5A234DA6A6D4C9DAFE51CFB /* iOS */ = {
 			isa = PBXGroup;
 			children = (
+				844636A71921CA88007F419E /* opencv2.framework */,
 				70EC99473F2441FD8A46D18F /* Accelerate.framework */,
 				F9ECB48EFF284B38BE1F8450 /* Foundation.framework */,
 				82769E6DFEEA4AE698916A14 /* QuartzCore.framework */,
@@ -362,6 +366,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
 				DSTROOT = /tmp/xcodeproj.dst;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -419,6 +427,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
 				DSTROOT = /tmp/xcodeproj.dst;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
