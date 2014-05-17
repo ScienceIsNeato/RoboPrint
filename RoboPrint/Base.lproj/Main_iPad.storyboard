@@ -253,6 +253,10 @@
                                 </subviews>
                                 <color key="backgroundColor" white="0.26619203629032256" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
+                            <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="C5D-2n-RGl" userLabel="backgroundImageView">
+                                <rect key="frame" x="198" y="127" width="826" height="641"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
                             <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nZn-gy-arn" userLabel="canvasImageView">
                                 <rect key="frame" x="198" y="127" width="826" height="641"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -265,6 +269,7 @@
                     <connections>
                         <outlet property="YellowButton" destination="6fe-Q8-GFD" id="XTt-Sv-T1R"/>
                         <outlet property="backButton" destination="bgg-F1-gzY" id="zsm-ca-UcX"/>
+                        <outlet property="backgroundImageView" destination="C5D-2n-RGl" id="JkW-ao-CZR"/>
                         <outlet property="backgroundsButton" destination="ny9-Ts-GT7" id="aaN-XH-eoA"/>
                         <outlet property="blackButton" destination="h5Y-L5-bjO" id="dso-cO-K8i"/>
                         <outlet property="blueButton" destination="LPj-ZL-gvv" id="ft0-kV-w9d"/>

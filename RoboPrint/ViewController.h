@@ -37,6 +37,7 @@
     CGFloat brush;
     CGFloat opacity;
     IBOutlet UIImageView *canvasImageView;
+    IBOutlet UIImageView *backgroundImageView;
     BOOL mouseSwiped;
     RoboPrintController *model;
     int imageStackIndex;
@@ -62,6 +63,7 @@
 
 @property (strong, nonatomic) RoboPrintController *model;
 @property (strong, retain) UIImageView *canvasImageView;
+@property (strong, retain) UIImageView *backgroundImageView;
 @property (strong, retain) UIImage *lastImage;
 @property (strong, retain) NSMutableArray *imageStack;
 @property (weak, nonatomic) IBOutlet UIButton *yellowButton;

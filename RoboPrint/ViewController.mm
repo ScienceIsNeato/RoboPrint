@@ -36,6 +36,7 @@
 // Other properties
 @synthesize model;
 @synthesize canvasImageView;
+@synthesize backgroundImageView;
 @synthesize lastImage;
 @synthesize imageStack;
 @synthesize backButton;
@@ -260,11 +261,20 @@
     self.model.currentMode = BACKGROUNDS_MODE;
     
     NSArray *images = [NSArray arrayWithObjects:
-                       [UIImage imageNamed:@"1.png"],
-                       [UIImage imageNamed:@"2.png"],
-                       [UIImage imageNamed:@"3.png"],
-                       [UIImage imageNamed:@"4.png"],
+                       [UIImage imageNamed:@"bg1_RElephant_SMALL.jpg"],
+                       [UIImage imageNamed:@"bg2_Rengine_SMALL.jpg"],
+                       [UIImage imageNamed:@"bg3_RGuitar_color_SMALL.jpg"],
+                       [UIImage imageNamed:@"bg4_Rhclown_face_color_SMALL.jpg"],
+                       [UIImage imageNamed:@"bg5_RHotAIr_Baloon_color_SMALL.jpg"],
+                       [UIImage imageNamed:@"bg6_RHouse_SMALL.jpg"],
+                       [UIImage imageNamed:@"bg7_Rjeep_SMALL.jpg"],
+                       [UIImage imageNamed:@"bg8_RKite_color_SMALL.jpg"],
+                       [UIImage imageNamed:@"bg9_RTeddyBear_color_SMALL.jpg"],
+                       [UIImage imageNamed:@"bg10_RTractor_color_SMALL.jpg"],
+                       [UIImage imageNamed:@"bg11_RTricycle_color_SMALL.jpg"],
+                       [UIImage imageNamed:@"bg12_none.png"],
                        nil];
+
     
     RNGridMenu *av = [[RNGridMenu alloc] initWithImages:images];
     //RoboPrintController *menuController = [[RoboPrintController alloc] init];
@@ -415,12 +425,12 @@
             break;
             
         case TEXT_MODE:
-            NSLog(@"should be resizing text now");
+            //NSLog(@"should be resizing text now");
             break;
         case ENLARGE_MODE:
             if (pinchGestureRecognizer.state == UIGestureRecognizerStateEnded
                 || pinchGestureRecognizer.state == UIGestureRecognizerStateChanged) {
-                NSLog(@"gesture.scale = %f", pinchGestureRecognizer.scale);
+                //NSLog(@"gesture.scale = %f", pinchGestureRecognizer.scale);
                 
                 CGFloat currentScale = self.canvasImageView.frame.size.width / self.canvasImageView.bounds.size.width;
                 CGFloat newScale = currentScale * pinchGestureRecognizer.scale;
@@ -442,12 +452,12 @@
                 [self.canvasImageView setCenter:CGPointMake(self.canvasImageView.center.x, self.canvasImageView.center.y + 44)];
                 pinchGestureRecognizer.scale = 1;
             }
-            NSLog(@"should be resizing image now");
+            //NSLog(@"should be resizing image now");
             break;
             
             
         default:
-            NSLog(@"should be doing nothing now");
+            //NSLog(@"should be doing nothing now");
             break;
     }
     
@@ -700,7 +710,7 @@
                         if (lineCanBeMoved)
                         {
                             // Drag line around (movement phase)
-                            NSLog(@"Offsets are %f, %f",shapeOriginOffset.x, shapeOriginOffset.y);
+                            //NSLog(@"Offsets are %f, %f",shapeOriginOffset.x, shapeOriginOffset.y);
                             CGPoint tempP1 = CGPointMake((lineP1.x + (currentPoint.x - lastPoint.x) + shapeOriginOffset.x), (lineP1.y + (currentPoint.y - lastPoint.y) + shapeOriginOffset.y));
                             CGPoint tempP2 = CGPointMake((lineP2.x + (currentPoint.x - lastPoint.x) + shapeOriginOffset.x), (lineP2.y + (currentPoint.y - lastPoint.y) + shapeOriginOffset.y));
                             shape = [self addLine:(self->canvasImageView.image) P1:tempP1 P2:tempP2];
@@ -746,7 +756,7 @@
             
         default:
         {
-            NSLog(@"Mode other than pencil");
+            //NSLog(@"Mode other than pencil");
             break;
         }
     }
@@ -780,7 +790,7 @@
             
         default:
         {
-            NSLog(@"Mode other than pencil");
+            //NSLog(@"Mode other than pencil");
             break;
         }
     }
@@ -964,28 +974,59 @@
                     background =  [UIImage imageNamed:@"bg1_RElephant.jpg"];
                     break;
                 case 1:
-                    background =  [UIImage imageNamed:@"2.png"];
+                    background =  [UIImage imageNamed:@"bg2_Rengine.jpg"];
                     break;
                 case 2:
-                    background =  [UIImage imageNamed:@"3.png"];
+                    background =  [UIImage imageNamed:@"bg3_RGuitar_color.jpg"];
                     break;
                 case 3:
-                    background =  [UIImage imageNamed:@"4.png"];
+                    background =  [UIImage imageNamed:@"bg4_Rhclown_face_color.jpg"];
+                    break;
+                case 4:
+                    background =  [UIImage imageNamed:@"bg5_HotAIr_Baloon_color.jpg"];
+                    break;
+                case 5:
+                    background =  [UIImage imageNamed:@"bg6_RHouse.jpg"];
+                    break;
+                case 6:
+                    background =  [UIImage imageNamed:@"bg7_Rjeep.jpg"];
+                    break;
+                case 7:
+                    background =  [UIImage imageNamed:@"bg8_RKite_color.jpg"];
+                    break;
+                case 8:
+                    background =  [UIImage imageNamed:@"bg9_RTeddyBear_color.jpg"];
+                    break;
+                case 9:
+                    background =  [UIImage imageNamed:@"bg10_RTractor_color.jpg"];
+                    break;
+                case 10:
+                    background =  [UIImage imageNamed:@"bg11_RTricycle_color.jpg"];
+                    break;
+                case 11:
+                    [self.backgroundImageView setImage:nil];
+                    background =  self.backgroundImageView.image;
                     break;
                 default:
                     break;
+                    
+                // TODO
+                    // Update save image to merge with background
+                    
                 
             }
             
             NSLog(@"Select ccc index was %d and the menu was %d", itemIndex, popupMenuName);
             UIGraphicsBeginImageContext(self.view.frame.size);
-            [self->canvasImageView.image drawInRect:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
+            [self->backgroundImageView.image drawInRect:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
             //self->canvasImageView.image = [self maskImage:self->canvasImageView.image withMask:background];
-            self->canvasImageView.image = [self mergeImage:self.canvasImageView.image overImage:background inSize:CGSizeMake(self.view.frame.size.height, self.view.frame.size.width)];
+            [self->backgroundImageView setImage:background];
+            
+            //NSLog(@"width height: %f, %f", self.view.frame.size.width, self.view.frame.size.height);
             //self->canvasImageView.image = [UIImage imageNamed:@"back_disabled.png"];
-            [self->canvasImageView setAlpha:opacity];
+            //[self->canvasImageView setAlpha:opacity];
             UIGraphicsEndImageContext();
-            [self updateImageStack];
+            //[self updateImageStack];
 
             break;
             
