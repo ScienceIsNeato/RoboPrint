@@ -71,7 +71,7 @@
     self.model.currentColor = YELLOW;
     imageStackIndex = 0; // most recent image
     
-    self.model.currentMode = PENCIL;
+    self.model.currentMode = PENCIL_MODE;
     [self.pencilButton setImage:[UIImage imageNamed:@"color_selected_mask.png"]
                        forState:UIControlStateNormal];
     // END TODO
@@ -205,18 +205,27 @@
     [self.shapesButton setImage:nil forState:UIControlStateNormal];
     [self.enlargeButton setImage:nil forState:UIControlStateNormal];
     [self.textButton setImage:nil forState:UIControlStateNormal];
-    self.model.currentMode = IMAGE;
+    self.model.currentMode = IMAGE_MODE;
     // TODO
     // SEE HERE FOR INSTRUCTIONS FOR GETTING IMAGE FROM CAMERA
     // http://www.icodeblog.com/2009/07/28/getting-images-from-the-iphone-photo-library-or-camera-using-uiimagepickercontroller/
     
-    cv::Mat greyMat;
-    //cv::cvtColor(inputMat, greyMat, CV_BGR2GRAY);
-    CvMat tempimage = [self cvMatFromUIImage:self.canvasImageView.image];
-    //CvMat tempimage = (cv::Mat)cvMatFromUIImage(self.canvasImageView.image);
-    UIImage *tempImage2 = [self UIImageFromCVMat:&tempimage];//[(cv::Mat)UIImageFromCVMat *tempimage];
     
-    [self.canvasImageView setImage:tempImage2];
+    if (self.canvasImageView.image != NULL)
+    {
+        cv::Mat greyMat;
+        //cv::cvtColor(inputMat, greyMat, CV_BGR2GRAY);
+        CvMat tempimage = [self cvMatFromUIImage:self.canvasImageView.image];
+        //CvMat tempimage = (cv::Mat)cvMatFromUIImage(self.canvasImageView.image);
+        UIImage *tempImage2 = [self UIImageFromCVMat:&tempimage];//[(cv::Mat)UIImageFromCVMat *tempimage];
+        [self.canvasImageView setImage:tempImage2];
+    }
+    else
+    {
+        NSLog(@"No image to manipulate");
+    }
+    
+    
     UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Pencil Sketch Conversion"
                                                    message: @"Not Yet Implemented"
                                                   delegate: self
@@ -237,7 +246,7 @@
     [self.shapesButton setImage:nil forState:UIControlStateNormal];
     [self.enlargeButton setImage:nil forState:UIControlStateNormal];
     [self.textButton setImage:nil forState:UIControlStateNormal];
-    self.model.currentMode = PENCIL;
+    self.model.currentMode = PENCIL_MODE;
 }
 
 -(IBAction)dispatchScenesMenu:(id)sender{
@@ -248,7 +257,7 @@
     [self.shapesButton setImage:nil forState:UIControlStateNormal];
     [self.enlargeButton setImage:nil forState:UIControlStateNormal];
     [self.textButton setImage:nil forState:UIControlStateNormal];
-    self.model.currentMode = BACKGROUNDS;
+    self.model.currentMode = BACKGROUNDS_MODE;
     
     NSArray *images = [NSArray arrayWithObjects:
                        [UIImage imageNamed:@"1.png"],
@@ -260,7 +269,7 @@
     RNGridMenu *av = [[RNGridMenu alloc] initWithImages:images];
     //RoboPrintController *menuController = [[RoboPrintController alloc] init];
     
-    popupMenuName = BACKGROUNDS;
+    popupMenuName = BACKGROUNDS_MENU;
     av.delegate = self;
     
     //av.highlightColor = [UIColor colorWithRed:66.0f/255.0f green:79.0f/255.0f blue:91.0f/255.0f alpha:1.0f];
@@ -277,7 +286,7 @@
                         forState:UIControlStateNormal];
     [self.enlargeButton setImage:nil forState:UIControlStateNormal];
     [self.textButton setImage:nil forState:UIControlStateNormal];
-    self.model.currentMode = SHAPES;
+    self.model.currentMode = SHAPES_MODE;
     
     NSArray *images = [NSArray arrayWithObjects:
                        [UIImage imageNamed:@"_circle.png"],
@@ -291,7 +300,7 @@
     RNGridMenu *av = [[RNGridMenu alloc] initWithImages:images];
     //RoboPrintController *menuController = [[RoboPrintController alloc] init];
     
-    popupMenuName = SHAPES;
+    popupMenuName = SHAPES_MENU;
     av.delegate = self;
     
     //av.highlightColor = [UIColor colorWithRed:66.0f/255.0f green:79.0f/255.0f blue:91.0f/255.0f alpha:1.0f];
@@ -311,7 +320,7 @@
                         forState:UIControlStateNormal];
     [self.textButton setImage:nil forState:UIControlStateNormal];
     [self.shapesButton setImage:nil forState:UIControlStateNormal];
-    self.model.currentMode = ENLARGE;
+    self.model.currentMode = ENLARGE_MODE;
 }
 
 - (IBAction)textPressed:(id)sender
@@ -323,7 +332,7 @@
     [self.enlargeButton setImage:nil forState:UIControlStateNormal];
     [self.textButton setImage:[UIImage imageNamed:@"color_selected_mask.png"]
                      forState:UIControlStateNormal];
-    self.model.currentMode = TEXT;
+    self.model.currentMode = TEXT_MODE;
     
     UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Adding Text"
                                                    message: @"Not Yet Implemented"
@@ -340,7 +349,7 @@
 {
     //handle pinch...
     switch (self.model.currentMode) {
-        case SHAPES:
+        case SHAPES_MODE:
             if (pinchGestureRecognizer.state == UIGestureRecognizerStateEnded
                 || pinchGestureRecognizer.state == UIGestureRecognizerStateChanged)
             {
@@ -405,10 +414,10 @@
             }
             break;
             
-        case TEXT:
+        case TEXT_MODE:
             NSLog(@"should be resizing text now");
             break;
-        case ENLARGE:
+        case ENLARGE_MODE:
             if (pinchGestureRecognizer.state == UIGestureRecognizerStateEnded
                 || pinchGestureRecognizer.state == UIGestureRecognizerStateChanged) {
                 NSLog(@"gesture.scale = %f", pinchGestureRecognizer.scale);
@@ -623,7 +632,7 @@
     
     switch (self.model.currentMode)
     {
-        case (PENCIL):
+        case (PENCIL_MODE):
         {
             mouseSwiped = YES; // Indicates that this is not a single point
             UITouch *touch = [touches anyObject];
@@ -655,7 +664,7 @@
             break;
         }
         
-        case (SHAPES):
+        case (SHAPES_MODE):
         {
             if (([imageStack count] > 0) && (shapeCreationIndex == imageStackIndex))
             {
@@ -748,12 +757,12 @@
     
     switch (self.model.currentMode)
     {
-        case (PENCIL):
+        case (PENCIL_MODE):
         {
             [self updateImageStack];
         }
             
-        case (SHAPES):
+        case (SHAPES_MODE):
         {
             // Get current absolute location of touch event in the view
             UITouch *touch = [touches anyObject];
@@ -784,7 +793,7 @@
 -(void)updateImageStack
 {
     // Ignore events that didn't create images and single points
-    if ((self.canvasImageView.image != nil && mouseSwiped) || (self.model.currentMode == SHAPES))
+    if ((self.canvasImageView.image != nil && mouseSwiped) || (self.model.currentMode == SHAPES_MODE))
     {
         [self.backButton setImage:[UIImage imageNamed:@"back_button.png"]
                          forState:UIControlStateNormal];
@@ -899,7 +908,7 @@
     
     switch (popupMenuName)
     {
-        case SHAPES:
+        case SHAPES_MENU:
             currentShape = itemIndex;
             switch (itemIndex)
             {
@@ -948,11 +957,11 @@
             shapeCreationIndex = imageStackIndex;
             
             break;
-        case BACKGROUNDS:
+        case BACKGROUNDS_MENU:
             switch (itemIndex)
             {
                 case 0:
-                    background =  [UIImage imageNamed:@"1.png"];
+                    background =  [UIImage imageNamed:@"bg1_RElephant.jpg"];
                     break;
                 case 1:
                     background =  [UIImage imageNamed:@"2.png"];

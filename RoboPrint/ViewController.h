@@ -12,8 +12,8 @@
 #define START_OVER 1
 #define LOAD_DRAWING 2
 
-#define SHAPES 1
-#define BACKGROUNDS 2
+#define SHAPES_MENU 1
+#define BACKGROUNDS_MENU 2
 
 #define CIRCLE      0
 #define TRIANGLE    1
@@ -89,9 +89,9 @@
 - (IBAction)blueButtonTouchUpInsideAction:(id)sender;
 - (IBAction)blackButtonTouchUpInsideAction:(id)sender;
 - (IBAction)greenButtonTouchUpInsideAction:(id)sender;
-- (BOOL) selectImage: (UIViewController*) controller
-       usingDelegate: (id <UIImagePickerControllerDelegate,
-                       UINavigationControllerDelegate>) delegate;
+//- (BOOL) selectImage: (UIViewController*) controller
+  //     usingDelegate: (id <UIImagePickerControllerDelegate,
+    //                   UINavigationControllerDelegate>) delegate;
 -(void)updateImageStack;
 -(UIImage*)mergeImage:(UIImage*)mask overImage:(UIImage*)source inSize:(CGSize)size;
 

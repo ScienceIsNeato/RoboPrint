@@ -9,12 +9,12 @@
 #import <Foundation/Foundation.h>
 #import <RNGridMenu/RNGridMenu.h>
 
-#define IMAGE       1
-#define PENCIL      2
-#define BACKGROUNDS 3
-#define SHAPES      4
-#define ENLARGE     5
-#define TEXT        6
+#define IMAGE_MODE       1
+#define PENCIL_MODE      2
+#define BACKGROUNDS_MODE 3
+#define SHAPES_MODE      4
+#define ENLARGE_MODE     5
+#define TEXT_MODE        6
 
 
 static const int YELLOW     = 0;
