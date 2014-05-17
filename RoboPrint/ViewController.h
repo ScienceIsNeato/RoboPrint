@@ -11,6 +11,7 @@
 
 #define START_OVER 1
 #define LOAD_DRAWING 2
+#define PENCIL_SKETCH 3
 
 #define SHAPES_MENU 1
 #define BACKGROUNDS_MENU 2
@@ -83,6 +84,8 @@
 @property int popupMenuName;
 @property CGFloat xRescale;
 @property CGFloat yRescale;
+@property (nonatomic, retain) IBOutlet UISlider *highSlider;
+@property (nonatomic, retain) IBOutlet UISlider *lowSlider;
 
 
 - (IBAction)yellowButtonTouchUpInsideAction:(id)sender;
@@ -98,5 +101,9 @@
 -(UIImage*)mergeImage:(UIImage*)mask overImage:(UIImage*)source inSize:(CGSize)size;
 
 - (cv::Mat)cvMatFromUIImage:(UIImage *)image;
+- (IBAction)capture:(id)sender;
+- (IBAction)sliderChanged:(id)sender;
+- (UIImage *)inverseColor:(UIImage *)image;
+- (void)createCannyImage:(UIImage *)input fromCamera:(bool)fromCamera;
 
 @end

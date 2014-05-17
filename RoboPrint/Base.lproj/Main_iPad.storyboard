@@ -185,7 +185,7 @@
                                         <rect key="frame" x="6" y="350" width="90" height="90"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
-                                        <state key="normal" backgroundImage="images_button.png">
+                                        <state key="normal" backgroundImage="pencilSketchButton.png">
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
                                         <connections>
@@ -225,7 +225,7 @@
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
                                         <connections>
-                                            <action selector="pencilSketchPressed:" destination="3y2-PS-00X" eventType="touchUpInside" id="3zk-Ww-kng"/>
+                                            <action selector="pencilPressed:" destination="3y2-PS-00X" eventType="touchUpInside" id="Src-x9-Hva"/>
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ny9-Ts-GT7" userLabel="Button - Options - Backgrounds">
@@ -297,9 +297,9 @@
         <image name="drawing_options_label.png" width="376" height="99"/>
         <image name="enlarge_button.png" width="183" height="180"/>
         <image name="forward_button.png" width="71" height="59"/>
-        <image name="images_button.png" width="183" height="183"/>
         <image name="menu_bar_background.png" width="2046" height="137"/>
         <image name="open_button.png" width="325" height="76"/>
+        <image name="pencilSketchButton.png" width="90" height="90"/>
         <image name="pencil_button.png" width="183" height="183"/>
         <image name="print_button.png" width="321" height="79"/>
         <image name="save_button.png" width="327" height="79"/>

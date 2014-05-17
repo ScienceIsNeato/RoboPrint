@@ -80,6 +80,7 @@
 		84F46EEF1927211600DD9941 /* bg5_RHotAIr_Baloon_color.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 84F46EEE1927211600DD9941 /* bg5_RHotAIr_Baloon_color.jpg */; };
 		84F46EF1192721EE00DD9941 /* bg5_HotAIr_Baloon_color.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 84F46EF0192721EE00DD9941 /* bg5_HotAIr_Baloon_color.jpg */; };
 		84F46EF719274BAA00DD9941 /* bg12_none.png in Resources */ = {isa = PBXBuildFile; fileRef = 84F46EF619274BAA00DD9941 /* bg12_none.png */; };
+		84F46EF91927F4C700DD9941 /* pencilSketchButton.png in Resources */ = {isa = PBXBuildFile; fileRef = 84F46EF81927F4C700DD9941 /* pencilSketchButton.png */; };
 		E71EB8B825D44910AAC7942B /* libPods-RoboPrint.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E1D275A3047642A4814CE03C /* libPods-RoboPrint.a */; };
 /* End PBXBuildFile section */
 
@@ -174,6 +175,7 @@
 		84F46EEE1927211600DD9941 /* bg5_RHotAIr_Baloon_color.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = bg5_RHotAIr_Baloon_color.jpg; path = ../../../Backgrounds/bg5_RHotAIr_Baloon_color.jpg; sourceTree = "<group>"; };
 		84F46EF0192721EE00DD9941 /* bg5_HotAIr_Baloon_color.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = bg5_HotAIr_Baloon_color.jpg; path = ../../../Backgrounds/bg5_HotAIr_Baloon_color.jpg; sourceTree = "<group>"; };
 		84F46EF619274BAA00DD9941 /* bg12_none.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = bg12_none.png; path = ../../../Backgrounds/bg12_none.png; sourceTree = "<group>"; };
+		84F46EF81927F4C700DD9941 /* pencilSketchButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = pencilSketchButton.png; path = "../../../Possible Image Sketch Icons/pencilSketchButton.png"; sourceTree = "<group>"; };
 		C1F57CFDC63646F5BD2DA1F0 /* Pods-RoboPrint.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RoboPrint.xcconfig"; path = "Pods/Pods-RoboPrint.xcconfig"; sourceTree = "<group>"; };
 		E1D275A3047642A4814CE03C /* libPods-RoboPrint.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RoboPrint.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -213,6 +215,7 @@
 		842FB78218FA54F30028FD06 /* images */ = {
 			isa = PBXGroup;
 			children = (
+				84F46EF81927F4C700DD9941 /* pencilSketchButton.png */,
 				84F46EF619274BAA00DD9941 /* bg12_none.png */,
 				84F46EF0192721EE00DD9941 /* bg5_HotAIr_Baloon_color.jpg */,
 				84F46EEE1927211600DD9941 /* bg5_RHotAIr_Baloon_color.jpg */,
@@ -484,6 +487,7 @@
 				842FB7C819048EFF0028FD06 /* undo_label.png in Resources */,
 				844636D419271949007F419E /* bg3_RGuitar_color_SMALL.jpg in Resources */,
 				842FB7D01904C6D10028FD06 /* backgrounds_button.png in Resources */,
+				84F46EF91927F4C700DD9941 /* pencilSketchButton.png in Resources */,
 				841069D519109DA40051226E /* forward_disabled.png in Resources */,
 				844636C71926F357007F419E /* bg8_RKite_color.jpg in Resources */,
 				841069D419109DA40051226E /* back_disabled.png in Resources */,

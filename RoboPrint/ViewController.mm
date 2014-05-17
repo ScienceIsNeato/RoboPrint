@@ -11,6 +11,9 @@
 #import <RNGridMenu/RNGridMenu.h>
 #import <QuartzCore/QuartzCore.h>
 
+// Aperture value to use for the Canny edge detection
+const int kCannyAperture = 7;
+
 @interface ViewController ()
 
 @end
@@ -44,6 +47,10 @@
 @synthesize popupMenuName;
 @synthesize xRescale;
 @synthesize yRescale;
+
+// OpenCV properties
+@synthesize highSlider = _highSlider;
+@synthesize lowSlider= _lowSlider;
 
 
 
@@ -206,38 +213,23 @@
     [self.shapesButton setImage:nil forState:UIControlStateNormal];
     [self.enlargeButton setImage:nil forState:UIControlStateNormal];
     [self.textButton setImage:nil forState:UIControlStateNormal];
-    self.model.currentMode = IMAGE_MODE;
+    self.model.currentMode = PENCIL_SKETCH;
     // TODO
     // SEE HERE FOR INSTRUCTIONS FOR GETTING IMAGE FROM CAMERA
     // http://www.icodeblog.com/2009/07/28/getting-images-from-the-iphone-photo-library-or-camera-using-uiimagepickercontroller/
-    
-    
-    if (self.canvasImageView.image != NULL)
-    {
-        cv::Mat greyMat;
-        //cv::cvtColor(inputMat, greyMat, CV_BGR2GRAY);
-        CvMat tempimage = [self cvMatFromUIImage:self.canvasImageView.image];
-        //CvMat tempimage = (cv::Mat)cvMatFromUIImage(self.canvasImageView.image);
-        UIImage *tempImage2 = [self UIImageFromCVMat:&tempimage];//[(cv::Mat)UIImageFromCVMat *tempimage];
-        [self.canvasImageView setImage:tempImage2];
-    }
-    else
-    {
-        NSLog(@"No image to manipulate");
-    }
-    
-    
-    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Pencil Sketch Conversion"
-                                                   message: @"Not Yet Implemented"
+
+    // First, present dialog to load from file, camera, or canclel
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Pencil Sketch"
+                                                   message: @"Clear canvas and generate pencil sketch?"
                                                   delegate: self
-                                         cancelButtonTitle:@"Cancel"
-                                         otherButtonTitles:@"OK",nil];
-    
-    
+                                         cancelButtonTitle:@"From Photo"
+                                         otherButtonTitles:@"Cancel",@"From Camera", nil];
+    alert.tag = PENCIL_SKETCH;
     [alert show];
+
 }
 
-- (IBAction)pencilSketchPressed:(id)sender
+- (IBAction)pencilPressed:(id)sender
 {
     
     [self.imagesButton setImage:nil forState:UIControlStateNormal];
@@ -852,34 +844,53 @@
 {
     // This function handles the results of any yes/no dialogs that have had the yes
     // button selected.
-    if (buttonIndex == 0)
+
+    // Clicked through warning. Load image.
+    if ((alertView.tag == START_OVER) && buttonIndex)
     {
-        //NSLog(@"User decided to cancel Image Load");
-    }
-    else
-    {
-        // Clicked through warning. Load image.
-        if (alertView.tag == START_OVER)
+        // Clear the currently displayed image
+        self.canvasImageView.image = nil;
+        
+        // Clear all images off of the image stack
+        while ([imageStack count] > 0)
         {
-            // Clear the currently displayed image
-            self.canvasImageView.image = nil;
-            
-            // Clear all images off of the image stack
-            while ([imageStack count] > 0)
-            {
-                [imageStack removeObjectAtIndex:0];
-            }
-            imageStackIndex = 0;
-            
-            // Disable forward and back buttons
-            [self.forwardButton setImage:[UIImage imageNamed:@"forward_disabled.png"]
-                                forState:UIControlStateNormal];
-            [self.backButton setImage:[UIImage imageNamed:@"back_disabled.png"]
-                             forState:UIControlStateNormal];
+            [imageStack removeObjectAtIndex:0];
         }
-        // Clicked through warning. Load image.
-        else if (alertView.tag == LOAD_DRAWING)
+        imageStackIndex = 0;
+        
+        // Disable forward and back buttons
+        [self.forwardButton setImage:[UIImage imageNamed:@"forward_disabled.png"]
+                            forState:UIControlStateNormal];
+        [self.backButton setImage:[UIImage imageNamed:@"back_disabled.png"]
+                         forState:UIControlStateNormal];
+    }
+    // Clicked through warning. Load image.
+    else if (alertView.tag == LOAD_DRAWING && buttonIndex)
+    {
+        UIImagePickerController * picker = [[UIImagePickerController alloc] init];
+        picker.delegate = self;
+        picker.sourceType = UIImagePickerControllerSourceTypeSavedPhotosAlbum;
+        
+        [self presentViewController:picker animated:YES completion:nil];
+        
+        // Clear all images off of the image stack
+        while ([imageStack count] > 0)
         {
+            [imageStack removeObjectAtIndex:0];
+        }
+        imageStackIndex = 0;
+        
+        // Disable forward and back buttons
+        [self.forwardButton setImage:[UIImage imageNamed:@"forward_disabled.png"]
+                            forState:UIControlStateNormal];
+        [self.backButton setImage:[UIImage imageNamed:@"back_disabled.png"]
+                         forState:UIControlStateNormal];
+    }
+    else if (alertView.tag == PENCIL_SKETCH && buttonIndex != 1)
+    {
+        if (buttonIndex == 0)
+        {
+            // Load photo from gallery
             UIImagePickerController * picker = [[UIImagePickerController alloc] init];
             picker.delegate = self;
             picker.sourceType = UIImagePickerControllerSourceTypeSavedPhotosAlbum;
@@ -899,7 +910,13 @@
             [self.backButton setImage:[UIImage imageNamed:@"back_disabled.png"]
                              forState:UIControlStateNormal];
         }
+        else if (buttonIndex == 2)
+        {
+            // Load image from camera
+        }
+        
     }
+    
 }
 
 
@@ -1065,12 +1082,26 @@
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
-    // Handles loader for choices from image library
-    [self dismissViewControllerAnimated:YES completion:nil];
-	canvasImageView.image = [info objectForKey:@"UIImagePickerControllerOriginalImage"];
     
-    // Save chosen image as current top of stack
-    [self.imageStack insertObject:self.canvasImageView.image atIndex:0];
+    if (self.model.currentMode == PENCIL_SKETCH)
+    {
+        // Send this image to the canny edge detector
+        
+        // Handles loader for choices from image library
+        [self dismissViewControllerAnimated:YES completion:nil];
+        UIImage *cannyInput = [info objectForKey:@"UIImagePickerControllerOriginalImage"];
+        
+        [self createCannyImage:cannyInput fromCamera:FALSE];
+    }
+    else
+    {
+        // Handles loader for choices from image library
+        [self dismissViewControllerAnimated:YES completion:nil];
+        canvasImageView.image = [info objectForKey:@"UIImagePickerControllerOriginalImage"];
+        
+        // Save chosen image as current top of stack
+        [self.imageStack insertObject:self.canvasImageView.image atIndex:0];
+    }
 }
 
 - (NSUInteger)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window
@@ -1371,6 +1402,73 @@
     return finalImage;
 }
 
+- (UIImage *)inverseColor:(UIImage *)image
+{
+    CIImage *coreImage = [CIImage imageWithCGImage:image.CGImage];
+    CIFilter *filter = [CIFilter filterWithName:@"CIColorInvert"];
+    [filter setValue:coreImage forKey:kCIInputImageKey];
+    CIImage *result = [filter valueForKey:kCIOutputImageKey];
+    return [UIImage imageWithCIImage:result];
+}
+
+- (void)createCannyImage:(UIImage *)input fromCamera:(bool)fromCamera
+{
+    // Declare output of edge detector
+    cv::Mat greyMat;
+    
+    //cv::cvtColor(inputMat, greyMat, CV_BGR2GRAY);
+    //CvMat tempimage = [self cvMatFromUIImage:self.canvasImageView.image];
+    
+    // Create (greyscale) cvMat input for edge detector
+    cv::Mat inputArray = [self cvMatFromUIImage:input];
+    
+    // convert image to greyscale
+    
+    //CvMat tempimage = (cv::Mat)cvMatFromUIImage(self.canvasImageView.image);
+    
+    
+    // Convert captured frame to grayscale
+    //cv::cvtColor(_lastFrame, grayFrame, cv::COLOR_RGB2GRAY);
+    
+    //UIImage *testImage = [UIImage imageNamed:@"testimage.jpg"];
+    
+    // Convert from cv::Mat to UIImage
+    //cv::Mat& inputArray = [testImage CVMat];
+    
+    // Convert from cv::Mat to UIImage
+    //cv::Mat& outputArray = [testImage CVMat];
+    
+    // Initialize output
+    cv::Mat output;
+    
+    // Convert captured frame to grayscale
+    //cv::cvtColor(tempimage, grayFrame, cv::COLOR_RGB2GRAY);
+    //////////
+    
+    //cv::Canny(grayImage, edges, m_cannyLoThreshold, m_cannyHiThreshold, m_cannyAperture * 2 + 1);
+    //cv::cvtColor(edges, outputFrame, CV_GRAY2BGRA);
+    
+    // Perform Canny edge detection using slide values for thresholds
+    cv::Canny(inputArray, output,
+              _lowSlider.value * kCannyAperture * kCannyAperture,
+              _highSlider.value * kCannyAperture * kCannyAperture,
+              kCannyAperture);
+    
+    // Invert to white background black edges
+    //cv::subtract(output, 100, output);
+    
+    UIImage *cvEdgeOuptut = [self UIImageFromCVMat:output];//[(cv::Mat)UIImageFromCVMat *tempimage];
+    
+    // Invert the color
+    cvEdgeOuptut = [self inverseColor:cvEdgeOuptut];
+    
+    // Display the image
+    [self.canvasImageView setImage:cvEdgeOuptut];
+    
+    // update the image stack
+    [self updateImageStack];
+}
+
 @end
 
 
@@ -1410,6 +1508,7 @@
 }
 
 @end
+
 
 
 
