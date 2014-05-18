@@ -12,7 +12,7 @@
 #import <QuartzCore/QuartzCore.h>
 
 // Aperture value to use for the Canny edge detection
-const int kCannyAperture = 7;
+const int kCannyAperture = 3;
 
 @interface ViewController ()
 
@@ -49,8 +49,7 @@ const int kCannyAperture = 7;
 @synthesize yRescale;
 
 // OpenCV properties
-@synthesize highSlider = _highSlider;
-@synthesize lowSlider= _lowSlider;
+
 
 
 
@@ -123,6 +122,14 @@ const int kCannyAperture = 7;
     currentShape = CIRCLE;
     shapeCreationIndex = 0;
     lineCanBeMoved = TRUE;
+    
+    cannySliderValue = 10;
+    cannySliderMinVal = 1;
+    cannySliderMaxVal = 255/3;
+    cannySliderWidth = 200;
+    cannySliderHeigth = 20;
+    cannyButtonWidth = cannySliderWidth/2;
+    cannyButtonHeight = cannySliderHeigth*2;
     
 }
 
@@ -217,6 +224,10 @@ const int kCannyAperture = 7;
     // TODO
     // SEE HERE FOR INSTRUCTIONS FOR GETTING IMAGE FROM CAMERA
     // http://www.icodeblog.com/2009/07/28/getting-images-from-the-iphone-photo-library-or-camera-using-uiimagepickercontroller/
+    
+    // TODO
+    // there is a bug where, if you load a pencil sketch, the very next thing you do suffers from
+    // sever memory lag. 
 
     // First, present dialog to load from file, camera, or canclel
     UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Pencil Sketch"
@@ -239,6 +250,7 @@ const int kCannyAperture = 7;
     [self.shapesButton setImage:nil forState:UIControlStateNormal];
     [self.enlargeButton setImage:nil forState:UIControlStateNormal];
     [self.textButton setImage:nil forState:UIControlStateNormal];
+    [self cannyExecuteDoneAction]; // cleanup pencil sketch objects
     self.model.currentMode = PENCIL_MODE;
 }
 
@@ -250,6 +262,7 @@ const int kCannyAperture = 7;
     [self.shapesButton setImage:nil forState:UIControlStateNormal];
     [self.enlargeButton setImage:nil forState:UIControlStateNormal];
     [self.textButton setImage:nil forState:UIControlStateNormal];
+    [self cannyExecuteDoneAction]; // cleanup pencil sketch objects
     self.model.currentMode = BACKGROUNDS_MODE;
     
     NSArray *images = [NSArray arrayWithObjects:
@@ -288,6 +301,7 @@ const int kCannyAperture = 7;
                         forState:UIControlStateNormal];
     [self.enlargeButton setImage:nil forState:UIControlStateNormal];
     [self.textButton setImage:nil forState:UIControlStateNormal];
+    [self cannyExecuteDoneAction]; // cleanup pencil sketch objects
     self.model.currentMode = SHAPES_MODE;
     
     NSArray *images = [NSArray arrayWithObjects:
@@ -322,6 +336,7 @@ const int kCannyAperture = 7;
                         forState:UIControlStateNormal];
     [self.textButton setImage:nil forState:UIControlStateNormal];
     [self.shapesButton setImage:nil forState:UIControlStateNormal];
+    [self cannyExecuteDoneAction]; // cleanup pencil sketch objects
     self.model.currentMode = ENLARGE_MODE;
 }
 
@@ -334,7 +349,9 @@ const int kCannyAperture = 7;
     [self.enlargeButton setImage:nil forState:UIControlStateNormal];
     [self.textButton setImage:[UIImage imageNamed:@"color_selected_mask.png"]
                      forState:UIControlStateNormal];
+    [self cannyExecuteDoneAction]; // cleanup pencil sketch objects
     self.model.currentMode = TEXT_MODE;
+    
     
     UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Adding Text"
                                                    message: @"Not Yet Implemented"
@@ -386,6 +403,7 @@ const int kCannyAperture = 7;
                             break;
                         case PENTAGON:
                             shape = [self addPentagon:(self->canvasImageView.image) radius:(shapeWidth/2) origin:(shapeOrigin)];
+                            break;
                         case STAR:
                             shape = [self addStar:(self->canvasImageView.image) radius:(shapeWidth/2) origin:(shapeOrigin)];
                             break;
@@ -795,7 +813,9 @@ const int kCannyAperture = 7;
 -(void)updateImageStack
 {
     // Ignore events that didn't create images and single points
-    if ((self.canvasImageView.image != nil && mouseSwiped) || (self.model.currentMode == SHAPES_MODE))
+    if ((self.canvasImageView.image != nil && mouseSwiped) ||
+        (self.model.currentMode == SHAPES_MODE) ||
+        (self.model.currentMode == PENCIL_SKETCH) )
     {
         [self.backButton setImage:[UIImage imageNamed:@"back_button.png"]
                          forState:UIControlStateNormal];
@@ -909,6 +929,7 @@ const int kCannyAperture = 7;
                                 forState:UIControlStateNormal];
             [self.backButton setImage:[UIImage imageNamed:@"back_disabled.png"]
                              forState:UIControlStateNormal];
+            
         }
         else if (buttonIndex == 2)
         {
@@ -1091,7 +1112,14 @@ const int kCannyAperture = 7;
         [self dismissViewControllerAnimated:YES completion:nil];
         UIImage *cannyInput = [info objectForKey:@"UIImagePickerControllerOriginalImage"];
         
-        [self createCannyImage:cannyInput fromCamera:FALSE];
+        [self createCannyImage:cannyInput fromCamera:FALSE replace:FALSE];
+        
+        // Add controller objects for the edge detector
+        [self cannySlider];
+        [self addCannyRotateButton];
+        [self addCannyDoneButton];
+        [self cannySliderText];
+        
     }
     else
     {
@@ -1411,63 +1439,135 @@ const int kCannyAperture = 7;
     return [UIImage imageWithCIImage:result];
 }
 
-- (void)createCannyImage:(UIImage *)input fromCamera:(bool)fromCamera
+- (void)createCannyImage:(UIImage *)input fromCamera:(bool)fromCamera replace:(bool)replace
 {
-    // Declare output of edge detector
-    cv::Mat greyMat;
-    
-    //cv::cvtColor(inputMat, greyMat, CV_BGR2GRAY);
-    //CvMat tempimage = [self cvMatFromUIImage:self.canvasImageView.image];
-    
-    // Create (greyscale) cvMat input for edge detector
-    cv::Mat inputArray = [self cvMatFromUIImage:input];
-    
-    // convert image to greyscale
-    
-    //CvMat tempimage = (cv::Mat)cvMatFromUIImage(self.canvasImageView.image);
-    
-    
-    // Convert captured frame to grayscale
-    //cv::cvtColor(_lastFrame, grayFrame, cv::COLOR_RGB2GRAY);
-    
-    //UIImage *testImage = [UIImage imageNamed:@"testimage.jpg"];
-    
-    // Convert from cv::Mat to UIImage
-    //cv::Mat& inputArray = [testImage CVMat];
-    
-    // Convert from cv::Mat to UIImage
-    //cv::Mat& outputArray = [testImage CVMat];
-    
+    if (!replace)
+    {
+        // Create (greyscale) cvMat input for edge detector
+        inputArrayForCanny = [self cvMatFromUIImage:input];
+    }
+
     // Initialize output
     cv::Mat output;
     
-    // Convert captured frame to grayscale
-    //cv::cvtColor(tempimage, grayFrame, cv::COLOR_RGB2GRAY);
-    //////////
-    
-    //cv::Canny(grayImage, edges, m_cannyLoThreshold, m_cannyHiThreshold, m_cannyAperture * 2 + 1);
-    //cv::cvtColor(edges, outputFrame, CV_GRAY2BGRA);
-    
     // Perform Canny edge detection using slide values for thresholds
-    cv::Canny(inputArray, output,
-              _lowSlider.value * kCannyAperture * kCannyAperture,
-              _highSlider.value * kCannyAperture * kCannyAperture,
+    cv::Canny(inputArrayForCanny, output,
+              cannySliderValue * kCannyAperture,
+              cannySliderValue * 3,
               kCannyAperture);
     
-    // Invert to white background black edges
-    //cv::subtract(output, 100, output);
-    
-    UIImage *cvEdgeOuptut = [self UIImageFromCVMat:output];//[(cv::Mat)UIImageFromCVMat *tempimage];
+    // convert output of canny transform to UIImage
+    cvEdgeOuptut = [self UIImageFromCVMat:output];
     
     // Invert the color
     cvEdgeOuptut = [self inverseColor:cvEdgeOuptut];
     
     // Display the image
     [self.canvasImageView setImage:cvEdgeOuptut];
+
+}
+
+-(IBAction)cannySlider
+{
+    // Creates the slider for the pencil sketch and sets up listener
+    CGRect frame = CGRectMake(self.view.frame.size.width/2,
+                              self.view.frame.size.height - 3 * cannySliderHeigth,
+                              cannySliderWidth,
+                              cannySliderHeigth);
+    cannySlider = [[UISlider alloc] initWithFrame:frame];
+    [cannySlider addTarget:self action:@selector(cannySliderAction:) forControlEvents:UIControlEventValueChanged];
+    [cannySlider setBackgroundColor:[UIColor lightGrayColor]];
+    cannySlider.minimumValue = cannySliderMinVal;
+    cannySlider.maximumValue = cannySliderMaxVal;
+    cannySlider.continuous = NO;
+    cannySlider.value = (cannySliderMaxVal - cannySliderMinVal)/2;
+    cannySlider.layer.cornerRadius = 10.0f;
+    [self.view addSubview:cannySlider];
+}
+
+-(void)cannySliderAction:(id)sender
+{
+    UISlider *slider = (UISlider*)sender;
+    cannySliderValue = slider.value;
+
+    [self createCannyImage:self.canvasImageView.image fromCamera:FALSE replace:TRUE];
+}
+
+-(IBAction)addCannyRotateButton
+{
+    cannyRotateButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    [cannyRotateButton addTarget:self
+               action:@selector(cannyRotateAction:)
+     forControlEvents:UIControlEventTouchUpInside];
+    [cannyRotateButton setBackgroundColor:[UIColor lightGrayColor]];
+    [cannyRotateButton setTitle:@"Rotate Image" forState:UIControlStateNormal];
+    cannyRotateButton.frame = CGRectMake(self.view.frame.size.width/2 - cannySliderWidth*.25 - cannyButtonWidth,
+                                    self.view.frame.size.height - 3.5 * cannySliderHeigth,
+                                    cannyButtonWidth,
+                                    cannyButtonHeight);
+    cannyRotateButton.layer.cornerRadius = 10.0f;
+    [self.view addSubview:cannyRotateButton];
+}
+
+-(void)cannyRotateAction:(id)sender
+{
+    // Flip across X axis then Y to rotate 90 degrees
+    cv::transpose(inputArrayForCanny,inputArrayForCanny);
+    cv::flip(inputArrayForCanny,inputArrayForCanny, 1);
     
-    // update the image stack
+    // Update the display issue
+    [self createCannyImage:self.canvasImageView.image fromCamera:FALSE replace:TRUE];
+    
+}
+
+-(IBAction)addCannyDoneButton
+{
+    cannyDoneButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    [cannyDoneButton addTarget:self
+                     action:@selector(cannyDoneAction:)
+           forControlEvents:UIControlEventTouchUpInside];
+    [cannyDoneButton setBackgroundColor:[UIColor lightGrayColor]];
+    [cannyDoneButton setTitle:@"Done Editing" forState:UIControlStateNormal];
+    cannyDoneButton.frame = CGRectMake(self.view.frame.size.width/2 + cannySliderWidth*.75 + cannyButtonWidth,
+                                    self.view.frame.size.height - 3.5 * cannySliderHeigth,
+                                    cannyButtonWidth,
+                                    cannyButtonHeight);
+    cannyDoneButton.layer.cornerRadius = 10.0f;
+    [self.view addSubview:cannyDoneButton];
+}
+
+-(void)cannyDoneAction:(id)sender
+{
+    // Redirect to cleanup function
+    [self cannyExecuteDoneAction];
+}
+
+-(IBAction)cannyExecuteDoneAction
+{
+    // Clean up all programatically added screen helper elements for the pencil sketch
+    [cannySliderLabel removeFromSuperview];
+    [cannyRotateButton removeFromSuperview];
+    [cannyDoneButton removeFromSuperview];
+    [cannySlider removeFromSuperview];
+    
+    // Add finalized image to the image stack
     [self updateImageStack];
 }
+
+-(IBAction)cannySliderText
+{
+    cannySliderLabel = [[UILabel alloc] initWithFrame:CGRectMake(
+            self.view.frame.size.width/2,
+            self.view.frame.size.height - 5 * cannySliderHeigth,
+            cannyButtonWidth*2,
+            cannyButtonHeight)];
+    cannySliderLabel.backgroundColor = [UIColor clearColor];
+    cannySliderLabel.textAlignment = NSTextAlignmentCenter; // UITextAlignmentCenter, UITextAlignmentLeft
+    cannySliderLabel.textColor=[UIColor colorWithRed:0.0 green:122.0/255.0 blue:1.0 alpha:1.0];
+    cannySliderLabel.text = @"Fine Tune Sketch...";
+    [self.view addSubview:cannySliderLabel];
+}
+
 
 @end
 

@@ -31,7 +31,7 @@ static const int GREEN      = 5;
 }
 
 - (void)setMode: (int)Mode;
-- (void)gridMenu:(RNGridMenu *)gridMenu willDismissWithSelectedItem:(RNGridMenuItem *)item atIndex:(NSInteger)itemIndex;
+//- (void)gridMenu:(RNGridMenu *)gridMenu willDismissWithSelectedItem:(RNGridMenuItem *)item atIndex:(NSInteger)itemIndex;
 - (float)getRed;
 - (float)getGreen;
 - (float)getBlue;
