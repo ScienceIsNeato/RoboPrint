@@ -29,7 +29,7 @@
 
 
 
-@interface ViewController : UIViewController <UIGestureRecognizerDelegate, RNGridMenuDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate>{
+@interface ViewController : UIViewController <UITextFieldDelegate, UIGestureRecognizerDelegate, RNGridMenuDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate>{
     
     CGPoint lastPoint;
     CGFloat red;

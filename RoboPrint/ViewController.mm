@@ -227,7 +227,7 @@ const int kCannyAperture = 3;
     
     // TODO
     // there is a bug where, if you load a pencil sketch, the very next thing you do suffers from
-    // sever memory lag. 
+    // sever memory lag.
 
     // First, present dialog to load from file, camera, or canclel
     UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Pencil Sketch"
@@ -353,14 +353,27 @@ const int kCannyAperture = 3;
     self.model.currentMode = TEXT_MODE;
     
     
-    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Adding Text"
+    UITextField *textField = [[UITextField alloc] initWithFrame:CGRectMake(self.view.frame.size.width/2, self.view.frame.size.height/4, 300, 40)];
+    textField.borderStyle = UITextBorderStyleRoundedRect;
+    textField.font = [UIFont systemFontOfSize:15];
+    textField.placeholder = @"enter text";
+    textField.autocorrectionType = UITextAutocorrectionTypeNo;
+    textField.keyboardType = UIKeyboardTypeDefault;
+    textField.returnKeyType = UIReturnKeyDone;
+    textField.clearButtonMode = UITextFieldViewModeWhileEditing;
+    textField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
+    textField.delegate = self;
+    [self.view addSubview:textField];
+    //[textField release];
+    
+    /*UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Adding Text"
                                                    message: @"Not Yet Implemented"
                                                   delegate: self
                                          cancelButtonTitle:@"Cancel"
-                                         otherButtonTitles:@"OK",nil];
+                                         otherButtonTitles:@"OK",nil];*/
     
     
-    [alert show];
+    //[alert show];
 }
 
 
@@ -480,6 +493,8 @@ const int kCannyAperture = 3;
 {
     // Handler for back button
     
+    [self cannyExecuteDoneAction]; // cleanup pencil sketch objects if present
+    
     int imagesOnStack = [imageStack count]; // Need to cast to signed int
     
     // Enable forward button if clicked back from existing image and not very first thing
@@ -537,6 +552,8 @@ const int kCannyAperture = 3;
 {
     // Handler for forward action
     
+    [self cannyExecuteDoneAction]; // cleanup pencil sketch objects if present
+    
     if (imageStackIndex > 0)
     {
         // Back has been pressed prior to the forward button being pressed
@@ -567,6 +584,8 @@ const int kCannyAperture = 3;
 
 - (IBAction)startOverPressed:(id)sender
 {
+    [self cannyExecuteDoneAction]; // cleanup pencil sketch objects if present
+
     // Initially, show an alert letting the user know
     // that this will erase their progress
     UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Warning"
@@ -582,6 +601,8 @@ const int kCannyAperture = 3;
 
 - (IBAction)openImagePressed:(id)sender
 {
+    [self cannyExecuteDoneAction]; // cleanup pencil sketch objects if present
+
     // Initially, show an alert letting the user know
     UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Warning"
                                                 message: @"Opening an image will erase this image. Continue?"
@@ -596,6 +617,8 @@ const int kCannyAperture = 3;
 
 - (IBAction)saveImagePressed:(id)sender
 {
+    [self cannyExecuteDoneAction]; // cleanup pencil sketch objects if present
+
     UIImageWriteToSavedPhotosAlbum(self.canvasImageView.image, nil, nil, nil);
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Saving Images"
                                                     message:@"Image saved successfully."
@@ -610,6 +633,8 @@ const int kCannyAperture = 3;
 
 - (IBAction)printPressed:(id)sender
 {
+    [self cannyExecuteDoneAction]; // cleanup pencil sketch objects if present
+
     UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Robo Print!"
                                                    message: @"Not Yet Implemented"
                                                   delegate: self
@@ -622,6 +647,8 @@ const int kCannyAperture = 3;
 
 - (IBAction)openSettingsMenu:(id)sender
 {
+    [self cannyExecuteDoneAction]; // cleanup pencil sketch objects if present
+
     UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Manage Settings"
                                                    message: @"Not Yet Implemented"
                                                   delegate: self
@@ -836,8 +863,12 @@ const int kCannyAperture = 3;
             // Reset stack index as head
             imageStackIndex = 0;
             
-            // Then put current image as head
-            [self.imageStack insertObject:self.canvasImageView.image atIndex:0];
+            // Save chosen image as current top of stack
+            if (self.canvasImageView.image != nil)
+            {
+                // Then put current image as head
+                [self.imageStack insertObject:self.canvasImageView.image atIndex:0];
+            }
             
             // Disable forward button
             [self.forwardButton setImage:[UIImage imageNamed:@"forward_disabled.png"]
@@ -853,7 +884,10 @@ const int kCannyAperture = 3;
             {
                 [imageStack removeObjectAtIndex:(imageStackMaxSize - 1)];
             }
-            [self.imageStack insertObject:self.canvasImageView.image atIndex:0];
+            if (self.canvasImageView.image != nil)
+            {
+                [self.imageStack insertObject:self.canvasImageView.image atIndex:0];
+            }
         }
     }
     
@@ -908,36 +942,79 @@ const int kCannyAperture = 3;
     }
     else if (alertView.tag == PENCIL_SKETCH && buttonIndex != 1)
     {
-        if (buttonIndex == 0)
+        // Ignore button index of 1 (Cancel)
+        if (buttonIndex != 1)
         {
-            // Load photo from gallery
+            // Initialize picker
             UIImagePickerController * picker = [[UIImagePickerController alloc] init];
             picker.delegate = self;
-            picker.sourceType = UIImagePickerControllerSourceTypeSavedPhotosAlbum;
             
-            [self presentViewController:picker animated:YES completion:nil];
-            
-            // Clear all images off of the image stack
-            while ([imageStack count] > 0)
+            if(buttonIndex == 2) // Load from camera
             {
-                [imageStack removeObjectAtIndex:0];
+                if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera])
+                {
+                    picker.sourceType = UIImagePickerControllerSourceTypeCamera;
+
+                    [self presentViewController:picker animated:YES completion:nil];
+                    
+                    // Clear all images off of the image stack
+                    while ([imageStack count] > 0)
+                    {
+                        [imageStack removeObjectAtIndex:0];
+                    }
+                    imageStackIndex = 0;
+                    
+                    // Disable forward and back buttons
+                    [self.forwardButton setImage:[UIImage imageNamed:@"forward_disabled.png"]
+                                        forState:UIControlStateNormal];
+                    [self.backButton setImage:[UIImage imageNamed:@"back_disabled.png"]
+                                     forState:UIControlStateNormal];
+                }
+                else
+                {
+                    // display device not available error
+                    NSString *messageString = @"Cannot access camera.";
+                    
+                    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Error Loading Image"
+                                                                        message:messageString delegate:self
+                                                              cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                    [alertView show];
+                }
             }
-            imageStackIndex = 0;
-            
-            // Disable forward and back buttons
-            [self.forwardButton setImage:[UIImage imageNamed:@"forward_disabled.png"]
-                                forState:UIControlStateNormal];
-            [self.backButton setImage:[UIImage imageNamed:@"back_disabled.png"]
-                             forState:UIControlStateNormal];
-            
+            else // button index 0 - load from photo gallery
+            {
+                if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeSavedPhotosAlbum])
+                {
+                    picker.sourceType = UIImagePickerControllerSourceTypeSavedPhotosAlbum;
+                    
+                    [self presentViewController:picker animated:YES completion:nil];
+                    
+                    // Clear all images off of the image stack
+                    while ([imageStack count] > 0)
+                    {
+                        [imageStack removeObjectAtIndex:0];
+                    }
+                    imageStackIndex = 0;
+                    
+                    // Disable forward and back buttons
+                    [self.forwardButton setImage:[UIImage imageNamed:@"forward_disabled.png"]
+                                        forState:UIControlStateNormal];
+                    [self.backButton setImage:[UIImage imageNamed:@"back_disabled.png"]
+                                     forState:UIControlStateNormal];
+                }
+                else
+                {
+                    // display device not available error
+                    NSString *messageString = @"Cannot access photo library.";
+                    
+                    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Error Loading Image"
+                                                                        message:messageString delegate:self
+                                                              cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                    [alertView show];
+                }
+            }
         }
-        else if (buttonIndex == 2)
-        {
-            // Load image from camera
-        }
-        
     }
-    
 }
 
 
@@ -1080,6 +1157,8 @@ const int kCannyAperture = 3;
 {
     //Capture image context ref
     
+    // TODO - try a different tactic for memory management here. Don't alloc on every call
+    
     UIImageView *totalimage=[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, size.height, size.width)];
     
     UIImageView *firstImage=[[UIImageView alloc] initWithImage:mask];
@@ -1128,7 +1207,10 @@ const int kCannyAperture = 3;
         canvasImageView.image = [info objectForKey:@"UIImagePickerControllerOriginalImage"];
         
         // Save chosen image as current top of stack
-        [self.imageStack insertObject:self.canvasImageView.image atIndex:0];
+        if (self.canvasImageView.image != nil)
+        {
+            [self.imageStack insertObject:self.canvasImageView.image atIndex:0];
+        }
     }
 }
 
@@ -1151,6 +1233,55 @@ const int kCannyAperture = 3;
     
     return tempShape;
 }
+/***************** BEGIN TEXT HANDLING ********************/
+
+- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField{
+    NSLog(@"textFieldShouldBeginEditing");
+    textField.backgroundColor = [UIColor colorWithRed:220.0f/255.0f green:220.0f/255.0f blue:220.0f/255.0f alpha:1.0f];
+    return YES;
+}
+
+- (void)textFieldDidBeginEditing:(UITextField *)textField{
+    NSLog(@"textFieldDidBeginEditing");
+}
+
+- (BOOL)textFieldShouldEndEditing:(UITextField *)textField{
+    NSLog(@"textFieldShouldEndEditing");
+    textField.backgroundColor = [UIColor whiteColor];
+    return YES;
+}
+
+- (void)textFieldDidEndEditing:(UITextField *)textField{
+    NSLog(@"textFieldDidEndEditing");
+}
+
+- (BOOL)textFieldShouldClear:(UITextField *)textField{
+    NSLog(@"textFieldShouldClear:");
+    return YES;
+}
+
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string{
+    NSLog(@"textField:shouldChangeCharactersInRange:replacementString:");
+    if ([string isEqualToString:@"#"]) {
+        return NO;
+    }
+    else {
+        return YES;
+    }
+}
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField{
+    NSLog(@"textFieldShouldReturn:");
+    if (textField.tag == 1) {
+        UITextField *passwordTextField = (UITextField *)[self.view viewWithTag:2];
+        [passwordTextField becomeFirstResponder];
+    }
+    else {
+        [textField resignFirstResponder];
+    }
+    return YES;
+}
+/***************** BEGIN SHAPE ADDERS *********************/
 
 -(UIImage *)addSquare:(UIImage *)img radius:(CGFloat)radius origin:(CGPoint)origin
 {
@@ -1549,6 +1680,16 @@ const int kCannyAperture = 3;
     [cannyRotateButton removeFromSuperview];
     [cannyDoneButton removeFromSuperview];
     [cannySlider removeFromSuperview];
+    
+    // TODO fix back button issue
+    // Change current mode to pencil mode if current mode is sketch mode
+    /*if (self.model.currentMode == PENCIL_MODE)
+    {
+        self.model.currentMode = PENCIL_MODE;
+        [self.pencilButton setImage:[UIImage imageNamed:@"color_selected_mask.png"]
+                           forState:UIControlStateNormal];
+        [self.imagesButton setImage:nil forState:UIControlStateNormal];
+    }*/
     
     // Add finalized image to the image stack
     [self updateImageStack];
