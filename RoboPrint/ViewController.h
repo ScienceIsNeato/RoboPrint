@@ -9,9 +9,9 @@
 #import <UIKit/UIKit.h>
 #import "RoboPrintController.h"
 
-#define START_OVER 1
-#define LOAD_DRAWING 2
-#define PENCIL_SKETCH 3
+#define START_OVER_TAG 1
+#define LOAD_DRAWING_TAG 2
+#define PENCIL_SKETCH_TAG 3
 
 #define SHAPES_MENU 1
 #define BACKGROUNDS_MENU 2
@@ -72,6 +72,12 @@
     UIButton *cannyRotateButton;
     UIButton *cannyDoneButton;
     UILabel *cannySliderLabel;
+    BOOL cannyButtonsExist;
+    int textLeft;
+    int textTop;
+    int textWidth;
+    int textHeight;
+    int fontSize;
     
     
 }

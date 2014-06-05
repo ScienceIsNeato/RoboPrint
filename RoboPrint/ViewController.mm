@@ -78,7 +78,7 @@ const int kCannyAperture = 3;
     self.model.currentColor = YELLOW;
     imageStackIndex = 0; // most recent image
     
-    self.model.currentMode = PENCIL_MODE;
+    self.model.currentMode = PENCIL_DRAW_MODE;
     [self.pencilButton setImage:[UIImage imageNamed:@"color_selected_mask.png"]
                        forState:UIControlStateNormal];
     // END TODO
@@ -130,6 +130,12 @@ const int kCannyAperture = 3;
     cannySliderHeigth = 20;
     cannyButtonWidth = cannySliderWidth/2;
     cannyButtonHeight = cannySliderHeigth*2;
+    cannyButtonsExist = false;
+    textLeft = self.canvasImageView.frame.size.width/2;
+    textTop = self.canvasImageView.frame.size.height/2;
+    textWidth = 300;
+    textHeight = 40;
+    fontSize = 15;
     
 }
 
@@ -220,7 +226,7 @@ const int kCannyAperture = 3;
     [self.shapesButton setImage:nil forState:UIControlStateNormal];
     [self.enlargeButton setImage:nil forState:UIControlStateNormal];
     [self.textButton setImage:nil forState:UIControlStateNormal];
-    self.model.currentMode = PENCIL_SKETCH;
+    self.model.currentMode = PENCIL_SKETCH_MODE;
     // TODO
     // SEE HERE FOR INSTRUCTIONS FOR GETTING IMAGE FROM CAMERA
     // http://www.icodeblog.com/2009/07/28/getting-images-from-the-iphone-photo-library-or-camera-using-uiimagepickercontroller/
@@ -235,7 +241,7 @@ const int kCannyAperture = 3;
                                                   delegate: self
                                          cancelButtonTitle:@"From Photo"
                                          otherButtonTitles:@"Cancel",@"From Camera", nil];
-    alert.tag = PENCIL_SKETCH;
+    alert.tag = PENCIL_SKETCH_TAG;
     [alert show];
 
 }
@@ -251,7 +257,7 @@ const int kCannyAperture = 3;
     [self.enlargeButton setImage:nil forState:UIControlStateNormal];
     [self.textButton setImage:nil forState:UIControlStateNormal];
     [self cannyExecuteDoneAction]; // cleanup pencil sketch objects
-    self.model.currentMode = PENCIL_MODE;
+    self.model.currentMode = PENCIL_DRAW_MODE;
 }
 
 -(IBAction)dispatchScenesMenu:(id)sender{
@@ -338,6 +344,17 @@ const int kCannyAperture = 3;
     [self.shapesButton setImage:nil forState:UIControlStateNormal];
     [self cannyExecuteDoneAction]; // cleanup pencil sketch objects
     self.model.currentMode = ENLARGE_MODE;
+    
+    UIImage *zoomedImage;
+    
+    // Zoom by a factor of 2 from the center
+    zoomedImage = [self croppedImageWithImage:(self->canvasImageView.image) zoom:2.0f];
+    
+    // Put the new shape on the canvas
+    self->canvasImageView.image = zoomedImage;
+    // Update image stack
+    [self updateImageStack];
+    
 }
 
 - (IBAction)textPressed:(id)sender
@@ -353,27 +370,20 @@ const int kCannyAperture = 3;
     self.model.currentMode = TEXT_MODE;
     
     
-    UITextField *textField = [[UITextField alloc] initWithFrame:CGRectMake(self.view.frame.size.width/2, self.view.frame.size.height/4, 300, 40)];
+    UITextField *textField = [[UITextField alloc] initWithFrame:CGRectMake(textLeft, self.view.frame.size.height/4, textWidth, textHeight)];
     textField.borderStyle = UITextBorderStyleRoundedRect;
-    textField.font = [UIFont systemFontOfSize:15];
-    textField.placeholder = @"enter text";
+    textField.font = [UIFont systemFontOfSize:fontSize];
+    textField.placeholder = @"Everything is Awesome";
     textField.autocorrectionType = UITextAutocorrectionTypeNo;
     textField.keyboardType = UIKeyboardTypeDefault;
     textField.returnKeyType = UIReturnKeyDone;
+    textField.textColor = [UIColor colorWithRed:model.getRed green:model.getGreen blue:model.getBlue alpha:1.0f];
     textField.clearButtonMode = UITextFieldViewModeWhileEditing;
     textField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
     textField.delegate = self;
     [self.view addSubview:textField];
-    //[textField release];
-    
-    /*UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Adding Text"
-                                                   message: @"Not Yet Implemented"
-                                                  delegate: self
-                                         cancelButtonTitle:@"Cancel"
-                                         otherButtonTitles:@"OK",nil];*/
-    
-    
-    //[alert show];
+    [super viewWillAppear:true];
+    [textField becomeFirstResponder];
 }
 
 
@@ -451,31 +461,8 @@ const int kCannyAperture = 3;
             //NSLog(@"should be resizing text now");
             break;
         case ENLARGE_MODE:
-            if (pinchGestureRecognizer.state == UIGestureRecognizerStateEnded
-                || pinchGestureRecognizer.state == UIGestureRecognizerStateChanged) {
-                //NSLog(@"gesture.scale = %f", pinchGestureRecognizer.scale);
-                
-                CGFloat currentScale = self.canvasImageView.frame.size.width / self.canvasImageView.bounds.size.width;
-                CGFloat newScale = currentScale * pinchGestureRecognizer.scale;
-                
-                if (newScale < MINIMUM_SCALE) {
-                    newScale = MINIMUM_SCALE;
-                }
-                if (newScale > MAXIMUM_SCALE) {
-                    newScale = MAXIMUM_SCALE;
-                }
-                
-                CGAffineTransform transform = CGAffineTransformMakeScale(newScale, newScale);
-                self.canvasImageView.transform = transform;
-                //CGFloat tx = 5.0f;
-                //CGFloat ty = 1500.0f;
-                // transform = CGAffineTransformMakeTranslation(tx, ty);
-                
-                self.canvasImageView.transform = transform;
-                [self.canvasImageView setCenter:CGPointMake(self.canvasImageView.center.x, self.canvasImageView.center.y + 44)];
-                pinchGestureRecognizer.scale = 1;
-            }
-            //NSLog(@"should be resizing image now");
+            
+            //Pinch not supported in ENLARGE_MODE
             break;
             
             
@@ -593,7 +580,7 @@ const int kCannyAperture = 3;
                                                   delegate: self
                                          cancelButtonTitle:@"Cancel"
                                          otherButtonTitles:@"Start Over",nil];
-    alert.tag = START_OVER;
+    alert.tag = START_OVER_TAG;
     [alert show];
     
     // Handing done in alertView handler
@@ -609,7 +596,7 @@ const int kCannyAperture = 3;
                                                 delegate: self
                                                 cancelButtonTitle:@"Cancel"
                                                 otherButtonTitles:@"Load Image",nil];
-    alert.tag = LOAD_DRAWING;
+    alert.tag = LOAD_DRAWING_TAG;
     [alert show];
 }
 
@@ -679,7 +666,7 @@ const int kCannyAperture = 3;
     
     switch (self.model.currentMode)
     {
-        case (PENCIL_MODE):
+        case (PENCIL_DRAW_MODE):
         {
             mouseSwiped = YES; // Indicates that this is not a single point
             UITouch *touch = [touches anyObject];
@@ -691,7 +678,7 @@ const int kCannyAperture = 3;
             currentPoint.x = currentPoint.x*xRescale;
             currentPoint.y = currentPoint.y*yRescale;
             
-            UIGraphicsBeginImageContextWithOptions(self.view.frame.size, NO, 1);
+            UIGraphicsBeginImageContextWithOptions(CGSizeMake(self.view.frame.size.width,self.view.frame.size.height), NO, 1);
             [self->canvasImageView.image drawInRect:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
             CGContextMoveToPoint(UIGraphicsGetCurrentContext(), lastPoint.x, lastPoint.y);
             CGContextAddLineToPoint(UIGraphicsGetCurrentContext(), currentPoint.x, currentPoint.y);
@@ -804,7 +791,7 @@ const int kCannyAperture = 3;
     
     switch (self.model.currentMode)
     {
-        case (PENCIL_MODE):
+        case (PENCIL_DRAW_MODE):
         {
             [self updateImageStack];
         }
@@ -842,7 +829,8 @@ const int kCannyAperture = 3;
     // Ignore events that didn't create images and single points
     if ((self.canvasImageView.image != nil && mouseSwiped) ||
         (self.model.currentMode == SHAPES_MODE) ||
-        (self.model.currentMode == PENCIL_SKETCH) )
+        (self.model.currentMode == PENCIL_SKETCH_MODE) ||
+        (self.model.currentMode == ENLARGE_MODE) )
     {
         [self.backButton setImage:[UIImage imageNamed:@"back_button.png"]
                          forState:UIControlStateNormal];
@@ -900,10 +888,13 @@ const int kCannyAperture = 3;
     // button selected.
 
     // Clicked through warning. Load image.
-    if ((alertView.tag == START_OVER) && buttonIndex)
+    if ((alertView.tag == START_OVER_TAG) && buttonIndex)
     {
         // Clear the currently displayed image
         self.canvasImageView.image = nil;
+        
+        // Clear the current background
+        [self.backgroundImageView setImage:nil];
         
         // Clear all images off of the image stack
         while ([imageStack count] > 0)
@@ -919,7 +910,7 @@ const int kCannyAperture = 3;
                          forState:UIControlStateNormal];
     }
     // Clicked through warning. Load image.
-    else if (alertView.tag == LOAD_DRAWING && buttonIndex)
+    else if (alertView.tag == LOAD_DRAWING_TAG && buttonIndex)
     {
         UIImagePickerController * picker = [[UIImagePickerController alloc] init];
         picker.delegate = self;
@@ -940,7 +931,7 @@ const int kCannyAperture = 3;
         [self.backButton setImage:[UIImage imageNamed:@"back_disabled.png"]
                          forState:UIControlStateNormal];
     }
-    else if (alertView.tag == PENCIL_SKETCH && buttonIndex != 1)
+    else if (alertView.tag == PENCIL_SKETCH_TAG && buttonIndex != 1)
     {
         // Ignore button index of 1 (Cancel)
         if (buttonIndex != 1)
@@ -1183,7 +1174,7 @@ const int kCannyAperture = 3;
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
     
-    if (self.model.currentMode == PENCIL_SKETCH)
+    if (self.model.currentMode == PENCIL_SKETCH_MODE)
     {
         // Send this image to the canny edge detector
         
@@ -1241,46 +1232,76 @@ const int kCannyAperture = 3;
     return YES;
 }
 
-- (void)textFieldDidBeginEditing:(UITextField *)textField{
-    NSLog(@"textFieldDidBeginEditing");
-}
-
-- (BOOL)textFieldShouldEndEditing:(UITextField *)textField{
-    NSLog(@"textFieldShouldEndEditing");
-    textField.backgroundColor = [UIColor whiteColor];
-    return YES;
-}
 
 - (void)textFieldDidEndEditing:(UITextField *)textField{
     NSLog(@"textFieldDidEndEditing");
+
+    textField.borderStyle = UITextBorderStyleNone;
+
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(canvasImageView.frame.size.width,canvasImageView.frame.size.height), NO, 1);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+
+    UIImage *imageOfText = [self imageFromText:textField];
+        
+    self->canvasImageView.image = imageOfText;
+    
+    // Add finalized image to the image stack
+    [self updateImageStack];
+    
+    [textField removeFromSuperview];
+    
 }
 
-- (BOOL)textFieldShouldClear:(UITextField *)textField{
-    NSLog(@"textFieldShouldClear:");
-    return YES;
-}
+-(UIImage *)imageFromText:(UITextField *)textField
+{
+    
+    NSString *text = textField.text;
+    // set the font type and size
+    UIFont *font = [UIFont systemFontOfSize:fontSize];
+    //CGSize size  = [text sizeWithFont:font];
+    
+    // check if UIGraphicsBeginImageContextWithOptions is available (iOS is 4.0+)
+    if (UIGraphicsBeginImageContextWithOptions != NULL)
+    {
+        UIGraphicsBeginImageContextWithOptions(CGSizeMake(canvasImageView.frame.size.width,canvasImageView.frame.size.height),NO,1);
+    }
+    else
+    {
+        // iOS is < 4.0
+        UIGraphicsBeginImageContext(CGSizeMake(canvasImageView.frame.size.width,canvasImageView.frame.size.height));
+    }
+    
+    CGContextSetFillColorWithColor(UIGraphicsGetCurrentContext(),
+                                   [UIColor colorWithRed:model.getRed green:model.getGreen blue:model.getBlue alpha:1.0f].CGColor);
+    
+    [text drawAtPoint:CGPointMake(textLeft - textWidth/2 - textHeight, textTop/2 - textHeight/2) withFont:font];
+    
+    
+    //CGImageRef cimg = UIGraphicsGetCurrentContext();
+    
+    // transfer image
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    CGRect rect = CGRectMake(0, 0, canvasImageView.frame.size.width, canvasImageView.frame.size.height);
+    [image drawInRect:rect blendMode:kCGBlendModeNormal alpha:1.0];
 
-- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string{
-    NSLog(@"textField:shouldChangeCharactersInRange:replacementString:");
-    if ([string isEqualToString:@"#"]) {
-        return NO;
-    }
-    else {
-        return YES;
-    }
+    UIImage *testImg = UIGraphicsGetImageFromCurrentImageContext();
+    
+    UIGraphicsEndImageContext();
+    
+    // merge with existing view
+    testImg = [self mergeImage:testImg overImage:self.canvasImageView.image inSize:CGSizeMake(canvasImageView.frame.size.height, canvasImageView.frame.size.width)];
+    
+    // TODO fix layering bug
+    // TODO add aility to scale and translate text, possibly add buttons as well. 
+    
+    return testImg;
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField{
-    NSLog(@"textFieldShouldReturn:");
-    if (textField.tag == 1) {
-        UITextField *passwordTextField = (UITextField *)[self.view viewWithTag:2];
-        [passwordTextField becomeFirstResponder];
-    }
-    else {
-        [textField resignFirstResponder];
-    }
-    return YES;
+    [textField resignFirstResponder];
+    return TRUE;
 }
+
 /***************** BEGIN SHAPE ADDERS *********************/
 
 -(UIImage *)addSquare:(UIImage *)img radius:(CGFloat)radius origin:(CGPoint)origin
@@ -1477,6 +1498,23 @@ const int kCannyAperture = 3;
     return tempShape;
 }
 
+-(UIImage*)croppedImageWithImage:(UIImage *)image zoom:(CGFloat)zoom
+{
+    //CGFloat zoom = 2.0f;
+    CGFloat zoomReciprocal = 1.0f / zoom;
+    
+    CGPoint offset = CGPointMake(image.size.width * ((1.0f - zoomReciprocal) / 2.0f), image.size.height * ((1.0f - zoomReciprocal) / 2.0f));
+    CGRect croppedRect = CGRectMake(offset.x, offset.y, image.size.width * zoomReciprocal, image.size.height * zoomReciprocal);
+    
+    CGImageRef croppedImageRef = CGImageCreateWithImageInRect([image CGImage], croppedRect);
+    
+    UIImage* croppedImage = [[UIImage alloc] initWithCGImage:croppedImageRef scale:[image scale] orientation:[image imageOrientation]];
+    
+    CGImageRelease(croppedImageRef);
+    
+    return croppedImage;
+}
+
 /*********** BEGIN OPEN CV SUPPORT ********************/
 - (cv::Mat)cvMatFromUIImage:(UIImage *)image
 {
@@ -1665,6 +1703,7 @@ const int kCannyAperture = 3;
                                     cannyButtonHeight);
     cannyDoneButton.layer.cornerRadius = 10.0f;
     [self.view addSubview:cannyDoneButton];
+    cannyButtonsExist = true;
 }
 
 -(void)cannyDoneAction:(id)sender
@@ -1675,24 +1714,18 @@ const int kCannyAperture = 3;
 
 -(IBAction)cannyExecuteDoneAction
 {
+    if (cannyButtonsExist)
+    {
     // Clean up all programatically added screen helper elements for the pencil sketch
     [cannySliderLabel removeFromSuperview];
     [cannyRotateButton removeFromSuperview];
     [cannyDoneButton removeFromSuperview];
     [cannySlider removeFromSuperview];
     
-    // TODO fix back button issue
-    // Change current mode to pencil mode if current mode is sketch mode
-    /*if (self.model.currentMode == PENCIL_MODE)
-    {
-        self.model.currentMode = PENCIL_MODE;
-        [self.pencilButton setImage:[UIImage imageNamed:@"color_selected_mask.png"]
-                           forState:UIControlStateNormal];
-        [self.imagesButton setImage:nil forState:UIControlStateNormal];
-    }*/
-    
     // Add finalized image to the image stack
     [self updateImageStack];
+    cannyButtonsExist = false;
+    }
 }
 
 -(IBAction)cannySliderText

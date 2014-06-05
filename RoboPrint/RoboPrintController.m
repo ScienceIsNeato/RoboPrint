@@ -16,13 +16,6 @@
 {
     currentMode = Mode;
     
-    switch (self.currentColor)
-    {
-
-            
-        default:
-            break;
-    }
 }
 
 - (float)getRed
@@ -30,7 +23,7 @@
     switch (self.currentColor)
     {
         case YELLOW:
-            return 255.0/255.0;
+            return 242.0/255.0;
             break;
         case RED:
             return 255.0/255.0;
@@ -58,7 +51,7 @@
     switch (self.currentColor)
     {
         case YELLOW:
-            return 255.0/255.0;
+            return 235.0/255.0;
             break;
         case RED:
             return 0.0/255.0;
