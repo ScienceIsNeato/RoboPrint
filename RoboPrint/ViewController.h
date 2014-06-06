@@ -15,6 +15,7 @@
 
 #define SHAPES_MENU 1
 #define BACKGROUNDS_MENU 2
+#define SETTINGS_MENU 3
 
 #define CIRCLE      0
 #define TRIANGLE    1

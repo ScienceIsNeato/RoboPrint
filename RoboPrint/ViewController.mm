@@ -293,12 +293,9 @@ const int kCannyAperture = 3;
 
     
     RNGridMenu *av = [[RNGridMenu alloc] initWithImages:images];
-    //RoboPrintController *menuController = [[RoboPrintController alloc] init];
     
     popupMenuName = BACKGROUNDS_MENU;
     av.delegate = self;
-    
-    //av.highlightColor = [UIColor colorWithRed:66.0f/255.0f green:79.0f/255.0f blue:91.0f/255.0f alpha:1.0f];
     
     [av showInViewController:self center:CGPointMake(500, 500)];
     
@@ -695,16 +692,30 @@ const int kCannyAperture = 3;
 
 - (IBAction)openSettingsMenu:(id)sender
 {
+    
+    
+    NSArray *currencies = @[@"Robot Connection Settings", @"About", @"Review This App", @"Contact Us"];
+    
+    
+    RNGridMenu *av = [[RNGridMenu alloc] initWithTitles:currencies];
+    CGSize temp = CGSizeMake(200, 50);
+    av.itemSize = temp;
+    
+    popupMenuName = SETTINGS_MENU;
+    av.delegate = self;
+    
+    [av showInViewController:self center:CGPointMake(500, 500)];
+    
     [self cannyExecuteDoneAction]; // cleanup pencil sketch objects if present
 
-    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Manage Settings"
+    /*UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Manage Settings"
                                                    message: @"Not Yet Implemented"
                                                   delegate: self
                                          cancelButtonTitle:@"Cancel"
                                          otherButtonTitles:@"OK",nil];
     
     
-    [alert show];
+    [alert show];*/
 }
 
 
@@ -1246,8 +1257,52 @@ const int kCannyAperture = 3;
 
             break;
             
-        default:
-            break;
+        case SETTINGS_MENU:
+            UIAlertView *alert;
+            switch (itemIndex)
+            {
+                case 0:
+                    // connection settings
+                    // First, present dialog to load from file, camera, or canclel
+                    alert = [[UIAlertView alloc]initWithTitle: @"Connection Settings"
+                                                                   message: @"To be implemented in Phase 3."
+                                                                  delegate: self
+                                                         cancelButtonTitle:@"OK"
+                                                         otherButtonTitles:nil];
+                    //alert.tag = PENCIL_SKETCH_TAG;
+                    break;
+                case 1:
+                    // About
+                    alert = [[UIAlertView alloc] initWithTitle:@"About"
+                                                                    message:@"Property of Anwar Farooq."
+                                                                   delegate:self
+                                                          cancelButtonTitle:@"OK"
+                                                          otherButtonTitles:nil];
+                    break;
+                case 2:
+                    // Review this app
+                    alert = [[UIAlertView alloc] initWithTitle:@"Review This App"
+                                                                    message:@"Link to be provided in Phase 3."
+                                                                   delegate:self
+                                                          cancelButtonTitle:@"OK"
+                                                          otherButtonTitles:nil];
+                    break;
+                case 3:
+                    // Contact Us
+                    alert = [[UIAlertView alloc] initWithTitle:@"Contact"
+                                                                    message:@"Contact us at http://www.mrfarooq.com"
+                                                                   delegate:self
+                                                          cancelButtonTitle:@"OK"
+                                                          otherButtonTitles:nil];
+                    http://www.mrfarooq.com
+                    break;
+                
+                default:
+                    break;
+                    
+            }
+            [alert show];
+
     }
 
     
