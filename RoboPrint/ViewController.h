@@ -75,10 +75,15 @@
     BOOL cannyButtonsExist;
     int textLeft;
     int textTop;
+    int defaultTextLeft;
+    int defaultTextTop;
+    int textLeftOffset;
+    int textTopOffset;
     int textWidth;
     int textHeight;
     int fontSize;
-    
+    int defaultFontSize;
+    NSString *currentTextString;    
     
 }
 
@@ -102,8 +107,6 @@
 @property (weak, nonatomic) IBOutlet UIButton *enlargeButton;
 @property (weak, nonatomic) IBOutlet UIButton *textButton;
 @property int popupMenuName;
-@property CGFloat xRescale;
-@property CGFloat yRescale;
 
 
 - (IBAction)yellowButtonTouchUpInsideAction:(id)sender;

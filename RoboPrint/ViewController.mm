@@ -45,8 +45,7 @@ const int kCannyAperture = 3;
 @synthesize backButton;
 @synthesize forwardButton;
 @synthesize popupMenuName;
-@synthesize xRescale;
-@synthesize yRescale;
+
 
 // OpenCV properties
 
@@ -56,6 +55,9 @@ const int kCannyAperture = 3;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    // Clear the current background
+    [self.backgroundImageView setImage:nil];
     
     // Initialize sub controller
     self.model = [[RoboPrintController alloc] init];
@@ -67,7 +69,7 @@ const int kCannyAperture = 3;
     brush = 1.0;
     opacity = 1.0;
     
-    // TODO - replace this block with function call
+    // Set start state for color menu
     [self.yellowButton setImage:[UIImage imageNamed:@"color_selected_mask.png"]
                        forState:UIControlStateNormal];
     [self.redButton setImage:nil forState:UIControlStateNormal];
@@ -78,9 +80,17 @@ const int kCannyAperture = 3;
     self.model.currentColor = YELLOW;
     imageStackIndex = 0; // most recent image
     
-    self.model.currentMode = PENCIL_DRAW_MODE;
+    // Set start state for left menu
+    [self.imagesButton setImage:nil forState:UIControlStateNormal];
     [self.pencilButton setImage:[UIImage imageNamed:@"color_selected_mask.png"]
                        forState:UIControlStateNormal];
+    [self.backgroundsButton setImage:nil forState:UIControlStateNormal];
+    [self.shapesButton setImage:nil forState:UIControlStateNormal];
+    [self.enlargeButton setImage:nil forState:UIControlStateNormal];
+    [self.textButton setImage:nil forState:UIControlStateNormal];
+    [self cannyExecuteDoneAction]; // cleanup pencil sketch objects
+    self.model.currentMode = PENCIL_DRAW_MODE;
+    
     // END TODO
     
     // Initialize image stack and associated bools, ints, and nav buttons
@@ -107,10 +117,6 @@ const int kCannyAperture = 3;
     [self.canvasImageView addGestureRecognizer:pgr];
     //[pgr release];
     
-    // Set up scale factors
-    xRescale = (self.view.frame.size.width/self->canvasImageView.frame.size.width);
-    yRescale = (self.view.frame.size.height/self->canvasImageView.frame.size.height);
-    
     // Set starting shape width and origin
     defaultShapeWidth = 100.0;
     shapeWidth = defaultShapeWidth;
@@ -131,11 +137,17 @@ const int kCannyAperture = 3;
     cannyButtonWidth = cannySliderWidth/2;
     cannyButtonHeight = cannySliderHeigth*2;
     cannyButtonsExist = false;
-    textLeft = self.canvasImageView.frame.size.width/2;
-    textTop = self.canvasImageView.frame.size.height/2;
+    textLeft = 0;
+    textTop = 0;
+    textLeftOffset = 0;
+    textTopOffset = 0;
+    defaultTextLeft = 0;
+    defaultTextTop = 0;
     textWidth = 300;
     textHeight = 40;
-    fontSize = 15;
+    defaultFontSize = 25;
+    fontSize = defaultFontSize;
+    currentTextString = NULL;
     
 }
 
@@ -227,13 +239,6 @@ const int kCannyAperture = 3;
     [self.enlargeButton setImage:nil forState:UIControlStateNormal];
     [self.textButton setImage:nil forState:UIControlStateNormal];
     self.model.currentMode = PENCIL_SKETCH_MODE;
-    // TODO
-    // SEE HERE FOR INSTRUCTIONS FOR GETTING IMAGE FROM CAMERA
-    // http://www.icodeblog.com/2009/07/28/getting-images-from-the-iphone-photo-library-or-camera-using-uiimagepickercontroller/
-    
-    // TODO
-    // there is a bug where, if you load a pencil sketch, the very next thing you do suffers from
-    // sever memory lag.
 
     // First, present dialog to load from file, camera, or canclel
     UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Pencil Sketch"
@@ -350,8 +355,14 @@ const int kCannyAperture = 3;
     // Zoom by a factor of 2 from the center
     zoomedImage = [self croppedImageWithImage:(self->canvasImageView.image) zoom:2.0f];
     
+    // Need to resize whatever the image size was
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(canvasImageView.frame.size.width,canvasImageView.frame.size.height), NO, 0.0);
+    [zoomedImage drawInRect:CGRectMake(0, 0, canvasImageView.frame.size.width,canvasImageView.frame.size.height)];
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
     // Put the new shape on the canvas
-    self->canvasImageView.image = zoomedImage;
+    self->canvasImageView.image = newImage;
     // Update image stack
     [self updateImageStack];
     
@@ -369,10 +380,19 @@ const int kCannyAperture = 3;
     [self cannyExecuteDoneAction]; // cleanup pencil sketch objects
     self.model.currentMode = TEXT_MODE;
     
+    defaultTextTop = textHeight;
+    defaultTextLeft = canvasImageView.frame.size.width/2 - textWidth/2;
     
-    UITextField *textField = [[UITextField alloc] initWithFrame:CGRectMake(textLeft, self.view.frame.size.height/4, textWidth, textHeight)];
+    textTop = defaultTextTop;
+    textLeft = defaultTextLeft;
+    textLeftOffset = 0;
+    textTopOffset  = 0;
+    fontSize = defaultFontSize;
+    
+    UITextField *textField = [[UITextField alloc] initWithFrame:CGRectMake(canvasImageView.frame.origin.x + textLeft, canvasImageView.frame.origin.y + textTop, textWidth, textHeight)];
+
     textField.borderStyle = UITextBorderStyleRoundedRect;
-    textField.font = [UIFont systemFontOfSize:fontSize];
+    textField.font = [UIFont fontWithName:@"AppleSDGothicNeo-Thin" size:fontSize];
     textField.placeholder = @"Everything is Awesome";
     textField.autocorrectionType = UITextAutocorrectionTypeNo;
     textField.keyboardType = UIKeyboardTypeDefault;
@@ -389,26 +409,28 @@ const int kCannyAperture = 3;
 
 - (void)handlePinch:(UIPinchGestureRecognizer *)pinchGestureRecognizer
 {
+    // TODO condense the two switch statements
     //handle pinch...
     switch (self.model.currentMode) {
         case SHAPES_MODE:
             if (pinchGestureRecognizer.state == UIGestureRecognizerStateEnded
                 || pinchGestureRecognizer.state == UIGestureRecognizerStateChanged)
             {
-                
-                CGFloat currentScale = self.canvasImageView.frame.size.width / self.canvasImageView.bounds.size.width;
-                CGFloat newScale = currentScale * pinchGestureRecognizer.scale;
-                
-                if (newScale < MINIMUM_SCALE) {
-                    newScale = MINIMUM_SCALE;
+                if (pinchGestureRecognizer.scale < 1)
+                {
+                    // Pinch in
+                    shapeWidth-=4;
                 }
-                if (newScale > MAXIMUM_SCALE) {
-                    newScale = MAXIMUM_SCALE;
+                else
+                {
+                    // Pinch out
+                    shapeWidth+=4;
                 }
+
                 if ([imageStack count] > 0)
                 {
                     // Get scale of pinch
-                    shapeWidth *= newScale;
+                    //shapeWidth *= newScale;
                     UIImage *shape = nil;
                     // Put the new shape on the canvas
                     switch (currentShape)
@@ -449,7 +471,7 @@ const int kCannyAperture = 3;
                         [self.canvasImageView setImage:nil];
                     }
                     // Put the new shape on the canvas
-                    self->canvasImageView.image = [self mergeImage:shape overImage:self.canvasImageView.image inSize:CGSizeMake(self.view.frame.size.height, self.view.frame.size.width)];
+                    self->canvasImageView.image = [self mergeImage:shape overImage:self.canvasImageView.image inSize:CGSizeMake(canvasImageView.frame.size.height, canvasImageView.frame.size.width)];
                     // Update image stack
                     [self updateImageStack];
                 }
@@ -458,16 +480,55 @@ const int kCannyAperture = 3;
             break;
             
         case TEXT_MODE:
-            //NSLog(@"should be resizing text now");
+            if (pinchGestureRecognizer.state == UIGestureRecognizerStateEnded
+                || pinchGestureRecognizer.state == UIGestureRecognizerStateChanged)
+            {
+                
+                if (pinchGestureRecognizer.scale < 1)
+                {
+                    // Pinch in
+                    fontSize--;
+                }
+                else
+                {
+                    // Pinch out
+                    fontSize++;
+                }
+                
+                if ([imageStack count] > 0)
+                {
+                    UIImage *shape = nil;
+                    // Put the new shape on the canvas
+
+                    // Pop previous circle off the stack
+                    [imageStack removeObjectAtIndex:0];
+                    
+                    shape = [self imageFromText];
+
+                    // Make sure there was more than one image on the stack
+                    if ([imageStack count] > 0)
+                    {
+                        // Set the image on the canvas to the one before the shape was added
+                        [self.canvasImageView setImage:[self.imageStack objectAtIndex: 0]];
+                    }
+                    else
+                    {
+                        [self.canvasImageView setImage:nil];
+                    }
+                    // Put the new shape on the canvas
+                    self->canvasImageView.image = [self mergeImage:shape overImage:self.canvasImageView.image inSize:CGSizeMake(canvasImageView.frame.size.height, canvasImageView.frame.size.width)];
+                    // Update image stack
+                    [self updateImageStack];
+                }
+                pinchGestureRecognizer.scale = 1;
+            }
             break;
         case ENLARGE_MODE:
             
             //Pinch not supported in ENLARGE_MODE
             break;
             
-            
         default:
-            //NSLog(@"should be doing nothing now");
             break;
     }
     
@@ -656,13 +717,12 @@ const int kCannyAperture = 3;
     mouseSwiped = NO;
     UITouch *touch = [touches anyObject];
     lastPoint = [touch locationInView:self->canvasImageView];
-    lastPoint.x = lastPoint.x*xRescale;
-    lastPoint.y = lastPoint.y*yRescale;
+    lastPoint.x = lastPoint.x;
+    lastPoint.y = lastPoint.y;
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
-    // TODO - Confirm that start of touch is in canvas
-    
+    // TODO - Condense the switch statements
     
     switch (self.model.currentMode)
     {
@@ -675,16 +735,15 @@ const int kCannyAperture = 3;
             CGPoint currentPoint = [touch locationInView:self->canvasImageView];
             
             // Scale the point so that it matches the height and width of the drawing canvas
-            currentPoint.x = currentPoint.x*xRescale;
-            currentPoint.y = currentPoint.y*yRescale;
+            currentPoint.x = currentPoint.x;
+            currentPoint.y = currentPoint.y;
             
-            UIGraphicsBeginImageContextWithOptions(CGSizeMake(self.view.frame.size.width,self.view.frame.size.height), NO, 1);
-            [self->canvasImageView.image drawInRect:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
+            UIGraphicsBeginImageContextWithOptions(CGSizeMake(canvasImageView.frame.size.width,canvasImageView.frame.size.height), NO, 1);
+            [self->canvasImageView.image drawInRect:CGRectMake(0, 0, canvasImageView.frame.size.width, canvasImageView.frame.size.height)];
             CGContextMoveToPoint(UIGraphicsGetCurrentContext(), lastPoint.x, lastPoint.y);
             CGContextAddLineToPoint(UIGraphicsGetCurrentContext(), currentPoint.x, currentPoint.y);
             CGContextSetLineCap(UIGraphicsGetCurrentContext(), kCGLineCapRound);
             CGContextSetLineWidth(UIGraphicsGetCurrentContext(), brush );
-            //NSLog(@"RGB are (%f,%f,%f", self.model.getRed,self.model.getGreen,self.model.getBlue);
             
             CGContextSetRGBStrokeColor(UIGraphicsGetCurrentContext(), self.model.getRed, self.model.getGreen, self.model.getBlue, 1.0);
             CGContextSetBlendMode(UIGraphicsGetCurrentContext(),kCGBlendModeNormal);
@@ -707,8 +766,6 @@ const int kCannyAperture = 3;
                 CGPoint currentPoint = [touch locationInView:self->canvasImageView];
                 
                 // Scale the point so that it matches the height and width of the drawing canvas
-                currentPoint.x = currentPoint.x*xRescale;
-                currentPoint.y = currentPoint.y*yRescale;
                 shapeOrigin.x = (defaultShapeOrigin.x + (currentPoint.x - lastPoint.x) + shapeOriginOffset.x);
                 shapeOrigin.y = (defaultShapeOrigin.y + (currentPoint.y - lastPoint.y) + shapeOriginOffset.y);
                 
@@ -734,7 +791,6 @@ const int kCannyAperture = 3;
                         if (lineCanBeMoved)
                         {
                             // Drag line around (movement phase)
-                            //NSLog(@"Offsets are %f, %f",shapeOriginOffset.x, shapeOriginOffset.y);
                             CGPoint tempP1 = CGPointMake((lineP1.x + (currentPoint.x - lastPoint.x) + shapeOriginOffset.x), (lineP1.y + (currentPoint.y - lastPoint.y) + shapeOriginOffset.y));
                             CGPoint tempP2 = CGPointMake((lineP2.x + (currentPoint.x - lastPoint.x) + shapeOriginOffset.x), (lineP2.y + (currentPoint.y - lastPoint.y) + shapeOriginOffset.y));
                             shape = [self addLine:(self->canvasImageView.image) P1:tempP1 P2:tempP2];
@@ -744,8 +800,8 @@ const int kCannyAperture = 3;
                         {
                             // Set end point of line (creation phase)
                             lineP2 = currentPoint;
-                            lineP2.x = currentPoint.x/xRescale;
-                            lineP2.y = currentPoint.y/yRescale;
+                            lineP2.x = currentPoint.x;
+                            lineP2.y = currentPoint.y;
                             shape = [self addLine:(self->canvasImageView.image) P1:lineP1 P2:lineP2];
                             lastPoint = currentPoint;
                         }
@@ -769,7 +825,7 @@ const int kCannyAperture = 3;
                     [self.canvasImageView setImage:nil];
                 }
                 // Put the new shape on the canvas
-                self->canvasImageView.image = [self mergeImage:shape overImage:self.canvasImageView.image inSize:CGSizeMake(self.view.frame.size.height, self.view.frame.size.width)];
+                self->canvasImageView.image = [self mergeImage:shape overImage:self.canvasImageView.image inSize:CGSizeMake(canvasImageView.frame.size.height, canvasImageView.frame.size.width)];
                 // Update image stack
                 [self updateImageStack];
             }
@@ -778,9 +834,50 @@ const int kCannyAperture = 3;
             break;
         }
             
+        case TEXT_MODE:
+        {
+            if (([imageStack count] > 0))
+            {
+                // Get current absolute location of touch event in the view
+                UITouch *touch = [touches anyObject];
+                CGPoint currentPoint = [touch locationInView:self->canvasImageView];
+                
+                textLeft = (defaultTextLeft + (currentPoint.x - lastPoint.x) + textLeftOffset);
+                textTop = (defaultTextTop + (currentPoint.y - lastPoint.y) + textTopOffset);
+                
+                // Put the new shape on the canvas
+                UIImage *textImage;
+
+                
+                
+                // Pop previous circle off the stack
+                [imageStack removeObjectAtIndex:0];
+                
+                textImage = [self imageFromText];
+                
+                // Make sure there was more than one image on the stack
+                if ([imageStack count] > 0)
+                {
+                    // Set the image on the canvas to the one before the shape was added
+                    [self.canvasImageView setImage:[self.imageStack objectAtIndex: 0]];
+                }
+                else
+                {
+                    [self.canvasImageView setImage:nil];
+                }
+                // Put the new shape on the canvas
+                self->canvasImageView.image = [self mergeImage:textImage overImage:self.canvasImageView.image inSize:CGSizeMake(canvasImageView.frame.size.height, canvasImageView.frame.size.width)];
+                // Update image stack
+                [self updateImageStack];
+
+            }
+
+            
+        }
+            
         default:
         {
-            //NSLog(@"Mode other than pencil");
+
             break;
         }
     }
@@ -803,18 +900,28 @@ const int kCannyAperture = 3;
             
             // Get current absolute location of touch event in the view
             CGPoint currentPoint = [touch locationInView:self->canvasImageView];
-            // Scale the point so that it matches the height and width of the drawing canvas
-            currentPoint.x = currentPoint.x*xRescale;
-            currentPoint.y = currentPoint.y*yRescale;
+
             shapeOriginOffset.x += (currentPoint.x - lastPoint.x);
             shapeOriginOffset.y += (currentPoint.y - lastPoint.y);
             lineCanBeMoved = TRUE;
             break;
         }
             
+        case (TEXT_MODE):
+        {
+            // Get current absolute location of touch event in the view
+            UITouch *touch = [touches anyObject];
+            
+            // Get current absolute location of touch event in the view
+            CGPoint currentPoint = [touch locationInView:self->canvasImageView];
+            textLeftOffset += (currentPoint.x - lastPoint.x);
+            textTopOffset  += (currentPoint.y - lastPoint.y);
+            break;
+        }
+            
         default:
         {
-            //NSLog(@"Mode other than pencil");
+
             break;
         }
     }
@@ -830,7 +937,8 @@ const int kCannyAperture = 3;
     if ((self.canvasImageView.image != nil && mouseSwiped) ||
         (self.model.currentMode == SHAPES_MODE) ||
         (self.model.currentMode == PENCIL_SKETCH_MODE) ||
-        (self.model.currentMode == ENLARGE_MODE) )
+        (self.model.currentMode == ENLARGE_MODE) ||
+        (self.model.currentMode == TEXT_MODE) )
     {
         [self.backButton setImage:[UIImage imageNamed:@"back_button.png"]
                          forState:UIControlStateNormal];
@@ -842,10 +950,8 @@ const int kCannyAperture = 3;
             // In this case, back was pressed, then new drawing began,
             // so we need to clear everything off the stack that the
             // user clicked 'back' through'
-            NSLog(@"need to clear stack in future");
             for (int index = 0; index < imageStackIndex; index++)
             {
-                NSLog(@"Image removed");
                 [imageStack removeObjectAtIndex:0];
             }
             // Reset stack index as head
@@ -890,6 +996,9 @@ const int kCannyAperture = 3;
     // Clicked through warning. Load image.
     if ((alertView.tag == START_OVER_TAG) && buttonIndex)
     {
+        // call the start state
+        [self viewDidLoad];
+        
         // Clear the currently displayed image
         self.canvasImageView.image = nil;
         
@@ -912,6 +1021,9 @@ const int kCannyAperture = 3;
     // Clicked through warning. Load image.
     else if (alertView.tag == LOAD_DRAWING_TAG && buttonIndex)
     {
+        // call the start state
+        [self viewDidLoad];
+        
         UIImagePickerController * picker = [[UIImagePickerController alloc] init];
         picker.delegate = self;
         picker.sourceType = UIImagePickerControllerSourceTypeSavedPhotosAlbum;
@@ -933,6 +1045,13 @@ const int kCannyAperture = 3;
     }
     else if (alertView.tag == PENCIL_SKETCH_TAG && buttonIndex != 1)
     {
+        // call the start state and reset mode
+        [self viewDidLoad];
+        [self.imagesButton setImage:[UIImage imageNamed:@"color_selected_mask.png"]
+                           forState:UIControlStateNormal];
+        [self.pencilButton setImage:nil forState:UIControlStateNormal];
+        self.model.currentMode = PENCIL_SKETCH_MODE;
+        
         // Ignore button index of 1 (Cancel)
         if (buttonIndex != 1)
         {
@@ -1062,10 +1181,9 @@ const int kCannyAperture = 3;
             shapeOriginOffset.x = 0;
             shapeOriginOffset.y = 0;
             shapeWidth = defaultShapeWidth;
-            NSLog(@"Select ccc index was %d and the menu was %d", itemIndex, popupMenuName);
 
             // Put the new shape on the canvas
-            self->canvasImageView.image = [self mergeImage:shape overImage:self.canvasImageView.image inSize:CGSizeMake(self.view.frame.size.height, self.view.frame.size.width)];
+            self->canvasImageView.image = [self mergeImage:shape overImage:self.canvasImageView.image inSize:CGSizeMake(canvasImageView.frame.size.height, canvasImageView.frame.size.width)];
             // Update image stack
             [self updateImageStack];
             
@@ -1115,22 +1233,14 @@ const int kCannyAperture = 3;
                     break;
                 default:
                     break;
-                    
-                // TODO
-                    // Update save image to merge with background
-                    
                 
             }
             
-            NSLog(@"Select ccc index was %d and the menu was %d", itemIndex, popupMenuName);
             UIGraphicsBeginImageContext(self.view.frame.size);
-            [self->backgroundImageView.image drawInRect:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
+            [self->backgroundImageView.image drawInRect:CGRectMake(0, 0, canvasImageView.frame.size.width, canvasImageView.frame.size.height)];
             //self->canvasImageView.image = [self maskImage:self->canvasImageView.image withMask:background];
             [self->backgroundImageView setImage:background];
-            
-            //NSLog(@"width height: %f, %f", self.view.frame.size.width, self.view.frame.size.height);
-            //self->canvasImageView.image = [UIImage imageNamed:@"back_disabled.png"];
-            //[self->canvasImageView setAlpha:opacity];
+
             UIGraphicsEndImageContext();
             //[self updateImageStack];
 
@@ -1182,7 +1292,13 @@ const int kCannyAperture = 3;
         [self dismissViewControllerAnimated:YES completion:nil];
         UIImage *cannyInput = [info objectForKey:@"UIImagePickerControllerOriginalImage"];
         
-        [self createCannyImage:cannyInput fromCamera:FALSE replace:FALSE];
+        // Need to resize whatever the image size was
+        UIGraphicsBeginImageContextWithOptions(CGSizeMake(canvasImageView.frame.size.width,canvasImageView.frame.size.height), NO, 0.0);
+        [cannyInput drawInRect:CGRectMake(0, 0, canvasImageView.frame.size.width,canvasImageView.frame.size.height)];
+        UIImage *resizedCanny = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+        
+        [self createCannyImage:resizedCanny fromCamera:FALSE replace:FALSE];
         
         // Add controller objects for the edge detector
         [self cannySlider];
@@ -1213,11 +1329,11 @@ const int kCannyAperture = 3;
 
 -(UIImage *)addCircle:(UIImage *)img radius:(CGFloat)radius origin:(CGPoint)origin
 {
-    UIGraphicsBeginImageContextWithOptions(CGSizeMake(self.view.frame.size.width,self.view.frame.size.height), NO, 1);
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(canvasImageView.frame.size.width,canvasImageView.frame.size.height), NO, 1);
     CGContextRef context = UIGraphicsGetCurrentContext();
     
     CGContextSetRGBStrokeColor(context, self.model.getRed, self.model.getGreen, self.model.getBlue, 1.0f);
-    CGContextStrokeEllipseInRect(context, CGRectMake((origin.x+radius)*xRescale, (origin.y+radius)*yRescale, 2*radius*xRescale, 2*radius*yRescale));
+    CGContextStrokeEllipseInRect(context, CGRectMake((origin.x+radius), (origin.y+radius), 2*radius, 2*radius));
     
     UIImage *tempShape = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
@@ -1227,22 +1343,22 @@ const int kCannyAperture = 3;
 /***************** BEGIN TEXT HANDLING ********************/
 
 - (BOOL)textFieldShouldBeginEditing:(UITextField *)textField{
-    NSLog(@"textFieldShouldBeginEditing");
     textField.backgroundColor = [UIColor colorWithRed:220.0f/255.0f green:220.0f/255.0f blue:220.0f/255.0f alpha:1.0f];
     return YES;
 }
 
 
 - (void)textFieldDidEndEditing:(UITextField *)textField{
-    NSLog(@"textFieldDidEndEditing");
-
     textField.borderStyle = UITextBorderStyleNone;
-
     UIGraphicsBeginImageContextWithOptions(CGSizeMake(canvasImageView.frame.size.width,canvasImageView.frame.size.height), NO, 1);
     CGContextRef context = UIGraphicsGetCurrentContext();
 
-    UIImage *imageOfText = [self imageFromText:textField];
-        
+    currentTextString = textField.text;
+    UIImage *imageOfText = [self imageFromText];
+    
+    // Merge image of text with existing image on canvas
+    imageOfText = [self mergeImage:imageOfText overImage:self.canvasImageView.image inSize:CGSizeMake(canvasImageView.frame.size.height, canvasImageView.frame.size.width)];
+    
     self->canvasImageView.image = imageOfText;
     
     // Add finalized image to the image stack
@@ -1252,13 +1368,12 @@ const int kCannyAperture = 3;
     
 }
 
--(UIImage *)imageFromText:(UITextField *)textField
+-(UIImage *)imageFromText
 {
     
-    NSString *text = textField.text;
+
     // set the font type and size
-    UIFont *font = [UIFont systemFontOfSize:fontSize];
-    //CGSize size  = [text sizeWithFont:font];
+    UIFont *font = [UIFont fontWithName:@"AppleSDGothicNeo-Thin" size:fontSize];
     
     // check if UIGraphicsBeginImageContextWithOptions is available (iOS is 4.0+)
     if (UIGraphicsBeginImageContextWithOptions != NULL)
@@ -1274,10 +1389,8 @@ const int kCannyAperture = 3;
     CGContextSetFillColorWithColor(UIGraphicsGetCurrentContext(),
                                    [UIColor colorWithRed:model.getRed green:model.getGreen blue:model.getBlue alpha:1.0f].CGColor);
     
-    [text drawAtPoint:CGPointMake(textLeft - textWidth/2 - textHeight, textTop/2 - textHeight/2) withFont:font];
+    [currentTextString drawAtPoint:CGPointMake(textLeft, textTop) withFont:font];
     
-    
-    //CGImageRef cimg = UIGraphicsGetCurrentContext();
     
     // transfer image
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
@@ -1287,12 +1400,6 @@ const int kCannyAperture = 3;
     UIImage *testImg = UIGraphicsGetImageFromCurrentImageContext();
     
     UIGraphicsEndImageContext();
-    
-    // merge with existing view
-    testImg = [self mergeImage:testImg overImage:self.canvasImageView.image inSize:CGSizeMake(canvasImageView.frame.size.height, canvasImageView.frame.size.width)];
-    
-    // TODO fix layering bug
-    // TODO add aility to scale and translate text, possibly add buttons as well. 
     
     return testImg;
 }
@@ -1306,27 +1413,27 @@ const int kCannyAperture = 3;
 
 -(UIImage *)addSquare:(UIImage *)img radius:(CGFloat)radius origin:(CGPoint)origin
 {
-    UIGraphicsBeginImageContextWithOptions(CGSizeMake(self.view.frame.size.width,self.view.frame.size.height), NO, 1);
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(canvasImageView.frame.size.width,canvasImageView.frame.size.height), NO, 1);
     CGContextRef context = UIGraphicsGetCurrentContext();
     
     CGContextSetRGBStrokeColor(context, self.model.getRed, self.model.getGreen, self.model.getBlue, 1.0f);
     CGContextSetLineWidth(context, 1);
     
     // Top edge
-    CGContextMoveToPoint(context, (origin.x)*xRescale,(origin.y)*yRescale);
-    CGContextAddLineToPoint(context, (origin.x+2*radius)*xRescale, (origin.y)*yRescale);
+    CGContextMoveToPoint(context, (origin.x),(origin.y));
+    CGContextAddLineToPoint(context, (origin.x+2*radius), (origin.y));
     
     // Left Edge
-    CGContextMoveToPoint(context, (origin.x)*xRescale,(origin.y)*yRescale);
-    CGContextAddLineToPoint(context, (origin.x)*xRescale, (origin.y+2*radius)*yRescale);
+    CGContextMoveToPoint(context, (origin.x),(origin.y));
+    CGContextAddLineToPoint(context, (origin.x), (origin.y+2*radius));
     
     // Right Edge
-    CGContextMoveToPoint(context, (origin.x+2*radius)*xRescale,(origin.y+2*radius)*yRescale);
-    CGContextAddLineToPoint(context, (origin.x+2*radius)*xRescale, (origin.y)*yRescale);
+    CGContextMoveToPoint(context, (origin.x+2*radius),(origin.y+2*radius));
+    CGContextAddLineToPoint(context, (origin.x+2*radius), (origin.y));
     
     // Bottom Edge
-    CGContextMoveToPoint(context, (origin.x)*xRescale,(origin.y+2*radius)*yRescale);
-    CGContextAddLineToPoint(context, (origin.x+2*radius)*xRescale, (origin.y+2*radius)*yRescale);
+    CGContextMoveToPoint(context, (origin.x),(origin.y+2*radius));
+    CGContextAddLineToPoint(context, (origin.x+2*radius), (origin.y+2*radius));
     
     CGContextStrokePath(context);
     
@@ -1338,23 +1445,23 @@ const int kCannyAperture = 3;
 
 -(UIImage *)addTriangle:(UIImage *)img radius:(CGFloat)radius origin:(CGPoint)origin
 {
-    UIGraphicsBeginImageContextWithOptions(CGSizeMake(self.view.frame.size.width,self.view.frame.size.height), NO, 1);
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(canvasImageView.frame.size.width,canvasImageView.frame.size.height), NO, 1);
     CGContextRef context = UIGraphicsGetCurrentContext();
     
     CGContextSetRGBStrokeColor(context, self.model.getRed, self.model.getGreen, self.model.getBlue, 1.0f);
     CGContextSetLineWidth(context, 1);
     
     // Left edge
-    CGContextMoveToPoint(context, (origin.x+radius)*xRescale,(origin.y-radius/2)*yRescale);
-    CGContextAddLineToPoint(context, (origin.x)*xRescale, (origin.y+radius)*yRescale);
+    CGContextMoveToPoint(context, (origin.x+radius),(origin.y-radius/2));
+    CGContextAddLineToPoint(context, (origin.x), (origin.y+radius));
     
     // Right Edge
-    CGContextMoveToPoint(context, (origin.x+radius)*xRescale,(origin.y-radius/2)*yRescale);
-    CGContextAddLineToPoint(context, (origin.x+2*radius)*xRescale, (origin.y+radius)*yRescale);
+    CGContextMoveToPoint(context, (origin.x+radius),(origin.y-radius/2));
+    CGContextAddLineToPoint(context, (origin.x+2*radius), (origin.y+radius));
     
     // Bottom Edge
-    CGContextMoveToPoint(context, (origin.x)*xRescale,(origin.y+radius)*yRescale);
-    CGContextAddLineToPoint(context, (origin.x+2*radius)*xRescale, (origin.y+radius)*yRescale);
+    CGContextMoveToPoint(context, (origin.x),(origin.y+radius));
+    CGContextAddLineToPoint(context, (origin.x+2*radius), (origin.y+radius));
     
     CGContextStrokePath(context);
 
@@ -1366,7 +1473,7 @@ const int kCannyAperture = 3;
 
 -(UIImage *)addPentagon:(UIImage *)img radius:(CGFloat)radius origin:(CGPoint)origin
 {
-    UIGraphicsBeginImageContextWithOptions(CGSizeMake(self.view.frame.size.width,self.view.frame.size.height), NO, 1);
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(canvasImageView.frame.size.width,canvasImageView.frame.size.height), NO, 1);
     CGContextRef context = UIGraphicsGetCurrentContext();
     
     CGContextSetRGBStrokeColor(context, self.model.getRed, self.model.getGreen, self.model.getBlue, 1.0f);
@@ -1374,16 +1481,16 @@ const int kCannyAperture = 3;
     
     float fudgeFactor = 0.2;
     // Pentagon Points
-    CGPoint topPoint = CGPointMake((origin.x+radius)*xRescale,
-                                   (origin.y + (radius*fudgeFactor))*yRescale);
-    CGPoint topLeftPoint = CGPointMake((origin.x)*xRescale,
-                                   (origin.y + radius)*yRescale);
-    CGPoint topRightPoint = CGPointMake((origin.x+2*radius)*xRescale,
-                                   (origin.y + radius)*yRescale);
-    CGPoint bottomLeftPoint = CGPointMake((origin.x + radius*2*fudgeFactor)*xRescale,
-                                   (origin.y + 2*radius)*yRescale);
-    CGPoint bottomRightPoint = CGPointMake((origin.x + 2*radius - radius*2*fudgeFactor)*xRescale,
-                                   (origin.y + 2*radius)*yRescale);
+    CGPoint topPoint = CGPointMake((origin.x+radius),
+                                   (origin.y + (radius*fudgeFactor)));
+    CGPoint topLeftPoint = CGPointMake((origin.x),
+                                   (origin.y + radius));
+    CGPoint topRightPoint = CGPointMake((origin.x+2*radius),
+                                   (origin.y + radius));
+    CGPoint bottomLeftPoint = CGPointMake((origin.x + radius*2*fudgeFactor),
+                                   (origin.y + 2*radius));
+    CGPoint bottomRightPoint = CGPointMake((origin.x + 2*radius - radius*2*fudgeFactor),
+                                   (origin.y + 2*radius));
     
     // Connect the dots
     
@@ -1417,7 +1524,7 @@ const int kCannyAperture = 3;
 
 -(UIImage *)addStar:(UIImage *)img radius:(CGFloat)radius origin:(CGPoint)origin
 {
-    UIGraphicsBeginImageContextWithOptions(CGSizeMake(self.view.frame.size.width,self.view.frame.size.height), NO, 1);
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(canvasImageView.frame.size.width,canvasImageView.frame.size.height), NO, 1);
     CGContextRef context = UIGraphicsGetCurrentContext();
     
     CGContextSetRGBStrokeColor(context, self.model.getRed, self.model.getGreen, self.model.getBlue, 1.0f);
@@ -1439,16 +1546,16 @@ const int kCannyAperture = 3;
 
     // Initialize first inner point
     innerTheta = offset;
-    innerLast = CGPointMake((actualOrigin.x + innerRadius*cosf(innerTheta))*xRescale,
-                            (actualOrigin.y + innerRadius*sinf(innerTheta))*yRescale);
+    innerLast = CGPointMake((actualOrigin.x + innerRadius*cosf(innerTheta)),
+                            (actualOrigin.y + innerRadius*sinf(innerTheta)));
     
     for (innerTheta = offset; innerTheta < 2*PI; innerTheta += delta)
     {
         // Create the inner and outer points
-        tempInner = CGPointMake((actualOrigin.x + innerRadius*cosf(innerTheta))*xRescale,
-                    (actualOrigin.y + innerRadius*sinf(innerTheta))*yRescale);
-        tempOuter = CGPointMake((actualOrigin.x + outerRadius*cosf(outerTheta))*xRescale,
-                                (actualOrigin.y + outerRadius*sinf(outerTheta))*yRescale);
+        tempInner = CGPointMake((actualOrigin.x + innerRadius*cosf(innerTheta)),
+                    (actualOrigin.y + innerRadius*sinf(innerTheta)));
+        tempOuter = CGPointMake((actualOrigin.x + outerRadius*cosf(outerTheta)),
+                                (actualOrigin.y + outerRadius*sinf(outerTheta)));
         
         // Connect the last inner point to the new outer point
         CGContextMoveToPoint(context, innerLast.x,innerLast.y);
@@ -1465,8 +1572,8 @@ const int kCannyAperture = 3;
     }
     
     // Connect last dot
-    tempOuter = CGPointMake((actualOrigin.x + outerRadius*cosf(outerTheta))*xRescale,
-                            (actualOrigin.y + outerRadius*sinf(outerTheta))*yRescale);
+    tempOuter = CGPointMake((actualOrigin.x + outerRadius*cosf(outerTheta)),
+                            (actualOrigin.y + outerRadius*sinf(outerTheta)));
     CGContextMoveToPoint(context, tempInner.x,tempInner.y);
     CGContextAddLineToPoint(context, tempOuter.x, tempOuter.y);
     
@@ -1480,15 +1587,15 @@ const int kCannyAperture = 3;
 
 -(UIImage *)addLine:(UIImage *)img P1:(CGPoint)P1 P2:(CGPoint)P2
 {
-    UIGraphicsBeginImageContextWithOptions(CGSizeMake(self.view.frame.size.width,self.view.frame.size.height), NO, 1);
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(canvasImageView.frame.size.width,canvasImageView.frame.size.height), NO, 1);
     CGContextRef context = UIGraphicsGetCurrentContext();
     
     CGContextSetRGBStrokeColor(context, self.model.getRed, self.model.getGreen, self.model.getBlue, 1.0f);
     CGContextSetLineWidth(context, 1);
     
     // Draw a single line
-    CGContextMoveToPoint(context, (P1.x)*xRescale,(P1.y)*yRescale);
-    CGContextAddLineToPoint(context, (P2.x)*xRescale, (P2.y+2)*yRescale);
+    CGContextMoveToPoint(context, (P1.x),(P1.y));
+    CGContextAddLineToPoint(context, (P2.x), (P2.y+2));
     
     CGContextStrokePath(context);
     
@@ -1639,8 +1746,8 @@ const int kCannyAperture = 3;
 -(IBAction)cannySlider
 {
     // Creates the slider for the pencil sketch and sets up listener
-    CGRect frame = CGRectMake(self.view.frame.size.width/2,
-                              self.view.frame.size.height - 3 * cannySliderHeigth,
+    CGRect frame = CGRectMake(canvasImageView.frame.size.width/2,
+                              canvasImageView.frame.size.height - 3 * cannySliderHeigth,
                               cannySliderWidth,
                               cannySliderHeigth);
     cannySlider = [[UISlider alloc] initWithFrame:frame];
@@ -1670,8 +1777,8 @@ const int kCannyAperture = 3;
      forControlEvents:UIControlEventTouchUpInside];
     [cannyRotateButton setBackgroundColor:[UIColor lightGrayColor]];
     [cannyRotateButton setTitle:@"Rotate Image" forState:UIControlStateNormal];
-    cannyRotateButton.frame = CGRectMake(self.view.frame.size.width/2 - cannySliderWidth*.25 - cannyButtonWidth,
-                                    self.view.frame.size.height - 3.5 * cannySliderHeigth,
+    cannyRotateButton.frame = CGRectMake(canvasImageView.frame.size.width/2 - cannySliderWidth*.25 - cannyButtonWidth,
+                                    canvasImageView.frame.size.height - 3.5 * cannySliderHeigth,
                                     cannyButtonWidth,
                                     cannyButtonHeight);
     cannyRotateButton.layer.cornerRadius = 10.0f;
@@ -1697,8 +1804,8 @@ const int kCannyAperture = 3;
            forControlEvents:UIControlEventTouchUpInside];
     [cannyDoneButton setBackgroundColor:[UIColor lightGrayColor]];
     [cannyDoneButton setTitle:@"Done Editing" forState:UIControlStateNormal];
-    cannyDoneButton.frame = CGRectMake(self.view.frame.size.width/2 + cannySliderWidth*.75 + cannyButtonWidth,
-                                    self.view.frame.size.height - 3.5 * cannySliderHeigth,
+    cannyDoneButton.frame = CGRectMake(canvasImageView.frame.size.width/2 + cannySliderWidth*.75 + cannyButtonWidth,
+                                    canvasImageView.frame.size.height - 3.5 * cannySliderHeigth,
                                     cannyButtonWidth,
                                     cannyButtonHeight);
     cannyDoneButton.layer.cornerRadius = 10.0f;
@@ -1722,6 +1829,13 @@ const int kCannyAperture = 3;
     [cannyDoneButton removeFromSuperview];
     [cannySlider removeFromSuperview];
     
+    // TODO - low priority - figure out why I need these four lines to avoid major lag on first action after canny
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(canvasImageView.frame.size.width,canvasImageView.frame.size.height), NO, 1);
+    [self->canvasImageView.image drawInRect:CGRectMake(0, 0, canvasImageView.frame.size.width, canvasImageView.frame.size.height)];
+    self->canvasImageView.image = UIGraphicsGetImageFromCurrentImageContext();
+    [self->canvasImageView setAlpha:opacity];
+    UIGraphicsEndImageContext();
+        
     // Add finalized image to the image stack
     [self updateImageStack];
     cannyButtonsExist = false;
@@ -1731,8 +1845,8 @@ const int kCannyAperture = 3;
 -(IBAction)cannySliderText
 {
     cannySliderLabel = [[UILabel alloc] initWithFrame:CGRectMake(
-            self.view.frame.size.width/2,
-            self.view.frame.size.height - 5 * cannySliderHeigth,
+            canvasImageView.frame.size.width/2,
+            canvasImageView.frame.size.height - 5 * cannySliderHeigth,
             cannyButtonWidth*2,
             cannyButtonHeight)];
     cannySliderLabel.backgroundColor = [UIColor clearColor];
@@ -1740,6 +1854,17 @@ const int kCannyAperture = 3;
     cannySliderLabel.textColor=[UIColor colorWithRed:0.0 green:122.0/255.0 blue:1.0 alpha:1.0];
     cannySliderLabel.text = @"Fine Tune Sketch...";
     [self.view addSubview:cannySliderLabel];
+}
+
++ (UIImage *)imageWithImage:(UIImage *)image scaledToSize:(CGSize)newSize {
+    //UIGraphicsBeginImageContext(newSize);
+    // In next line, pass 0.0 to use the current device's pixel scaling factor (and thus account for Retina resolution).
+    // Pass 1.0 to force exact pixel size.
+    UIGraphicsBeginImageContextWithOptions(newSize, NO, 0.0);
+    [image drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return newImage;
 }
 
 
