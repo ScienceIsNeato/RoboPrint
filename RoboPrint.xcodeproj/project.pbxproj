@@ -77,6 +77,8 @@
 		846B943C18F0EAE10063B9BA /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 846B943B18F0EAE10063B9BA /* Accelerate.framework */; };
 		846B943E18F0EAF10063B9BA /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 846B943D18F0EAF10063B9BA /* QuartzCore.framework */; };
 		846E642F18F8EBD40090E0A3 /* RoboPrintController.m in Sources */ = {isa = PBXBuildFile; fileRef = 846E642E18F8EBD40090E0A3 /* RoboPrintController.m */; };
+		848ED8DE194E82CC0023E33F /* BLE.m in Sources */ = {isa = PBXBuildFile; fileRef = 848ED8DA194E82CC0023E33F /* BLE.m */; };
+		848ED8DF194E82CC0023E33F /* BLEInterface.m in Sources */ = {isa = PBXBuildFile; fileRef = 848ED8DD194E82CC0023E33F /* BLEInterface.m */; };
 		84F46EEF1927211600DD9941 /* bg5_RHotAIr_Baloon_color.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 84F46EEE1927211600DD9941 /* bg5_RHotAIr_Baloon_color.jpg */; };
 		84F46EF1192721EE00DD9941 /* bg5_HotAIr_Baloon_color.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 84F46EF0192721EE00DD9941 /* bg5_HotAIr_Baloon_color.jpg */; };
 		84F46EF719274BAA00DD9941 /* bg12_none.png in Resources */ = {isa = PBXBuildFile; fileRef = 84F46EF619274BAA00DD9941 /* bg12_none.png */; };
@@ -172,6 +174,11 @@
 		846B943D18F0EAF10063B9BA /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		846E642D18F8EBD40090E0A3 /* RoboPrintController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RoboPrintController.h; sourceTree = "<group>"; };
 		846E642E18F8EBD40090E0A3 /* RoboPrintController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RoboPrintController.m; sourceTree = "<group>"; };
+		848ED8D9194E82CC0023E33F /* BLE.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BLE.h; path = BLE/BLE.h; sourceTree = "<group>"; };
+		848ED8DA194E82CC0023E33F /* BLE.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BLE.m; path = BLE/BLE.m; sourceTree = "<group>"; };
+		848ED8DB194E82CC0023E33F /* BLEDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BLEDefines.h; path = BLE/BLEDefines.h; sourceTree = "<group>"; };
+		848ED8DC194E82CC0023E33F /* BLEInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BLEInterface.h; path = BLE/BLEInterface.h; sourceTree = "<group>"; };
+		848ED8DD194E82CC0023E33F /* BLEInterface.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BLEInterface.m; path = BLE/BLEInterface.m; sourceTree = "<group>"; };
 		84F46EEE1927211600DD9941 /* bg5_RHotAIr_Baloon_color.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = bg5_RHotAIr_Baloon_color.jpg; path = ../../../Backgrounds/bg5_RHotAIr_Baloon_color.jpg; sourceTree = "<group>"; };
 		84F46EF0192721EE00DD9941 /* bg5_HotAIr_Baloon_color.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = bg5_HotAIr_Baloon_color.jpg; path = ../../../Backgrounds/bg5_HotAIr_Baloon_color.jpg; sourceTree = "<group>"; };
 		84F46EF619274BAA00DD9941 /* bg12_none.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = bg12_none.png; path = ../../../Backgrounds/bg12_none.png; sourceTree = "<group>"; };
@@ -273,6 +280,7 @@
 		846B93F718F0D1A60063B9BA = {
 			isa = PBXGroup;
 			children = (
+				84EBFAE819482209001E99E3 /* BlueTooth Low Energy (BLE) */,
 				846B940918F0D1A60063B9BA /* RoboPrint */,
 				846B942B18F0D1A70063B9BA /* RoboPrintTests */,
 				846B940218F0D1A60063B9BA /* Frameworks */,
@@ -355,6 +363,18 @@
 				846B942E18F0D1A70063B9BA /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		84EBFAE819482209001E99E3 /* BlueTooth Low Energy (BLE) */ = {
+			isa = PBXGroup;
+			children = (
+				848ED8D9194E82CC0023E33F /* BLE.h */,
+				848ED8DA194E82CC0023E33F /* BLE.m */,
+				848ED8DB194E82CC0023E33F /* BLEDefines.h */,
+				848ED8DC194E82CC0023E33F /* BLEInterface.h */,
+				848ED8DD194E82CC0023E33F /* BLEInterface.m */,
+			);
+			name = "BlueTooth Low Energy (BLE)";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -552,6 +572,8 @@
 				846B941D18F0D1A60063B9BA /* ViewController.mm in Sources */,
 				846E642F18F8EBD40090E0A3 /* RoboPrintController.m in Sources */,
 				846B941418F0D1A60063B9BA /* AppDelegate.m in Sources */,
+				848ED8DE194E82CC0023E33F /* BLE.m in Sources */,
+				848ED8DF194E82CC0023E33F /* BLEInterface.m in Sources */,
 				846B941018F0D1A60063B9BA /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -688,9 +710,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: William Martin (AHAR4DYTEQ)";
-				"CODE_SIGN_IDENTITY[sdk=*]" = "iPhone Distribution: William Martin (AHAR4DYTEQ)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: William Martin (AHAR4DYTEQ)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=*]" = "iPhone Developer: William Martin (EUNB7J5B2E)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: William Martin (EUNB7J5B2E)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Pods",
@@ -698,8 +720,9 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RoboPrint/RoboPrint-Prefix.pch";
 				INFOPLIST_FILE = "RoboPrint/RoboPrint-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "8D46EF99-3C04-452F-8A15-1F83CF9320E7";
+				PROVISIONING_PROFILE = "4E16BB10-86AC-42FB-AB91-2A32B8F90F87";
 				TARGETED_DEVICE_FAMILY = 2;
 				WRAPPER_EXTENSION = app;
 			};
@@ -711,7 +734,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: William Martin (AHAR4DYTEQ)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=*]" = "iPhone Distribution: William Martin (AHAR4DYTEQ)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: William Martin (AHAR4DYTEQ)";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -721,8 +744,9 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RoboPrint/RoboPrint-Prefix.pch";
 				INFOPLIST_FILE = "RoboPrint/RoboPrint-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "8D46EF99-3C04-452F-8A15-1F83CF9320E7";
+				PROVISIONING_PROFILE = "4E16BB10-86AC-42FB-AB91-2A32B8F90F87";
 				TARGETED_DEVICE_FAMILY = 2;
 				WRAPPER_EXTENSION = app;
 			};

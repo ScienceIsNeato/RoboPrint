@@ -8,10 +8,12 @@
 
 #import <UIKit/UIKit.h>
 #import "RoboPrintController.h"
+#import "BLEInterface.h"
 
 #define START_OVER_TAG 1
 #define LOAD_DRAWING_TAG 2
 #define PENCIL_SKETCH_TAG 3
+#define BACKGROUNDS_MENU_TAG 4
 
 #define SHAPES_MENU 1
 #define BACKGROUNDS_MENU 2
@@ -84,11 +86,16 @@
     int textHeight;
     int fontSize;
     int defaultFontSize;
-    NSString *currentTextString;    
+    NSString *currentTextString;
+    NSMutableArray *listOfDrawingCommands;
+    UITextField *textField;
+    BOOL isEditingText;
+    BOOL hasSketchBeenLoaded;
     
 }
 
 @property (strong, nonatomic) RoboPrintController *model;
+@property (strong, nonatomic) BLEInterface *robotInterface;
 @property (strong, retain) UIImageView *canvasImageView;
 @property (strong, retain) UIImageView *backgroundImageView;
 @property (strong, retain) UIImage *lastImage;

@@ -10,6 +10,7 @@
 #import "RoboPrintController.h"
 #import <RNGridMenu/RNGridMenu.h>
 #import <QuartzCore/QuartzCore.h>
+#import "BLEInterface.h"
 
 // Aperture value to use for the Canny edge detection
 const int kCannyAperture = 3;
@@ -62,22 +63,25 @@ const int kCannyAperture = 3;
     // Initialize sub controller
     self.model = [[RoboPrintController alloc] init];
     
+    // Initialize bluetooth connection with robot
+    self.robotInterface = [[BLEInterface alloc] init];
+    
     // Declare colors as black
     red = 0.0/255.0;
     green = 0.0/255.0;
     blue = 0.0/255.0;
-    brush = 1.0;
+    brush = 3.0;
     opacity = 1.0;
     
     // Set start state for color menu
-    [self.yellowButton setImage:[UIImage imageNamed:@"color_selected_mask.png"]
-                       forState:UIControlStateNormal];
+    [self.yellowButton setImage:nil forState:UIControlStateNormal];
     [self.redButton setImage:nil forState:UIControlStateNormal];
     [self.pinkButton setImage:nil forState:UIControlStateNormal];
     [self.blueButton setImage:nil forState:UIControlStateNormal];
-    [self.blackButton setImage:nil forState:UIControlStateNormal];
+    [self.blackButton setImage:[UIImage imageNamed:@"color_selected_mask.png"]
+                      forState:UIControlStateNormal];
     [self.greenButton setImage:nil forState:UIControlStateNormal];
-    self.model.currentColor = YELLOW;
+    self.model.currentColor = BLACK;
     imageStackIndex = 0; // most recent image
     
     // Set start state for left menu
@@ -132,10 +136,10 @@ const int kCannyAperture = 3;
     cannySliderValue = 10;
     cannySliderMinVal = 1;
     cannySliderMaxVal = 255/3;
-    cannySliderWidth = 200;
-    cannySliderHeigth = 20;
+    cannySliderWidth = 250;
+    cannySliderHeigth = 40;
     cannyButtonWidth = cannySliderWidth/2;
-    cannyButtonHeight = cannySliderHeigth*2;
+    cannyButtonHeight = cannySliderHeigth;
     cannyButtonsExist = false;
     textLeft = 0;
     textTop = 0;
@@ -148,6 +152,16 @@ const int kCannyAperture = 3;
     defaultFontSize = 25;
     fontSize = defaultFontSize;
     currentTextString = NULL;
+    
+    // Initializations for bluetooth connection with robot
+    listOfDrawingCommands = [NSMutableArray array];
+    [listOfDrawingCommands addObject:@"first string"]; // same with float values
+    [listOfDrawingCommands addObject:@"second string"];
+    [listOfDrawingCommands addObject:@"third string"];
+    
+    isEditingText = FALSE;
+    hasSketchBeenLoaded = FALSE;
+    
     
 }
 
@@ -170,6 +184,7 @@ const int kCannyAperture = 3;
     [self.blackButton setImage:nil forState:UIControlStateNormal];
     [self.greenButton setImage:nil forState:UIControlStateNormal];
     self.model.currentColor = YELLOW;
+    [self parseColorChangeEvent];
 }
 - (IBAction)redButtonTouchUpInsideAction:(id)sender
 {
@@ -181,6 +196,7 @@ const int kCannyAperture = 3;
     [self.blackButton setImage:nil forState:UIControlStateNormal];
     [self.greenButton setImage:nil forState:UIControlStateNormal];
     self.model.currentColor = RED;
+    [self parseColorChangeEvent];
 }
 - (IBAction)pinkButtonTouchUpInsideAction:(id)sender
 {
@@ -192,6 +208,7 @@ const int kCannyAperture = 3;
     [self.blackButton setImage:nil forState:UIControlStateNormal];
     [self.greenButton setImage:nil forState:UIControlStateNormal];
     self.model.currentColor = PINK;
+    [self parseColorChangeEvent];
 }
 - (IBAction)blueButtonTouchUpInsideAction:(id)sender
 {
@@ -203,6 +220,7 @@ const int kCannyAperture = 3;
     [self.blackButton setImage:nil forState:UIControlStateNormal];
     [self.greenButton setImage:nil forState:UIControlStateNormal];
     self.model.currentColor = BLUE;
+    [self parseColorChangeEvent];
 }
 - (IBAction)blackButtonTouchUpInsideAction:(id)sender
 {
@@ -214,6 +232,7 @@ const int kCannyAperture = 3;
                      forState:UIControlStateNormal];
     [self.greenButton setImage:nil forState:UIControlStateNormal];
     self.model.currentColor = BLACK;
+    [self parseColorChangeEvent];
 }
 - (IBAction)greenButtonTouchUpInsideAction:(id)sender
 {
@@ -225,6 +244,119 @@ const int kCannyAperture = 3;
     [self.greenButton setImage:[UIImage imageNamed:@"color_selected_mask.png"]
                       forState:UIControlStateNormal];
     self.model.currentColor = GREEN;
+    [self parseColorChangeEvent];
+}
+
+- (void)parseColorChangeEvent
+{
+    // If text or shapes are being edited when a color button
+    // is pressed, we need to update the color of that object
+    switch (model.currentMode) {
+        case SHAPES_MODE:
+            if (([imageStack count] > 0) && (shapeCreationIndex == imageStackIndex))
+            {
+                shapeOrigin.x = (defaultShapeOrigin.x + shapeOriginOffset.x);
+                shapeOrigin.y = (defaultShapeOrigin.y + shapeOriginOffset.y);
+                
+                // Put the new shape on the canvas
+                UIImage *shape;
+                switch (currentShape) {
+                    case CIRCLE:
+                        shape = [self addCircle:(self->canvasImageView.image) radius:(shapeWidth/2) origin:(shapeOrigin)];
+                        break;
+                    case SQUARE:
+                        shape = [self addSquare:(self->canvasImageView.image) radius:(shapeWidth/2) origin:(shapeOrigin)];
+                        break;
+                    case TRIANGLE:
+                        shape = [self addTriangle:(self->canvasImageView.image) radius:(shapeWidth/2) origin:(shapeOrigin)];
+                        break;
+                    case PENTAGON:
+                        shape = [self addPentagon:(self->canvasImageView.image) radius:(shapeWidth/2) origin:(shapeOrigin)];
+                        break;
+                    case STAR:
+                        shape = [self addStar:(self->canvasImageView.image) radius:(shapeWidth/2) origin:(shapeOrigin)];
+                        break;
+                    case LINE:
+                        if (lineCanBeMoved)
+                        {
+                            // Drag line around (movement phase)
+                            CGPoint tempP1 = CGPointMake((lineP1.x + shapeOriginOffset.x), (lineP1.y + shapeOriginOffset.y));
+                            CGPoint tempP2 = CGPointMake((lineP2.x + shapeOriginOffset.x), (lineP2.y + shapeOriginOffset.y));
+                            shape = [self addLine:(self->canvasImageView.image) P1:tempP1 P2:tempP2];
+                            
+                        }
+                        
+                        break;
+                    default:
+                        break;
+                }
+                
+                // Pop previous circle off the stack
+                [imageStack removeObjectAtIndex:0];
+                
+                // Make sure there was more than one image on the stack
+                if ([imageStack count] > 0)
+                {
+                    // Set the image on the canvas to the one before the shape was added
+                    [self.canvasImageView setImage:[self.imageStack objectAtIndex: 0]];
+                }
+                else
+                {
+                    [self.canvasImageView setImage:nil];
+                }
+                // Put the new shape on the canvas
+                self->canvasImageView.image = [self mergeImage:shape overImage:self.canvasImageView.image inSize:CGSizeMake(canvasImageView.frame.size.height, canvasImageView.frame.size.width)];
+                // Update image stack
+                [self updateImageStack];
+            }
+            break;
+    
+        case TEXT_MODE:
+            
+            if (isEditingText)
+            {
+                textField.textColor = [UIColor colorWithRed:model.getRed green:model.getGreen blue:model.getBlue alpha:1.0f];
+            }
+            else
+            {
+                if (([imageStack count] > 0))
+                {
+                    
+                    textLeft = defaultTextLeft + textLeftOffset;
+                    textTop = defaultTextTop + textTopOffset;
+                    
+                    // Put the new shape on the canvas
+                    UIImage *textImage;
+
+                    [imageStack removeObjectAtIndex:0];
+                    
+                    textImage = [self imageFromText];
+                    
+                    // Make sure there was more than one image on the stack
+                    if ([imageStack count] > 0)
+                    {
+                        // Set the image on the canvas to the one before the shape was added
+                        [self.canvasImageView setImage:[self.imageStack objectAtIndex: 0]];
+                    }
+                    else
+                    {
+                        [self.canvasImageView setImage:nil];
+                    }
+                    // Put the new shape on the canvas
+                    self->canvasImageView.image = [self mergeImage:textImage overImage:self.canvasImageView.image inSize:CGSizeMake(canvasImageView.frame.size.height, canvasImageView.frame.size.width)];
+                    // Update image stack
+                    [self updateImageStack];
+                    
+                }
+            }
+            break;
+            
+
+            
+        default:
+            break;
+    }
+    
 }
 
 /********* BEGIN SIDE MENU ***************/
@@ -276,28 +408,43 @@ const int kCannyAperture = 3;
     [self cannyExecuteDoneAction]; // cleanup pencil sketch objects
     self.model.currentMode = BACKGROUNDS_MODE;
     
-    NSArray *images = [NSArray arrayWithObjects:
-                       [UIImage imageNamed:@"bg1_RElephant_SMALL.jpg"],
-                       [UIImage imageNamed:@"bg2_Rengine_SMALL.jpg"],
-                       [UIImage imageNamed:@"bg3_RGuitar_color_SMALL.jpg"],
-                       [UIImage imageNamed:@"bg4_Rhclown_face_color_SMALL.jpg"],
-                       [UIImage imageNamed:@"bg5_RHotAIr_Baloon_color_SMALL.jpg"],
-                       [UIImage imageNamed:@"bg6_RHouse_SMALL.jpg"],
-                       [UIImage imageNamed:@"bg7_Rjeep_SMALL.jpg"],
-                       [UIImage imageNamed:@"bg8_RKite_color_SMALL.jpg"],
-                       [UIImage imageNamed:@"bg9_RTeddyBear_color_SMALL.jpg"],
-                       [UIImage imageNamed:@"bg10_RTractor_color_SMALL.jpg"],
-                       [UIImage imageNamed:@"bg11_RTricycle_color_SMALL.jpg"],
-                       [UIImage imageNamed:@"bg12_none.png"],
-                       nil];
+    if (hasSketchBeenLoaded)
+    {
+        // Present user w/ opportunity to bail on erasing image to
+        // load new background
+        UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Change Background"
+                                                       message: @"Delete sketch and load a new background?"
+                                                      delegate: self
+                                             cancelButtonTitle:@"Cancel"
+                                             otherButtonTitles:@"Load New",nil];
+        alert.tag = BACKGROUNDS_MENU_TAG;
+        [alert show];
+    }
+    else
+    {
+        NSArray *images = [NSArray arrayWithObjects:
+                           [UIImage imageNamed:@"bg1_RElephant_SMALL.jpg"],
+                           [UIImage imageNamed:@"bg2_Rengine_SMALL.jpg"],
+                           [UIImage imageNamed:@"bg3_RGuitar_color_SMALL.jpg"],
+                           [UIImage imageNamed:@"bg4_Rhclown_face_color_SMALL.jpg"],
+                           [UIImage imageNamed:@"bg5_RHotAIr_Baloon_color_SMALL.jpg"],
+                           [UIImage imageNamed:@"bg6_RHouse_SMALL.jpg"],
+                           [UIImage imageNamed:@"bg7_Rjeep_SMALL.jpg"],
+                           [UIImage imageNamed:@"bg8_RKite_color_SMALL.jpg"],
+                           [UIImage imageNamed:@"bg9_RTeddyBear_color_SMALL.jpg"],
+                           [UIImage imageNamed:@"bg10_RTractor_color_SMALL.jpg"],
+                           [UIImage imageNamed:@"bg11_RTricycle_color_SMALL.jpg"],
+                           [UIImage imageNamed:@"bg12_none.png"],
+                           nil];
 
-    
-    RNGridMenu *av = [[RNGridMenu alloc] initWithImages:images];
-    
-    popupMenuName = BACKGROUNDS_MENU;
-    av.delegate = self;
-    
-    [av showInViewController:self center:CGPointMake(500, 500)];
+        
+        RNGridMenu *av = [[RNGridMenu alloc] initWithImages:images];
+        
+        popupMenuName = BACKGROUNDS_MENU;
+        av.delegate = self;
+        
+        [av showInViewController:self center:CGPointMake(500, 500)];
+    }
     
 }
 
@@ -386,7 +533,7 @@ const int kCannyAperture = 3;
     textTopOffset  = 0;
     fontSize = defaultFontSize;
     
-    UITextField *textField = [[UITextField alloc] initWithFrame:CGRectMake(canvasImageView.frame.origin.x + textLeft, canvasImageView.frame.origin.y + textTop, textWidth, textHeight)];
+    textField = [[UITextField alloc] initWithFrame:CGRectMake(canvasImageView.frame.origin.x + textLeft, canvasImageView.frame.origin.y + textTop, textWidth, textHeight)];
 
     textField.borderStyle = UITextBorderStyleRoundedRect;
     textField.font = [UIFont fontWithName:@"AppleSDGothicNeo-Thin" size:fontSize];
@@ -401,6 +548,8 @@ const int kCannyAperture = 3;
     [self.view addSubview:textField];
     [super viewWillAppear:true];
     [textField becomeFirstResponder];
+    
+    isEditingText = TRUE;
 }
 
 
@@ -540,7 +689,7 @@ const int kCannyAperture = 3;
     
     [self cannyExecuteDoneAction]; // cleanup pencil sketch objects if present
     
-    int imagesOnStack = [imageStack count]; // Need to cast to signed int
+    int imagesOnStack = (int)[imageStack count]; // Need to cast to signed int
     
     // Enable forward button if clicked back from existing image and not very first thing
     if ([imageStack count] > 0)
@@ -680,24 +829,35 @@ const int kCannyAperture = 3;
 {
     [self cannyExecuteDoneAction]; // cleanup pencil sketch objects if present
 
-    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Robo Print!"
+
+    // Create interface with robot
+    // TODO if not null - may need to reinitialize
+    [self.robotInterface initBTInterface];
+    
+    // TODO if not connected
+    [self.robotInterface connectToRobot];
+    
+    // TODO some sort of connection health check
+    
+    
+    /*UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Robo Print!"
                                                    message: @"Not Yet Implemented"
                                                   delegate: self
                                          cancelButtonTitle:@"Cancel"
                                          otherButtonTitles:@"OK",nil];
     
     
-    [alert show];
+    [alert show];*/
 }
 
 - (IBAction)openSettingsMenu:(id)sender
 {
     
     
-    NSArray *currencies = @[@"Robot Connection Settings", @"About", @"Review This App", @"Contact Us"];
+    NSArray *settingsMenuOptions = @[@"Robot Connection Settings", @"About", @"Review This App", @"Contact Us"];
     
     
-    RNGridMenu *av = [[RNGridMenu alloc] initWithTitles:currencies];
+    RNGridMenu *av = [[RNGridMenu alloc] initWithTitles:settingsMenuOptions];
     CGSize temp = CGSizeMake(200, 50);
     av.itemSize = temp;
     
@@ -707,15 +867,6 @@ const int kCannyAperture = 3;
     [av showInViewController:self center:CGPointMake(500, 500)];
     
     [self cannyExecuteDoneAction]; // cleanup pencil sketch objects if present
-
-    /*UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Manage Settings"
-                                                   message: @"Not Yet Implemented"
-                                                  delegate: self
-                                         cancelButtonTitle:@"Cancel"
-                                         otherButtonTitles:@"OK",nil];
-    
-    
-    [alert show];*/
 }
 
 
@@ -1054,6 +1205,58 @@ const int kCannyAperture = 3;
         [self.backButton setImage:[UIImage imageNamed:@"back_disabled.png"]
                          forState:UIControlStateNormal];
     }
+    else if (alertView.tag == BACKGROUNDS_MENU_TAG && buttonIndex != 0)
+    {
+        // Since a sketch has been loaded, selection of a new background image
+        // will not appear (sketches are opaque). A dialog has just been shown that
+        // the user clicked through to delete the current image.
+        
+        // call the start state
+        [self viewDidLoad];
+        
+        // Clear the currently displayed image
+        self.canvasImageView.image = nil;
+        
+        // Clear the current background
+        [self.backgroundImageView setImage:nil];
+        
+        // Clear all images off of the image stack
+        while ([imageStack count] > 0)
+        {
+            [imageStack removeObjectAtIndex:0];
+        }
+        imageStackIndex = 0;
+        
+        // Disable forward and back buttons
+        [self.forwardButton setImage:[UIImage imageNamed:@"forward_disabled.png"]
+                            forState:UIControlStateNormal];
+        [self.backButton setImage:[UIImage imageNamed:@"back_disabled.png"]
+                         forState:UIControlStateNormal];
+        
+        // Prepare background images
+        NSArray *images = [NSArray arrayWithObjects:
+                           [UIImage imageNamed:@"bg1_RElephant_SMALL.jpg"],
+                           [UIImage imageNamed:@"bg2_Rengine_SMALL.jpg"],
+                           [UIImage imageNamed:@"bg3_RGuitar_color_SMALL.jpg"],
+                           [UIImage imageNamed:@"bg4_Rhclown_face_color_SMALL.jpg"],
+                           [UIImage imageNamed:@"bg5_RHotAIr_Baloon_color_SMALL.jpg"],
+                           [UIImage imageNamed:@"bg6_RHouse_SMALL.jpg"],
+                           [UIImage imageNamed:@"bg7_Rjeep_SMALL.jpg"],
+                           [UIImage imageNamed:@"bg8_RKite_color_SMALL.jpg"],
+                           [UIImage imageNamed:@"bg9_RTeddyBear_color_SMALL.jpg"],
+                           [UIImage imageNamed:@"bg10_RTractor_color_SMALL.jpg"],
+                           [UIImage imageNamed:@"bg11_RTricycle_color_SMALL.jpg"],
+                           [UIImage imageNamed:@"bg12_none.png"],
+                           nil];
+        
+        // Dispatch menu
+        RNGridMenu *av = [[RNGridMenu alloc] initWithImages:images];
+        
+        popupMenuName = BACKGROUNDS_MENU;
+        av.delegate = self;
+        
+        [av showInViewController:self center:CGPointMake(500, 500)];
+    }
     else if (alertView.tag == PENCIL_SKETCH_TAG && buttonIndex != 1)
     {
         // call the start state and reset mode
@@ -1090,6 +1293,8 @@ const int kCannyAperture = 3;
                                         forState:UIControlStateNormal];
                     [self.backButton setImage:[UIImage imageNamed:@"back_disabled.png"]
                                      forState:UIControlStateNormal];
+                    
+                    hasSketchBeenLoaded = TRUE;
                 }
                 else
                 {
@@ -1122,6 +1327,8 @@ const int kCannyAperture = 3;
                                         forState:UIControlStateNormal];
                     [self.backButton setImage:[UIImage imageNamed:@"back_disabled.png"]
                                      forState:UIControlStateNormal];
+                    
+                    hasSketchBeenLoaded = TRUE;
                 }
                 else
                 {
@@ -1155,7 +1362,7 @@ const int kCannyAperture = 3;
     switch (popupMenuName)
     {
         case SHAPES_MENU:
-            currentShape = itemIndex;
+            currentShape = (int)itemIndex;
             switch (itemIndex)
             {
                 case CIRCLE:
@@ -1263,7 +1470,9 @@ const int kCannyAperture = 3;
             {
                 case 0:
                     // connection settings
-                    // First, present dialog to load from file, camera, or canclel
+                    
+                    
+                    
                     alert = [[UIAlertView alloc]initWithTitle: @"Connection Settings"
                                                                    message: @"To be implemented in Phase 3."
                                                                   delegate: self
@@ -1361,6 +1570,8 @@ const int kCannyAperture = 3;
         [self addCannyDoneButton];
         [self cannySliderText];
         
+        hasSketchBeenLoaded = TRUE;
+        
     }
     else
     {
@@ -1389,6 +1600,7 @@ const int kCannyAperture = 3;
     
     CGContextSetRGBStrokeColor(context, self.model.getRed, self.model.getGreen, self.model.getBlue, 1.0f);
     CGContextStrokeEllipseInRect(context, CGRectMake((origin.x+radius), (origin.y+radius), 2*radius, 2*radius));
+    CGContextStrokeEllipseInRect(context, CGRectMake((origin.x+radius+1), (origin.y+radius+1), 2*radius-2, 2*radius-2));
     
     UIImage *tempShape = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
@@ -1397,16 +1609,16 @@ const int kCannyAperture = 3;
 }
 /***************** BEGIN TEXT HANDLING ********************/
 
-- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField{
-    textField.backgroundColor = [UIColor colorWithRed:220.0f/255.0f green:220.0f/255.0f blue:220.0f/255.0f alpha:1.0f];
+- (BOOL)textFieldShouldBeginEditing:(UITextField *)textFieldIn{
+    textFieldIn.backgroundColor = [UIColor colorWithRed:220.0f/255.0f green:220.0f/255.0f blue:220.0f/255.0f alpha:1.0f];
     return YES;
 }
 
 
-- (void)textFieldDidEndEditing:(UITextField *)textField{
-    textField.borderStyle = UITextBorderStyleNone;
+- (void)textFieldDidEndEditing:(UITextField *)textFieldIn{
+    textFieldIn.borderStyle = UITextBorderStyleNone;
     UIGraphicsBeginImageContextWithOptions(CGSizeMake(canvasImageView.frame.size.width,canvasImageView.frame.size.height), NO, 1);
-    CGContextRef context = UIGraphicsGetCurrentContext();
+    //CGContextRef context = UIGraphicsGetCurrentContext();
 
     currentTextString = textField.text;
     UIImage *imageOfText = [self imageFromText];
@@ -1420,6 +1632,8 @@ const int kCannyAperture = 3;
     [self updateImageStack];
     
     [textField removeFromSuperview];
+    
+    isEditingText = FALSE;
     
 }
 
@@ -1459,8 +1673,8 @@ const int kCannyAperture = 3;
     return testImg;
 }
 
-- (BOOL)textFieldShouldReturn:(UITextField *)textField{
-    [textField resignFirstResponder];
+- (BOOL)textFieldShouldReturn:(UITextField *)textFieldIn{
+    [textFieldIn resignFirstResponder];
     return TRUE;
 }
 
@@ -1472,7 +1686,7 @@ const int kCannyAperture = 3;
     CGContextRef context = UIGraphicsGetCurrentContext();
     
     CGContextSetRGBStrokeColor(context, self.model.getRed, self.model.getGreen, self.model.getBlue, 1.0f);
-    CGContextSetLineWidth(context, 1);
+    CGContextSetLineWidth(context, 2);
     
     // Top edge
     CGContextMoveToPoint(context, (origin.x),(origin.y));
@@ -1504,7 +1718,7 @@ const int kCannyAperture = 3;
     CGContextRef context = UIGraphicsGetCurrentContext();
     
     CGContextSetRGBStrokeColor(context, self.model.getRed, self.model.getGreen, self.model.getBlue, 1.0f);
-    CGContextSetLineWidth(context, 1);
+    CGContextSetLineWidth(context, 2);
     
     // Left edge
     CGContextMoveToPoint(context, (origin.x+radius),(origin.y-radius/2));
@@ -1532,7 +1746,7 @@ const int kCannyAperture = 3;
     CGContextRef context = UIGraphicsGetCurrentContext();
     
     CGContextSetRGBStrokeColor(context, self.model.getRed, self.model.getGreen, self.model.getBlue, 1.0f);
-    CGContextSetLineWidth(context, 1);
+    CGContextSetLineWidth(context, 2);
     
     float fudgeFactor = 0.2;
     // Pentagon Points
@@ -1583,7 +1797,7 @@ const int kCannyAperture = 3;
     CGContextRef context = UIGraphicsGetCurrentContext();
     
     CGContextSetRGBStrokeColor(context, self.model.getRed, self.model.getGreen, self.model.getBlue, 1.0f);
-    CGContextSetLineWidth(context, 1);
+    CGContextSetLineWidth(context, 2);
     
     // In this function, it will be easier to work in the polar coordinate system.
     CGFloat outerRadius = radius;
@@ -1646,7 +1860,7 @@ const int kCannyAperture = 3;
     CGContextRef context = UIGraphicsGetCurrentContext();
     
     CGContextSetRGBStrokeColor(context, self.model.getRed, self.model.getGreen, self.model.getBlue, 1.0f);
-    CGContextSetLineWidth(context, 1);
+    CGContextSetLineWidth(context, 2);
     
     // Draw a single line
     CGContextMoveToPoint(context, (P1.x),(P1.y));
@@ -1802,16 +2016,17 @@ const int kCannyAperture = 3;
 {
     // Creates the slider for the pencil sketch and sets up listener
     CGRect frame = CGRectMake(canvasImageView.frame.size.width/2,
-                              canvasImageView.frame.size.height - 3 * cannySliderHeigth,
+                              canvasImageView.frame.size.height - cannySliderHeigth,
                               cannySliderWidth,
                               cannySliderHeigth);
     cannySlider = [[UISlider alloc] initWithFrame:frame];
     [cannySlider addTarget:self action:@selector(cannySliderAction:) forControlEvents:UIControlEventValueChanged];
     [cannySlider setBackgroundColor:[UIColor lightGrayColor]];
+    [cannySlider setMinimumTrackTintColor:[UIColor redColor]];
     cannySlider.minimumValue = cannySliderMinVal;
     cannySlider.maximumValue = cannySliderMaxVal;
     cannySlider.continuous = NO;
-    cannySlider.value = (cannySliderMaxVal - cannySliderMinVal)/2;
+    cannySlider.value = (cannySliderMaxVal - cannySliderMinVal);
     cannySlider.layer.cornerRadius = 10.0f;
     [self.view addSubview:cannySlider];
 }
@@ -1832,8 +2047,9 @@ const int kCannyAperture = 3;
      forControlEvents:UIControlEventTouchUpInside];
     [cannyRotateButton setBackgroundColor:[UIColor lightGrayColor]];
     [cannyRotateButton setTitle:@"Rotate Image" forState:UIControlStateNormal];
+    cannyRotateButton.tintColor = [UIColor redColor];
     cannyRotateButton.frame = CGRectMake(canvasImageView.frame.size.width/2 - cannySliderWidth*.25 - cannyButtonWidth,
-                                    canvasImageView.frame.size.height - 3.5 * cannySliderHeigth,
+                                    canvasImageView.frame.size.height - cannySliderHeigth,
                                     cannyButtonWidth,
                                     cannyButtonHeight);
     cannyRotateButton.layer.cornerRadius = 10.0f;
@@ -1859,8 +2075,9 @@ const int kCannyAperture = 3;
            forControlEvents:UIControlEventTouchUpInside];
     [cannyDoneButton setBackgroundColor:[UIColor lightGrayColor]];
     [cannyDoneButton setTitle:@"Done Editing" forState:UIControlStateNormal];
+    cannyDoneButton.tintColor = [UIColor redColor];
     cannyDoneButton.frame = CGRectMake(canvasImageView.frame.size.width/2 + cannySliderWidth*.75 + cannyButtonWidth,
-                                    canvasImageView.frame.size.height - 3.5 * cannySliderHeigth,
+                                    canvasImageView.frame.size.height - cannySliderHeigth,
                                     cannyButtonWidth,
                                     cannyButtonHeight);
     cannyDoneButton.layer.cornerRadius = 10.0f;
@@ -1901,12 +2118,13 @@ const int kCannyAperture = 3;
 {
     cannySliderLabel = [[UILabel alloc] initWithFrame:CGRectMake(
             canvasImageView.frame.size.width/2,
-            canvasImageView.frame.size.height - 5 * cannySliderHeigth,
+            canvasImageView.frame.size.height - 2*cannySliderHeigth,
             cannyButtonWidth*2,
             cannyButtonHeight)];
     cannySliderLabel.backgroundColor = [UIColor clearColor];
     cannySliderLabel.textAlignment = NSTextAlignmentCenter; // UITextAlignmentCenter, UITextAlignmentLeft
-    cannySliderLabel.textColor=[UIColor colorWithRed:0.0 green:122.0/255.0 blue:1.0 alpha:1.0];
+    cannySliderLabel.textColor=[UIColor redColor];
+    cannySliderLabel.font = [UIFont systemFontOfSize:25];
     cannySliderLabel.text = @"Fine Tune Sketch...";
     [self.view addSubview:cannySliderLabel];
 }
