@@ -350,6 +350,20 @@ const int kCannyAperture = 3;
                 }
             }
             break;
+        //
+        case BACKGROUNDS_MODE:
+        case PENCIL_SKETCH_MODE:
+        case ENLARGE_MODE:
+            [self.imagesButton setImage:nil forState:UIControlStateNormal];
+            [self.pencilButton setImage:[UIImage imageNamed:@"color_selected_mask.png"]
+                               forState:UIControlStateNormal];
+            [self.backgroundsButton setImage:nil forState:UIControlStateNormal];
+            [self.shapesButton setImage:nil forState:UIControlStateNormal];
+            [self.enlargeButton setImage:nil forState:UIControlStateNormal];
+            [self.textButton setImage:nil forState:UIControlStateNormal];
+            [self cannyExecuteDoneAction]; // cleanup pencil sketch objects
+            self.model.currentMode = PENCIL_DRAW_MODE;
+            break;
             
 
             
