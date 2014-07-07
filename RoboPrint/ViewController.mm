@@ -162,6 +162,7 @@ const int kCannyAperture = 3;
     isEditingText = FALSE;
     hasSketchBeenLoaded = FALSE;
     
+    [self.robotInterface initBTInterface];
     
 }
 
@@ -846,7 +847,9 @@ const int kCannyAperture = 3;
 
     // Create interface with robot
     // TODO if not null - may need to reinitialize
-    [self.robotInterface initBTInterface];
+    
+    
+    //[NSThread sleepForTimeInterval:10.0];
     
     // TODO if not connected
     [self.robotInterface connectToRobot];
