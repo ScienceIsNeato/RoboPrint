@@ -13,13 +13,19 @@
 @interface BLEInterface : UIViewController <UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, BLEDelegate>
 {
     BLE *bleShield;
-    UIActivityIndicatorView *activityIndicator;
+    UIActivityIndicatorView *activityIndicator;    
 }
 
 @property (nonatomic, weak) IBOutlet UITableView *tableView;
 @property (nonatomic, weak) IBOutlet UITextField *text;
+@property (nonatomic, strong) NSMutableArray *messageQueue;
+@property bool isRobotConnected;
+@property (nonatomic, assign) id delegate;  
 
 -(void) initBTInterface;
 -(BOOL) connectToRobot;
+- (int) sendDrawingCommands;
+
+
 
 @end

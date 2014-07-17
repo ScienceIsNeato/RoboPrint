@@ -32,13 +32,13 @@ void setup()
   //ble_set_pins(3, 2);
   
   // Set your BLE Shield name here, max. length 10
-  //ble_set_name("My Name");
+  ble_set_name("RoboPrint Bluetooth Connection Sheild");
   
   // Init. and start BLE library.
   ble_begin();
   
   // Enable serial debug
-  Serial.begin(57600);
+  Serial.begin(115200);
 }
 
 unsigned char buf[16] = {0};

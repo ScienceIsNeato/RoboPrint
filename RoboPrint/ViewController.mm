@@ -46,6 +46,7 @@ const int kCannyAperture = 3;
 @synthesize backButton;
 @synthesize forwardButton;
 @synthesize popupMenuName;
+@synthesize connectionView;
 
 
 // OpenCV properties
@@ -65,6 +66,7 @@ const int kCannyAperture = 3;
     
     // Initialize bluetooth connection with robot
     self.robotInterface = [[BLEInterface alloc] init];
+    self.robotInterface.delegate = self;
     
     // Declare colors as black
     red = 0.0/255.0;
@@ -163,6 +165,13 @@ const int kCannyAperture = 3;
     hasSketchBeenLoaded = FALSE;
     
     [self.robotInterface initBTInterface];
+    self.robotInterface.delegate = self;
+    
+    self.connectionView.hidden = YES; // make hidden by default
+    self.connectionView.layer.cornerRadius = 5; // round the corners
+    self.connectionView.layer.masksToBounds = YES;
+    self.connectionView.layer.borderColor = [UIColor blackColor].CGColor;
+    self.connectionView.layer.borderWidth = 3.0f;
     
 }
 
@@ -849,22 +858,55 @@ const int kCannyAperture = 3;
     // TODO if not null - may need to reinitialize
     
     
-    //[NSThread sleepForTimeInterval:10.0];
-    
     // TODO if not connected
     [self.robotInterface connectToRobot];
+    float sleepTime = 1.0;
+    float interval = 0.0;
     
-    // TODO some sort of connection health check
+    self.connectionView.hidden = NO;
+    /*while (!self.robotInterface.isRobotConnected)
+    {
+        [NSThread sleepForTimeInterval:sleepTime];
+        interval+=sleepTime;
+        
+        if (interval > 10.00)
+        {
+            NSLog(@"Slept too long waiting for robot to connect. Breaking.");
+            return;
+        }
+        
+    }*/
     
+    // Initialize and display the progress dialog
+    //progressView = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleDefault];
+    //self.robotInterface.progressView = progressView;
+    //progressView.center = self.connectionView.center;
+    [progressView setTransform:CGAffineTransformMakeScale(1.0, 3.0)];
+    //progressView.frame = CGRectMake(self.connectionView.center.x, self.connectionView.center.y, 100, 20);
+    [self.connectionView addSubview:progressView];
+    [progressView setProgress:0.0 animated:NO];
+    for (int i=0; i<1000; i++)
+    {
+        //dispatch_async(dispatch_get_main_queue(), ^{
+          //  progressView.progress = (float)i/1000.0;
+        //});
+        
+        NSString *strFromInt = [NSString stringWithFormat:@"%d",i];
+        [self.robotInterface.messageQueue addObject:strFromInt];
+
+    }
     
-    /*UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Robo Print!"
-                                                   message: @"Not Yet Implemented"
-                                                  delegate: self
-                                         cancelButtonTitle:@"Cancel"
-                                         otherButtonTitles:@"OK",nil];
+
     
-    
-    [alert show];*/
+}
+
+
+- (void)updateProgress:(NSNumber *)number
+{
+    // Update the percent complete on the progress dialog
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [progressView setProgress:number.floatValue animated:YES];
+    });
 }
 
 - (IBAction)openSettingsMenu:(id)sender
@@ -2071,6 +2113,13 @@ const int kCannyAperture = 3;
                                     cannyButtonHeight);
     cannyRotateButton.layer.cornerRadius = 10.0f;
     [self.view addSubview:cannyRotateButton];
+}
+
+-(IBAction)uploadCancelPressed:(id)sender
+{
+    // TODO other parsing for when the cancel button is pressed
+    // TODO make the button switch to DONE once done
+    self.connectionView.hidden = YES;
 }
 
 -(void)cannyRotateAction:(id)sender

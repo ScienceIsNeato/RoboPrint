@@ -78,6 +78,7 @@
     BOOL cannyButtonsExist;
     int textLeft;
     int textTop;
+    IBOutlet UIProgressView *progressView;
     int defaultTextLeft;
     int defaultTextTop;
     int textLeftOffset;
@@ -91,12 +92,14 @@
     UITextField *textField;
     BOOL isEditingText;
     BOOL hasSketchBeenLoaded;
+    IBOutlet UIView *connectionView;
     
 }
 
 @property (strong, nonatomic) RoboPrintController *model;
 @property (strong, nonatomic) BLEInterface *robotInterface;
 @property (strong, retain) UIImageView *canvasImageView;
+@property (strong, retain) UIView *connectionView;
 @property (strong, retain) UIImageView *backgroundImageView;
 @property (strong, retain) UIImage *lastImage;
 @property (strong, retain) NSMutableArray *imageStack;
@@ -123,14 +126,12 @@
 - (IBAction)blueButtonTouchUpInsideAction:(id)sender;
 - (IBAction)blackButtonTouchUpInsideAction:(id)sender;
 - (IBAction)greenButtonTouchUpInsideAction:(id)sender;
-//- (BOOL) selectImage: (UIViewController*) controller
-  //     usingDelegate: (id <UIImagePickerControllerDelegate,
-    //                   UINavigationControllerDelegate>) delegate;
 -(void)updateImageStack;
 -(UIImage*)mergeImage:(UIImage*)mask overImage:(UIImage*)source inSize:(CGSize)size;
 
 - (cv::Mat)cvMatFromUIImage:(UIImage *)image;
 - (UIImage *)inverseColor:(UIImage *)image;
-//- (void)createCannyImage:(UIImage *)input fromCamera:(bool)fromCamera;
+- (void)setLoaderProgress:(NSNumber *)number;
+
 
 @end

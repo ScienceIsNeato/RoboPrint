@@ -21,6 +21,10 @@
 
 @implementation BLEInterface
 
+@synthesize messageQueue;
+@synthesize delegate;
+
+
 -(void)initBTInterface
 {
     //[super viewDidLoad];
@@ -42,6 +46,10 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWasShown:) name:UIKeyboardWillShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillBeHidden:) name:UIKeyboardWillHideNotification object:nil];
+    
+    self.isRobotConnected = false;
+    
+    messageQueue = [[NSMutableArray alloc] init];
 }
 
 -(void) connectionTimer:(NSTimer *)timer
@@ -107,6 +115,8 @@ NSTimer *rssiTimer;
     [activityIndicator stopAnimating];
     self.navigationItem.leftBarButtonItem.enabled = YES;
     
+    self.isRobotConnected = false;
+    
     [[UIApplication sharedApplication] sendAction:@selector(resignFirstResponder) to:nil from:nil forEvent:nil];
 }
 
@@ -116,7 +126,12 @@ NSTimer *rssiTimer;
     self.navigationItem.leftBarButtonItem.enabled = YES;
     [self.navigationItem.leftBarButtonItem setTitle:@"Disconnect"];
     
+    self.isRobotConnected = true;
+    
     NSLog(@"bleDidConnect");
+    
+    // Immediately dispatch any messages on the message queue
+    [self sendDrawingCommands];
 }
 
 - (void)didReceiveMemoryWarning
@@ -281,30 +296,48 @@ NSTimer *rssiTimer;
     return true;
 }
 
-- (int)sendDrawingCommands:(NSMutableArray*)commands
+
+
+
+- (int)sendDrawingCommands
 {
-    // Main function for sending drawing commands to the arduino
-    int i;
-    int count = (int)[commands count];
-    for (i = 0; i < count; i++)
-    {
-        // Get the current command
-        NSString *singleCommand = [commands objectAtIndex:i];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+        // Main function for sending drawing commands to the arduino
+        int i;
+        int count = (int)[self.messageQueue count];
         
-        // Break appart the current command
         
-        // Send command
-        
-        // Get confirmation of receipt of the command
-        /*
-         if (timeout)
-            return(count - i); // return commands remaining
-         */
-        
-        // Update the tracker information
-        NSLog(@"The element at index %d in the array is: %@", i, singleCommand); // just replace the %@ by %d
-    }
-    return (0);
+        for (i = 0; i < count; i++)
+        {
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.delegate performSelectorOnMainThread:@selector(updateProgress:) withObject:[NSNumber numberWithFloat:(float)i/count] waitUntilDone:YES];
+            });
+
+            // Get the current command
+            NSString *singleCommand = [self.messageQueue objectAtIndex:i];
+            
+            NSString *s;
+            NSData *d;
+            
+            if (singleCommand.length > 16)
+                s = [singleCommand substringToIndex:16];
+            else
+                s = singleCommand;
+            
+            d = [s dataUsingEncoding:NSUTF8StringEncoding];
+            if (bleShield.activePeripheral.state == CBPeripheralStateConnected) {
+                [bleShield write:d];
+
+                NSLog(@"sent");
+                NSLog(s);
+            }
+        }
+
+     });
+    
+    return YES;
+   
 }
 
 @end
