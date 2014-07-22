@@ -130,6 +130,7 @@
 -(UIImage*)mergeImage:(UIImage*)mask overImage:(UIImage*)source inSize:(CGSize)size;
 
 - (cv::Mat)cvMatFromUIImage:(UIImage *)image;
+- (cv::Mat)cvBinFromRGBUIImage:(UIImage *)image colorIn:(int)colorIn;
 - (UIImage *)inverseColor:(UIImage *)image;
 - (void)setLoaderProgress:(NSNumber *)number;
 

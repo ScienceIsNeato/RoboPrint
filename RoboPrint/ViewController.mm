@@ -853,51 +853,55 @@ const int kCannyAperture = 3;
 {
     [self cannyExecuteDoneAction]; // cleanup pencil sketch objects if present
 
-
-    // Create interface with robot
     // TODO if not null - may need to reinitialize
-    
     
     // TODO if not connected
     [self.robotInterface connectToRobot];
-    float sleepTime = 1.0;
-    float interval = 0.0;
     
     self.connectionView.hidden = NO;
-    /*while (!self.robotInterface.isRobotConnected)
-    {
-        [NSThread sleepForTimeInterval:sleepTime];
-        interval+=sleepTime;
-        
-        if (interval > 10.00)
-        {
-            NSLog(@"Slept too long waiting for robot to connect. Breaking.");
-            return;
-        }
-        
-    }*/
     
-    // Initialize and display the progress dialog
-    //progressView = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleDefault];
-    //self.robotInterface.progressView = progressView;
-    //progressView.center = self.connectionView.center;
+    // Make the progress dialog a bit taller than standard
+    // TODO give the progress view a 'analyzing image' state
     [progressView setTransform:CGAffineTransformMakeScale(1.0, 3.0)];
-    //progressView.frame = CGRectMake(self.connectionView.center.x, self.connectionView.center.y, 100, 20);
+    
+    // Add to the connection frame and add a default value
     [self.connectionView addSubview:progressView];
     [progressView setProgress:0.0 animated:NO];
-    for (int i=0; i<1000; i++)
+    
+    // Break the image into the 6 sub-color images
+    std::vector<cv::Mat>binaryImages;
+    //cv::Mat M = SomehowGetMatrix();
+    for (int color = 0; color <= GREEN; color++)
     {
-        //dispatch_async(dispatch_get_main_queue(), ^{
-          //  progressView.progress = (float)i/1000.0;
-        //});
+        // YELLOW     = 0;
+        // RED        = 1;
+        // PINK       = 2;
+        // BLUE       = 3;
+        // BLACK      = 4;
+        // GREEN      = 5;
+        
+        // First, create a single channel binary image of this color
+        cv::Mat binaryMat = [self cvBinFromRGBUIImage:self->canvasImageView.image colorIn:color];
+        
+        // TODO extract image commands for this color channel
+        
+        // Quick test to see if this works
+        if (color == PINK)
+        {
+            self.canvasImageView.image=[self UIImageFromCVMat:binaryMat];
+        }
+
+    }
+    
+    // TODO - send actual image commands
+    // Temporary stand in for actual commands
+    for (int i=0; i<10; i++)
+    {
         
         NSString *strFromInt = [NSString stringWithFormat:@"%d",i];
         [self.robotInterface.messageQueue addObject:strFromInt];
 
     }
-    
-
-    
 }
 
 
@@ -907,6 +911,20 @@ const int kCannyAperture = 3;
     dispatch_async(dispatch_get_main_queue(), ^{
         [progressView setProgress:number.floatValue animated:YES];
     });
+    
+    // Dismiss the dialog
+    if (progressView.progress == 1.0)
+    {
+        self.connectionView.hidden = YES;
+        
+        // Display Done Uploading message
+        NSString *messageString = @"Robot Should Now Be Printing...";
+        
+        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Done Uploading!"
+                                                            message:messageString delegate:self
+                                                  cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+        [alertView show];
+    }
 }
 
 - (IBAction)openSettingsMenu:(id)sender
@@ -1995,6 +2013,83 @@ const int kCannyAperture = 3;
     CGContextRelease(contextRef);
     
     return cvMat;
+}
+
+- (cv::Mat)cvBinFromRGBUIImage:(UIImage *)image colorIn:(int)colorIn
+{
+    // Get the current current color
+    int currentColor = self.model.currentColor;
+    
+    // Temporarily set the color to the input color
+    self.model.currentColor = colorIn;
+    
+    // Get the threshold values
+    float redComponent = self.model.getRed*255;
+    float greenComponent = self.model.getGreen*255;
+    float blueComponent = self.model.getBlue*255;
+    
+    // Initailize out output value
+    cv::Mat binaryOut(image.size.height, image.size.width, CV_8UC1); // 8 bits per component, single channel
+    
+    // TODO - add some buffer room from the input values for backgrounds
+    //float halfRange = 1;
+    
+    if(image == nil)
+    {
+        // TODO add error handling for no input image
+        NSLog(@"You're in trouble, buddy");
+        cv::Mat someNil;
+        return someNil;
+    }
+    
+    // Convert from UIImage (xcode) to Mat (opencv)
+    cv::Mat img=[self cvMatFromUIImage:image];
+
+    // Create pointers to the 4 channel input data and pixel arrays
+    uint8_t* pixelPtr = (uint8_t*)img.data;
+    int cn = img.channels();
+    
+    // Create simple 3 int arrays for the input image pixel data and the threshold values
+    cv::Scalar_<uint8_t> bgrPixel; // input image - determined pixel by pixel
+    cv::Scalar_<uint8_t> inColors; // threshold vals - determined statically below
+    inColors.val[0] = (int)redComponent;
+    inColors.val[1] = (int)greenComponent;
+    inColors.val[2] = (int)blueComponent;
+    
+    // Create pointer to the single hannel output image
+    uint8_t* outBinPtr = (uint8_t*)binaryOut.data;
+    
+    // Cycle through each row in the 4 channel input image
+    for(int i = 0; i < img.rows; i++)
+    {
+        // Cycle through each pixel in each column of this row
+        for(int j = 0; j < img.cols; j++)
+        {
+            // Determine the RGB values of this pixel
+            bgrPixel.val[0] = pixelPtr[i*img.cols*cn + j*cn + 0]; // B
+            bgrPixel.val[1] = pixelPtr[i*img.cols*cn + j*cn + 1]; // G
+            bgrPixel.val[2] = pixelPtr[i*img.cols*cn + j*cn + 2]; // R
+            
+            // Perform thresholding on a match
+            if ((bgrPixel.val[0] == inColors.val[0]) &&
+                (bgrPixel.val[1] == inColors.val[1]) &&
+                (bgrPixel.val[2] == inColors.val[2]))
+
+            {
+                outBinPtr[i*binaryOut.cols + j] = 255;
+            }
+            else
+            {
+                outBinPtr[i*binaryOut.cols + j] = 0;
+            }
+        }
+    }
+
+    // Reset the current color back to the original
+    self.model.currentColor = currentColor;
+    
+    //return the thresholded binary image
+    return binaryOut;
 }
 
 -(UIImage *)UIImageFromCVMat:(cv::Mat)cvMat

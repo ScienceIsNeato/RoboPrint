@@ -311,7 +311,7 @@ NSTimer *rssiTimer;
         {
             
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self.delegate performSelectorOnMainThread:@selector(updateProgress:) withObject:[NSNumber numberWithFloat:(float)i/count] waitUntilDone:YES];
+                [self.delegate performSelectorOnMainThread:@selector(updateProgress:) withObject:[NSNumber numberWithFloat:(float)i/(count-2)] waitUntilDone:YES];
             });
 
             // Get the current command
@@ -333,6 +333,8 @@ NSTimer *rssiTimer;
                 NSLog(s);
             }
         }
+        // Clear the queue
+        [self.messageQueue removeAllObjects];
 
      });
     
