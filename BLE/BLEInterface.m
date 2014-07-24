@@ -329,8 +329,8 @@ NSTimer *rssiTimer;
             if (bleShield.activePeripheral.state == CBPeripheralStateConnected) {
                 [bleShield write:d];
 
-                NSLog(@"sent");
-                NSLog(s);
+                NSLog(@"sent%@",@"s");
+                //NSLog(s);
             }
         }
         // Clear the queue
@@ -341,5 +341,16 @@ NSTimer *rssiTimer;
     return YES;
    
 }
+
+- (BOOL)testDrawingCommands:(float *)startX startY:(float *)startY 
+{
+    /* This function serves as a testbed for the robot. It will be removed in the final release.
+     It will take in motor controller commands and convert them into an image. This should give 
+     us a very good idea of how the algorithm breaks down the image into commands.*/
+    
+    return true;
+    
+}
+
 
 @end

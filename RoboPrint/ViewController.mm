@@ -883,12 +883,32 @@ const int kCannyAperture = 3;
         // First, create a single channel binary image of this color
         cv::Mat binaryMat = [self cvBinFromRGBUIImage:self->canvasImageView.image colorIn:color];
         
+        // Get dot skeleton for this channel
+        
         // TODO extract image commands for this color channel
         
         // Quick test to see if this works
-        if (color == PINK)
+        if (color == RED)
         {
-            self.canvasImageView.image=[self UIImageFromCVMat:binaryMat];
+            NSMutableArray *dotSkel = [self cvDotSkeletonFromBinaryImage:binaryMat ignoreRadius:(2)];
+            self.model.currentColor = BLUE;
+            
+            // BEGIN TEMP make image white
+            UIImage *shape =  [self addFilledCircle:self.canvasImageView.image radius:800 origin:(shapeOrigin)];
+            self->canvasImageView.image = [self mergeImage:shape overImage:shape inSize:CGSizeMake(canvasImageView.frame.size.height, canvasImageView.frame.size.width)];
+            [self updateImageStack];
+            // END TEMP make image white
+            
+            for(int ii = 0; ii < dotSkel.count -1; ii++)
+            {
+                // BEGIN TEMP show dot skeleton
+                CGPoint pointRestored = [[dotSkel objectAtIndex :ii ] CGPointValue];
+                UIImage *shape =  [self addLine:self.canvasImageView.image P1:pointRestored P2:pointRestored];
+                self->canvasImageView.image = [self mergeImage:shape overImage:self.canvasImageView.image inSize:CGSizeMake(canvasImageView.frame.size.height, canvasImageView.frame.size.width)];
+                // Update image stack
+                [self updateImageStack];
+            }
+            //self.canvasImageView.image=[self UIImageFromCVMat:binaryMat];
         }
 
     }
@@ -903,6 +923,7 @@ const int kCannyAperture = 3;
 
     }
 }
+
 
 
 - (void)updateProgress:(NSNumber *)number
@@ -1684,6 +1705,22 @@ const int kCannyAperture = 3;
     
     return tempShape;
 }
+
+-(UIImage *)addFilledCircle:(UIImage *)img radius:(CGFloat)radius origin:(CGPoint)origin
+{
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(canvasImageView.frame.size.width,canvasImageView.frame.size.height), NO, 1);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    
+    CGContextSetRGBStrokeColor(context, self.model.getRed, self.model.getGreen, self.model.getBlue, 1.0f);
+    CGContextSetRGBFillColor(context, 1.0f, 1.0f, 1.0f, 1.0f);
+    CGContextStrokeEllipseInRect(context, CGRectMake((origin.x+radius), (origin.y+radius), 2*radius, 2*radius));
+    CGContextStrokeEllipseInRect(context, CGRectMake((origin.x+radius+1), (origin.y+radius+1), 2*radius-2, 2*radius-2));
+    
+    UIImage *tempShape = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return tempShape;
+}
 /***************** BEGIN TEXT HANDLING ********************/
 
 - (BOOL)textFieldShouldBeginEditing:(UITextField *)textFieldIn{
@@ -1976,7 +2013,7 @@ const int kCannyAperture = 3;
     CGFloat rows = image.size.height;
     
     cv::Mat cvMat(rows, cols, CV_8UC4); // 8 bits per component, 4 channels (color channels + alpha)
-    
+    // TODO fix warning message here
     CGContextRef contextRef = CGBitmapContextCreate(cvMat.data,                 // Pointer to  data
                                                     cols,                       // Width of bitmap
                                                     rows,                       // Height of bitmap
@@ -1999,7 +2036,7 @@ const int kCannyAperture = 3;
     CGFloat rows = image.size.height;
     
     cv::Mat cvMat(rows, cols, CV_8UC1); // 8 bits per component, 1 channels
-    
+    // TODO fix possible warning message here
     CGContextRef contextRef = CGBitmapContextCreate(cvMat.data,                 // Pointer to data
                                                     cols,                       // Width of bitmap
                                                     rows,                       // Height of bitmap
@@ -2090,6 +2127,90 @@ const int kCannyAperture = 3;
     
     //return the thresholded binary image
     return binaryOut;
+}
+
+- (NSMutableArray *)cvDotSkeletonFromBinaryImage:(cv::Mat)binImageIn ignoreRadius:(int)ignoreRadius
+{
+    /* This function goes through a binary image and generates a dot skeleton of the image
+     
+     @param: binImage - a binary image created from one of the color channels
+     @param: ignoreRadius - radius around found dot for which to ignore other pixels
+     
+     returns - an array of skeleton points
+     */
+    
+    // make copy of the input image
+    cv::Mat binImage = binImageIn.clone();
+    
+    int rows = binImage.rows;
+    int cols = binImage.cols;
+    
+    // Create pointers to the single channel input data array
+    uint8_t* dataPtr = (uint8_t*)binImage.data;
+    
+    // initialize return value
+    NSMutableArray *dotSkeletonPoints = [[NSMutableArray alloc]init]; int arrayCount = 0;
+    
+    int leftEdge = 0; // initialize search area
+    int rightEdge = 0;
+    int bottomEdge = 0;
+    
+    // Cycle through each row in the 4 channel input image
+    for(int i = 0; i < rows; i++)
+    {
+        // Cycle through each pixel in each column of this row
+        for(int j = 0; j < cols; j++)
+        {
+
+            
+            // Search for lit pixels
+            if(dataPtr[i*cols + j] == 255)
+                
+            {
+                NSLog(@"pixel value at (j,i) = (%i,%i) is %i",j,i, dataPtr[i*cols + j]);
+
+                CGPoint cgpoint = CGPointMake(j, i); // Create the CGPoint (x,y = j,i)
+                NSValue *cgpointObj = [NSValue valueWithCGPoint:cgpoint]; // cast point into object
+                
+                // Add to dot skeleton return vector
+                [dotSkeletonPoints insertObject:cgpointObj atIndex:arrayCount++];
+                
+                // Erase nearby pixels in original image (only need to bother with area below this pixel)
+                // First, determine bounds
+                leftEdge = j - ignoreRadius;
+                rightEdge = j + ignoreRadius;
+                bottomEdge = i + ignoreRadius;
+                if(leftEdge < 0) leftEdge = 0;
+                if(rightEdge > cols - 1) rightEdge = cols - 1;
+                if(bottomEdge > rows - 1) bottomEdge = rows - 1;
+                
+                // Then cycle through nearby image
+                for(int i_prime = i; i_prime < bottomEdge; i_prime++)
+                {
+                    for (int j_prime = leftEdge; j_prime < rightEdge; j_prime++)
+                    {
+                        // Erase lit pixel nearby
+                        
+                        //NSLog(@"before erase val is %i", dataPtr[i*cols + j]);
+                        dataPtr[i_prime*cols + j_prime] =0;
+                        //NSLog(@"after erase val is %i", dataPtr[i*cols + j]);
+                    }
+                }
+                        
+            }
+            //else
+            //{
+            //    NSLog(@"found NOT lit pixel at (j,i) = (%i,%i)",j,i);
+            //}
+            
+        }
+    }
+    
+    int keeptrackwhereIam;
+    
+    NSLog(@" found that %i of %i pixels are lit",arrayCount,rows*cols);
+    return dotSkeletonPoints;
+    
 }
 
 -(UIImage *)UIImageFromCVMat:(cv::Mat)cvMat

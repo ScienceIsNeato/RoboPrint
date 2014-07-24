@@ -132,7 +132,7 @@
 - (cv::Mat)cvMatFromUIImage:(UIImage *)image;
 - (cv::Mat)cvBinFromRGBUIImage:(UIImage *)image colorIn:(int)colorIn;
 - (UIImage *)inverseColor:(UIImage *)image;
-- (void)setLoaderProgress:(NSNumber *)number;
+//- (void)setLoaderProgress:(NSNumber *)number;
 
 
 @end
